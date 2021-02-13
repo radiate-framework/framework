@@ -1,0 +1,67 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\Http\Request;
+use Radiate\Routing\Controller;
+
+class {{ class }} extends Controller
+{
+    /**
+     * Show multiple resources
+     *
+     * @param \Radiate\Http\Request $request
+     * @return mixed
+     */
+    public function index(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Show a resource
+     *
+     * @param \Radiate\Http\Request $request
+     * @param int $id
+     * @return mixed
+     */
+    public function show(Request $request, int $id)
+    {
+        //
+    }
+
+    /**
+     * Store a new resource
+     *
+     * @param \Radiate\Http\Request $request
+     * @return mixed
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Update a resource
+     *
+     * @param \Radiate\Http\Request $request
+     * @param int $id
+     * @return mixed
+     */
+    public function update(Request $request, int $id)
+    {
+        //
+    }
+
+    /**
+     * Delete a resource
+     *
+     * @param \Radiate\Http\Request $request
+     * @param int $id
+     * @return mixed
+     */
+    public function destroy(Request $request, int $id)
+    {
+        //
+    }
+}

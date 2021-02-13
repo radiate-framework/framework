@@ -1,0 +1,28 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\Mail\Mailable;
+
+class {{ class }} extends Mailable
+{
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Build the message.
+     *
+     * @return \Radiate\Mail\Mailable
+     */
+    public function build(): self
+    {
+        return $this->markdown('emails.message');
+    }
+}

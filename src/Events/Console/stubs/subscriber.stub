@@ -1,0 +1,19 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\Events\Dispatcher;
+
+class {{ class }}
+{
+    /**
+     * Register the listeners for the subscriber.
+     *
+     * @param \Radiate\Events\Dispatcher $events
+     * @return void
+     */
+    public function subscribe(Dispatcher $events): void
+    {
+        //
+    }
+}

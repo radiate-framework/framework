@@ -1,0 +1,18 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\Events\Dispatchable;
+
+class {{ class }}
+{
+    use Dispatchable;
+
+    /**
+     * Assign the event arguments.
+     */
+    public function __construct()
+    {
+        //
+    }
+}

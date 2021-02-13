@@ -1,0 +1,20 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\Http\Request;
+use Radiate\Routing\Controller;
+
+class {{ class }} extends Controller
+{
+    /**
+     * Handle the controller action
+     *
+     * @param \Radiate\Http\Request $request
+     * @return mixed
+     */
+    public function __invoke(Request $request)
+    {
+        //
+    }
+}

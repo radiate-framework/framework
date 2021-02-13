@@ -1,0 +1,24 @@
+<?php
+
+namespace {{ namespace }};
+
+class {{ class }}
+{
+    /**
+     * Create the event listener.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the event.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        //
+    }
+}

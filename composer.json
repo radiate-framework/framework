@@ -1,0 +1,23 @@
+{
+  "name": "brw/radiate-framework",
+  "description": "A WordPress plugin and theme framework",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Ben Rutland",
+      "email": "info@benrutlandweb.co.uk"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "Radiate\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^7.3",
+    "psr/container": "^1.0",
+    "erusev/parsedown": "^1.7"
+  }
+}
