@@ -1,3 +1,5 @@
+![Radiate](social-preview.png)
+
 # Radiate Framework
 
 A WordPress plugin and theme framework
