@@ -2,17 +2,14 @@
 
 namespace Radiate\Foundation;
 
-use Radiate\Auth\AuthServiceProvider;
 use Radiate\Container\Container;
 use Radiate\Events\EventServiceProvider;
 use Radiate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Radiate\Foundation\Providers\ConsoleServiceProvider;
 use Radiate\Filesystem\FilesystemServiceProvider;
 use Radiate\Http\Request;
-use Radiate\Routing\RoutingServiceProvider;
 use Radiate\Support\Facades\Facade;
 use Radiate\Support\Pipeline;
-use Radiate\View\ViewServiceProvider;
 use RuntimeException;
 use Throwable;
 
@@ -105,11 +102,8 @@ class Application extends Container
      */
     protected function registerCoreProviders()
     {
-        $this->register(AuthServiceProvider::class);
         $this->register(EventServiceProvider::class);
         $this->register(FilesystemServiceProvider::class);
-        $this->register(RoutingServiceProvider::class);
-        $this->register(ViewServiceProvider::class);
 
         if ($this->runningInConsole()) {
             $this->register(ConsoleServiceProvider::class);
