@@ -179,7 +179,7 @@ class Stringable
         $key = $this->string;
 
         if (isset(static::$camelCache[$key])) {
-            return static::$camelCache[$key];
+            return new static(static::$camelCache[$key]);
         }
 
         static::$camelCache[$key] = lcfirst($this->studly($key));
@@ -717,7 +717,7 @@ class Stringable
         $key = $this->string;
 
         if (isset(static::$snakeCache[$key][$delimiter])) {
-            return static::$snakeCache[$key][$delimiter];
+            return new static(static::$snakeCache[$key][$delimiter]);
         }
 
         if (!ctype_lower($key)) {
@@ -758,7 +758,7 @@ class Stringable
         $key = $this->string;
 
         if (isset(static::$studlyCache[$key])) {
-            return static::$studlyCache[$key];
+            return new static(static::$studlyCache[$key]);
         }
 
         $value = ucwords(str_replace(['-', '_'], ' ', $key));
