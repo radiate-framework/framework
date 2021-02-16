@@ -1,0 +1,42 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\WordPress\Cpt;
+
+class {{ class }} extends Cpt
+{
+    /**
+     * The post type
+     *
+     * @var string
+     */
+    protected $name = '{{ name }}';
+
+    /**
+     * The post type singular
+     *
+     * @var string
+     */
+    protected $singular = '{{ singular }}';
+
+    /**
+     * The post type plural
+     *
+     * @var string
+     */
+    protected $plural = '{{ plural }}';
+
+    /**
+     * Options for post type registration
+     *
+     * @var array
+     */
+    protected $options = [
+        'public'       => true,
+        'has_archive'  => true,
+        'show_in_rest' => true,
+        'menu_icon'    => 'dashicons-admin-post',
+        'supports'     => ['title', 'editor', 'author', 'thumbnail'],
+    ];
+}

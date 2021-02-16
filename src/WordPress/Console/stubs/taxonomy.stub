@@ -1,0 +1,41 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\WordPress\Taxonomy;
+
+class {{ class }} extends Taxonomy
+{
+    /**
+     * The taxonomy name
+     *
+     * @var string
+     */
+    protected $name = '{{ name }}';
+
+    /**
+     * The taxonomy singular
+     *
+     * @var string
+     */
+    protected $singular = '{{ singular }}';
+
+    /**
+     * The taxonomy plural
+     *
+     * @var string
+     */
+    protected $plural = '{{ plural }}';
+
+    /**
+     * Options for taxonomy registration
+     *
+     * @var array
+     */
+    protected $options = [
+        'public'            => true,
+        'hierarchical'      => true,
+        'show_admin_column' => true,
+        'show_in_rest'      => true,
+    ];
+}
