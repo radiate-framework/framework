@@ -7,28 +7,37 @@ use Radiate\WordPress\Cpt;
 class {{ class }} extends Cpt
 {
     /**
-     * The post type
+     * The name
      *
      * @var string
      */
     protected $name = '{{ name }}';
 
     /**
-     * The post type singular
+     * The singular label
      *
      * @var string
      */
     protected $singular = '{{ singular }}';
 
     /**
-     * The post type plural
+     * The plural label
      *
      * @var string
      */
     protected $plural = '{{ plural }}';
 
     /**
-     * Options for post type registration
+     * The taxonomies
+     *
+     * @var array
+     */
+    protected $taxonomies = [
+        //
+    ];
+
+    /**
+     * The options
      *
      * @var array
      */

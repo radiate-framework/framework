@@ -5,42 +5,97 @@ namespace Radiate\WordPress;
 abstract class Cpt
 {
     /**
-     * The post type
+     * The name
      *
      * @var string
      */
     protected $name;
 
     /**
-     * The post type singular
+     * The singular label
      *
      * @var string
      */
     protected $singular;
 
     /**
-     * The post type plural
+     * The plural label
      *
      * @var string
      */
     protected $plural;
 
     /**
-     * Options for post type registration
+     * The taxonomies
+     *
+     * @var array
+     */
+    protected $taxonomies = [];
+
+    /**
+     * The registered taxonomies
+     *
+     * @var array
+     */
+    protected $registeredTaxonomies = [];
+
+    /**
+     * The options
      *
      * @var array
      */
     protected $options = [];
 
     /**
+     * Register the post type and taxonomies
+     */
+    public function __construct()
+    {
+        $this->register();
+        $this->registerTaxonomies();
+    }
+
+    /**
      * Register the post type
      *
-     * @return static
+     * @return void
      */
-    public function register()
+    protected function register()
     {
-        $p = $this->plural;
+        register_post_type($this->name(), $this->options());
+    }
+
+    /**
+     * Register the taxonomies
+     *
+     * @return void
+     */
+    protected function registerTaxonomies()
+    {
+        foreach ($this->taxonomies as $taxonomy) {
+            $this->registeredTaxonomies[$taxonomy] = new $taxonomy($this);
+        }
+    }
+
+    /**
+     * Get the post type name
+     *
+     * @return string
+     */
+    public function name()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get the post type options
+     *
+     * @return array
+     */
+    public function options()
+    {
         $s = $this->singular;
+        $p = $this->plural;
 
         $labels = [
             'name'                  => __($p),
@@ -48,11 +103,11 @@ abstract class Cpt
             'all_items'             => __("All {$p}"),
             'archives'              => __("{$s} Archives"),
             'attributes'            => __("{$s} Attributes"),
-            'insert_into_item'      => __("Insert into {$s}"),
-            'uploaded_to_this_item' => __("Uploaded to this {$s}"),
-            'filter_items_list'     => __("Filter {$p} list"),
-            'items_list_navigation' => __("{$p} list navigation"),
-            'items_list'            => __("{$p} list"),
+            'insert_into_item'      => __("Insert Into {$s}"),
+            'uploaded_to_this_item' => __("Uploaded To This {$s}"),
+            'filter_items_list'     => __("Filter {$p} List"),
+            'items_list_navigation' => __("{$p} List Navigation"),
+            'items_list'            => __("{$p} List"),
             'new_item'              => __("New {$s}"),
             'add_new'               => __("Add New"),
             'add_new_item'          => __("Add New {$s}"),
@@ -60,27 +115,24 @@ abstract class Cpt
             'view_item'             => __("View {$s}"),
             'view_items'            => __("View {$p}"),
             'search_items'          => __("Search {$p}"),
-            'not_found'             => __("No {$p} found"),
-            'not_found_in_trash'    => __("No {$p} found in trash"),
+            'not_found'             => __("No {$p} Found"),
+            'not_found_in_trash'    => __("No {$p} Found In Trash"),
             'parent_item_colon'     => __("Parent {$s}:"),
             'menu_name '            => __($p),
         ];
 
-        register_post_type(
-            $this->name,
-            array_merge(['labels' => $labels], $this->options)
-        );
-
-        return $this;
+        return array_merge($this->options, [
+            'labels' => array_merge($labels, $this->labels()),
+        ]);
     }
 
     /**
-     * Get the cpt name
+     * Return the post type labels
      *
-     * @return string
+     * @return array
      */
-    public function name()
+    public function labels()
     {
-        return $this->name;
+        return [];
     }
 }

@@ -20,12 +20,8 @@ class CptServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        foreach ($this->postTypes as $postType => $taxonomies) {
-            $cpt = call_user_func([new $postType(), 'register']);
-
-            foreach (array_unique($taxonomies) as $taxonomy) {
-                call_user_func([new $taxonomy($cpt), 'register']);
-            }
+        foreach ($this->postTypes as $postType) {
+            new $postType();
         }
     }
 }

@@ -5,59 +5,102 @@ namespace Radiate\WordPress;
 abstract class Taxonomy
 {
     /**
-     * The taxonomy name
+     * The name
      *
      * @var string
      */
     protected $name;
 
     /**
-     * The taxonomy singular
+     * The singular label
      *
      * @var string
      */
     protected $singular;
 
     /**
-     * The taxonomy plural
+     * The plural label
      *
      * @var string
      */
     protected $plural;
 
     /**
-     * The post type
-     *
-     * @var \Radiate\WordPress\Cpt
-     */
-    protected $cpt;
-
-    /**
-     * Options for taxonomy registration
+     * The options
      *
      * @var array
      */
     protected $options = [];
 
     /**
-     * Register the post type
+     * The post type
      *
-     * @param string $cpt
+     * @var \Radiate\WordPress\Cpt
      */
-    public function __construct(Cpt $cpt)
+    protected $postType;
+
+    /**
+     * Register the taxonomy
+     *
+     * @var \Radiate\WordPress\Cpt
+     */
+    public function __construct(Cpt $postType)
     {
-        $this->cpt = $cpt;
+        $this->postType = $postType;
+
+        $this->register();
     }
 
     /**
-     * Register the post type
+     * Register the taxonomy
      *
-     * @return static
+     * @return void
      */
-    public function register()
+    protected function register()
     {
-        $p = $this->plural;
+        if ($this->exists()) {
+            register_taxonomy_for_object_type(
+                $this->name(),
+                $this->postType->name()
+            );
+        } else {
+            register_taxonomy(
+                $this->name(),
+                $this->postType->name(),
+                $this->options()
+            );
+        }
+    }
+
+    /**
+     * Determine if the taxonomy already exists
+     *
+     * @return bool
+     */
+    protected function exists()
+    {
+        return taxonomy_exists($this->name());
+    }
+
+    /**
+     * Get the taxonomy name
+     *
+     * @return string
+     */
+    public function name()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get the taxonomy options
+     *
+     * @return array
+     */
+    public function options()
+    {
         $s = $this->singular;
+        $p = $this->plural;
 
         $labels = [
             'name'                       => __($p),
@@ -72,37 +115,29 @@ abstract class Taxonomy
             'update_item'                => __("Update {$s}"),
             'add_new_item'               => __("Add New {$s}"),
             'new_item_name'              => __("New {$s} Name"),
-            'separate_items_with_commas' => __("Separate {$p} with commas"),
-            'add_or_remove_items'        => __("Add or remove {$p}"),
-            'choose_from_most_used'      => __("Choose from the most used {$p}"),
-            'not_found'                  => __("No {$p} found"),
+            'separate_items_with_commas' => __("Separate {$p} With Commas"),
+            'add_or_remove_items'        => __("Add Or Remove {$p}"),
+            'choose_from_most_used'      => __("Choose From The Most Used {$p}"),
+            'not_found'                  => __("No {$p} Found"),
             'no_terms'                   => __("No {$p}"),
-            'items_list_navigation'      => __("{$p} list navigation"),
-            'items_list'                 => __("{$p} list"),
+            'items_list_navigation'      => __("{$p} List Navigation"),
+            'items_list'                 => __("{$p} List"),
             'most_used'                  => __('Most Used'),
-            'back_to_items'              => __("&larr; Go to {$p}"),
+            'back_to_items'              => __("&larr; Go To {$p}"),
         ];
 
-        if (taxonomy_exists($this->name)) {
-            register_taxonomy_for_object_type($this->name, $this->cpt->name());
-        } else {
-            register_taxonomy(
-                $this->name,
-                $this->cpt->name(),
-                array_merge(['labels' => $labels], $this->options)
-            );
-        }
-
-        return $this;
+        return array_merge($this->options, [
+            'labels' => array_merge($labels, $this->labels()),
+        ]);
     }
 
     /**
-     * Get the taxonomy name
+     * Return the post type labels
      *
-     * @return string
+     * @return array
      */
-    public function name()
+    public function labels()
     {
-        return $this->name;
+        return [];
     }
 }
