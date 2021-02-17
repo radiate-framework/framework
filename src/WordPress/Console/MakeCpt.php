@@ -30,15 +30,55 @@ class MakeCpt extends GeneratorCommand
     protected $description = 'Make a custom post type';
 
     /**
+     * Reserved post types that cannot be used for generation.
+     *
+     * @var array
+     */
+    protected $reservedPostTypes = [
+        'post',
+        'page',
+        'attachment',
+        'revision',
+        'nav_menu_item',
+        'custom_css',
+        'customize_changeset',
+        'oembed_cache',
+        'user_request',
+        'wp_block',
+        'action',
+        'author',
+        'order',
+        'theme',
+    ];
+
+    /**
      * Call the parent handler and then flush rewrite rules
      *
      * @return void
      */
     protected function handle()
     {
+        // First we need to ensure that the given name is not a reserved word within WordPress.
+        if ($this->isReservedPostType($name = Str::snake($this->getNameInput()))) {
+            $this->error('The name "' . $name . '" is reserved by WordPress.');
+
+            return;
+        }
+
         parent::handle();
 
         flush_rewrite_rules();
+    }
+
+    /**
+     * Checks whether the given name is reserved.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function isReservedPostType(string $name)
+    {
+        return in_array($name, $this->reservedPostTypes);
     }
 
     /**

@@ -20,8 +20,10 @@ class CptServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        foreach ($this->postTypes as $postType) {
-            new $postType();
-        }
+        $this->app['events']->listen('init', function () {
+            foreach ($this->postTypes as $postType) {
+                new $postType();
+            }
+        });
     }
 }

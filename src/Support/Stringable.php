@@ -179,7 +179,7 @@ class Stringable
         $key = $this->string;
 
         if (isset(static::$camelCache[$key])) {
-            return static::$camelCache[$key];
+            return new static(static::$camelCache[$key]);
         }
 
         static::$camelCache[$key] = lcfirst($this->studly($key));
@@ -717,7 +717,7 @@ class Stringable
         $key = $this->string;
 
         if (isset(static::$snakeCache[$key][$delimiter])) {
-            return static::$snakeCache[$key][$delimiter];
+            return new static(static::$snakeCache[$key][$delimiter]);
         }
 
         if (!ctype_lower($key)) {
@@ -726,7 +726,7 @@ class Stringable
             $value = mb_strtolower(preg_replace('/(.)(?=[A-Z])/u', '$1' . $delimiter, $value));
         }
 
-        static::$snakeCache[$key][$delimiter] = $value;
+        static::$snakeCache[$key][$delimiter] = $value ?? $this->string;
 
         return new static(static::$snakeCache[$key][$delimiter]);
     }
@@ -758,7 +758,7 @@ class Stringable
         $key = $this->string;
 
         if (isset(static::$studlyCache[$key])) {
-            return static::$studlyCache[$key];
+            return new static(static::$studlyCache[$key]);
         }
 
         $value = ucwords(str_replace(['-', '_'], ' ', $key));
@@ -834,7 +834,7 @@ class Stringable
      * Call the given Closure with this instance then return the instance.
      *
      * @param  callable  $callback
-     * @return mixed
+     * @return static
      */
     public function tap(callable $callback)
     {
