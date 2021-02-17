@@ -726,7 +726,7 @@ class Stringable
             $value = mb_strtolower(preg_replace('/(.)(?=[A-Z])/u', '$1' . $delimiter, $value));
         }
 
-        static::$snakeCache[$key][$delimiter] = $value;
+        static::$snakeCache[$key][$delimiter] = $value ?? $this->string;
 
         return new static(static::$snakeCache[$key][$delimiter]);
     }
@@ -834,7 +834,7 @@ class Stringable
      * Call the given Closure with this instance then return the instance.
      *
      * @param  callable  $callback
-     * @return mixed
+     * @return static
      */
     public function tap(callable $callback)
     {
