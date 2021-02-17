@@ -7,28 +7,28 @@ use Radiate\WordPress\Taxonomy;
 class {{ class }} extends Taxonomy
 {
     /**
-     * The taxonomy name
+     * The name
      *
      * @var string
      */
     protected $name = '{{ name }}';
 
     /**
-     * The taxonomy singular
+     * The singular label
      *
      * @var string
      */
     protected $singular = '{{ singular }}';
 
     /**
-     * The taxonomy plural
+     * The plural label
      *
      * @var string
      */
     protected $plural = '{{ plural }}';
 
     /**
-     * Options for taxonomy registration
+     * The options
      *
      * @var array
      */
