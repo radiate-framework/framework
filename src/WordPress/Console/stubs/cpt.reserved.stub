@@ -1,0 +1,34 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\WordPress\Cpt;
+
+/**
+ * -----------------------------------------------------------------------------
+ *  WordPress Reserved Post Type
+ * -----------------------------------------------------------------------------
+ *
+ *  This post type is reserved by WordPress however you can still add
+ *  custom taxonomies to the default post type.
+ *
+ */
+
+class {{ class }} extends Cpt
+{
+    /**
+     * The name
+     *
+     * @var string
+     */
+    protected $name = '{{ name }}';
+
+    /**
+     * The taxonomies
+     *
+     * @var array
+     */
+    protected $taxonomies = [
+        //
+    ];
+}

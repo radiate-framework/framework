@@ -1,0 +1,25 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\WordPress\Taxonomy;
+
+/**
+ * -----------------------------------------------------------------------------
+ *  WordPress Reserved Taxonomy
+ * -----------------------------------------------------------------------------
+ *
+ *  This taxonomy is reserved by WordPress however you can still register
+ *  it on custom post types.
+ *
+ */
+
+class {{ class }} extends Taxonomy
+{
+    /**
+     * The name
+     *
+     * @var string
+     */
+    protected $name = '{{ name }}';
+}

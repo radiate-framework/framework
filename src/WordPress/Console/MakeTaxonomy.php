@@ -42,7 +42,6 @@ class MakeTaxonomy extends GeneratorCommand
         'author_name',
         'calendar',
         'cat',
-        'category',
         'category__and',
         'category__in',
         'category__not_in',
@@ -86,7 +85,6 @@ class MakeTaxonomy extends GeneratorCommand
         'post_format',
         'post_mime_type',
         'post_status',
-        'post_tag',
         'post_type',
         'posts',
         'posts_per_archive_page',
@@ -124,6 +122,16 @@ class MakeTaxonomy extends GeneratorCommand
     ];
 
     /**
+     * Reserved taxonomies that cannot be used for generation.
+     *
+     * @var array
+     */
+    protected $specialTaxonomies = [
+        'category',
+        'post_tag',
+    ];
+
+    /**
      * Call the parent handler and then flush rewrite rules
      *
      * @return void
@@ -151,6 +159,17 @@ class MakeTaxonomy extends GeneratorCommand
     protected function isReservedTaxonomy(string $name)
     {
         return in_array($name, $this->reservedTaxonomies);
+    }
+
+    /**
+     * Checks whether the given name is a pre-registered taxonomy.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function isSpecialTaxonomy(string $name)
+    {
+        return in_array($name, $this->specialTaxonomies);
     }
 
     /**
@@ -182,6 +201,10 @@ class MakeTaxonomy extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->isSpecialTaxonomy(Str::snake($this->getNameInput()))) {
+            return __DIR__ . '/stubs/taxonomy.reserved.stub';
+        }
+
         return __DIR__ . '/stubs/taxonomy.stub';
     }
 

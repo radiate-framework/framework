@@ -35,9 +35,6 @@ class MakeCpt extends GeneratorCommand
      * @var array
      */
     protected $reservedPostTypes = [
-        'post',
-        'page',
-        'attachment',
         'revision',
         'nav_menu_item',
         'custom_css',
@@ -52,13 +49,23 @@ class MakeCpt extends GeneratorCommand
     ];
 
     /**
+     * Special post types have a trimmed down class
+     *
+     * @var array
+     */
+    protected $specialPostTypes = [
+        'post',
+        'page',
+        'attachment',
+    ];
+
+    /**
      * Call the parent handler and then flush rewrite rules
      *
      * @return void
      */
     protected function handle()
     {
-        // First we need to ensure that the given name is not a reserved word within WordPress.
         if ($this->isReservedPostType($name = Str::snake($this->getNameInput()))) {
             $this->error('The name "' . $name . '" is reserved by WordPress.');
 
@@ -79,6 +86,17 @@ class MakeCpt extends GeneratorCommand
     protected function isReservedPostType(string $name)
     {
         return in_array($name, $this->reservedPostTypes);
+    }
+
+    /**
+     * Checks whether the given name is reserved.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function isSpecialPostType(string $name)
+    {
+        return in_array($name, $this->specialPostTypes);
     }
 
     /**
@@ -110,6 +128,10 @@ class MakeCpt extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->isSpecialPostType(Str::snake($this->getNameInput()))) {
+            return __DIR__ . '/stubs/cpt.reserved.stub';
+        }
+
         return __DIR__ . '/stubs/cpt.stub';
     }
 
