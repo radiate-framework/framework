@@ -65,7 +65,19 @@ abstract class Cpt
      */
     protected function register()
     {
-        register_post_type($this->name(), $this->options());
+        if (!$this->exists()) {
+            register_post_type($this->name(), $this->options());
+        }
+    }
+
+    /**
+     * Determine if the post type already exists
+     *
+     * @return bool
+     */
+    protected function exists()
+    {
+        return post_type_exists($this->name());
     }
 
     /**
