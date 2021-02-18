@@ -24,7 +24,8 @@ class WordPressServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->commands([
-            \Radiate\WordPress\Console\MakeCpt::class,
+            \Radiate\WordPress\Console\MakePostType::class,
+            \Radiate\WordPress\Console\MakeShortcode::class,
             \Radiate\WordPress\Console\MakeTaxonomy::class,
         ]);
     }

@@ -35,16 +35,16 @@ abstract class Taxonomy
     /**
      * The post type
      *
-     * @var \Radiate\WordPress\Cpt
+     * @var \Radiate\WordPress\PostType
      */
     protected $postType;
 
     /**
      * Register the taxonomy
      *
-     * @var \Radiate\WordPress\Cpt
+     * @var \Radiate\WordPress\PostType
      */
-    public function __construct(Cpt $postType)
+    public function __construct(PostType $postType)
     {
         $this->postType = $postType;
 

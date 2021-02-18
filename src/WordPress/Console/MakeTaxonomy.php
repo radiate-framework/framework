@@ -216,6 +216,6 @@ class MakeTaxonomy extends GeneratorCommand
      */
     protected function getDefaultNamespace(string $rootNamespace)
     {
-        return $rootNamespace . '\\Cpts\\Taxonomies';
+        return $rootNamespace . '\\WordPress\\Taxonomies';
     }
 }

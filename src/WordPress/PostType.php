@@ -2,10 +2,7 @@
 
 namespace Radiate\WordPress;
 
-use Radiate\WordPress\Core\Category;
-use Radiate\WordPress\Core\PostTag;
-
-abstract class Cpt
+abstract class PostType
 {
     /**
      * The name
@@ -90,10 +87,6 @@ abstract class Cpt
         foreach ($this->taxonomies as $taxonomy) {
             if (class_exists($taxonomy)) {
                 $this->registeredTaxonomies[$taxonomy] = new $taxonomy($this);
-            } elseif ($taxonomy === 'category') {
-                $this->registeredTaxonomies[$taxonomy] = new Category($this);
-            } elseif ($taxonomy === 'post_tag') {
-                $this->registeredTaxonomies[$taxonomy] = new PostTag($this);
             }
         }
     }
