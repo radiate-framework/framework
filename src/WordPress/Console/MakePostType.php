@@ -20,7 +20,7 @@ class MakePostType extends GeneratorCommand
      * @var string
      */
     protected $signature = 'make:posttype {name : The name of the post type}
-                                           {--force : Overwrite the post type if it exists}';
+                                          {--force : Overwrite the post type if it exists}';
 
     /**
      * The command description.
