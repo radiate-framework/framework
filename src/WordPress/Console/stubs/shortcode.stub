@@ -1,0 +1,34 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\WordPress\Shortcode;
+
+class {{ class }} extends Shortcode
+{
+    /**
+     * The shortcode name
+     *
+     * @var string
+     */
+    protected $name = '{{ name }}';
+
+    /**
+     * An array of allowed attributes and defaults
+     *
+     * @var array
+     */
+    protected $defaultAttributes = [
+        //
+    ];
+
+    /**
+     * handle the shortcode
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        //
+    }
+}

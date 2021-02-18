@@ -5,29 +5,29 @@ namespace Radiate\WordPress\Console;
 use Radiate\Console\GeneratorCommand;
 use Radiate\Support\Facades\Str;
 
-class MakeCpt extends GeneratorCommand
+class MakePostType extends GeneratorCommand
 {
     /**
      * The type of class being generated.
      *
      * @var string
      */
-    protected $type = 'Cpt';
+    protected $type = 'PostType';
 
     /**
      * The command signature.
      *
      * @var string
      */
-    protected $signature = 'make:cpt {name : The name of the custom post type}
-                                     {--force : Overwrite the cpt if it exists}';
+    protected $signature = 'make:posttype {name : The name of the post type}
+                                           {--force : Overwrite the post type if it exists}';
 
     /**
      * The command description.
      *
      * @var string
      */
-    protected $description = 'Make a custom post type';
+    protected $description = 'Make a post type';
 
     /**
      * Reserved post types that cannot be used for generation.
@@ -129,10 +129,10 @@ class MakeCpt extends GeneratorCommand
     protected function getStub()
     {
         if ($this->isSpecialPostType(Str::snake($this->getNameInput()))) {
-            return __DIR__ . '/stubs/cpt.reserved.stub';
+            return __DIR__ . '/stubs/posttype.reserved.stub';
         }
 
-        return __DIR__ . '/stubs/cpt.stub';
+        return __DIR__ . '/stubs/posttype.stub';
     }
 
     /**
@@ -143,6 +143,6 @@ class MakeCpt extends GeneratorCommand
      */
     protected function getDefaultNamespace(string $rootNamespace)
     {
-        return $rootNamespace . '\\Cpts';
+        return $rootNamespace . '\\WordPress\\PostTypes';
     }
 }

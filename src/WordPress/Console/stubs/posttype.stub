@@ -2,9 +2,9 @@
 
 namespace {{ namespace }};
 
-use Radiate\WordPress\Cpt;
+use Radiate\WordPress\PostType;
 
-class {{ class }} extends Cpt
+class {{ class }} extends PostType
 {
     /**
      * The name
