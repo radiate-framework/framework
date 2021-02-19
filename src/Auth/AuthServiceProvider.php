@@ -16,6 +16,12 @@ class AuthServiceProvider extends ServiceProvider
         $this->app->singleton('auth', function () {
             return new AuthManager();
         });
+
+        $this->app->rebinding('request', function ($app, $request) {
+            $request->setUserResolver(function () use ($app) {
+                return $app['auth']->user();
+            });
+        });
     }
 
     /**
@@ -25,8 +31,6 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app['request']->setUserResolver(function () {
-            return $this->app['auth']->user();
-        });
+        //
     }
 }
