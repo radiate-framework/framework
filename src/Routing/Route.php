@@ -183,7 +183,7 @@ abstract class Route
                 ->send($request)
                 ->through($this->middleware())
                 ->then(function ($request) use ($parameters) {
-                    return call_user_func($this->action(), $request, ...$parameters);
+                    return $this->app->call($this->action(), $parameters);
                 });
         } catch (Throwable $e) {
             $response = $this->app->renderException($request, $e);
