@@ -23,9 +23,9 @@ namespace Radiate\Support\Facades;
  * @method static bool has(string $abstract) Determine if the abstract is bound to the container
  * @method static mixed get(string $abstract) Resolve an instance
  * @method static \Radiate\Foundation\Application getInstance() Get the container instance
- * @method static \Radiate\Foundation\Application setInstance(\Radiate\Container\Container $container = null) Set the container instance
+ * @method static \Radiate\Foundation\Application setInstance(\Illuminate\Container\Container $container = null) Set the container instance
  *
- * @see \Radiate\Foundation\Application, \Radiate\Container\Container
+ * @see \Radiate\Foundation\Application
  */
 class App extends Facade
 {
