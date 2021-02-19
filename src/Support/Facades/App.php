@@ -34,7 +34,7 @@ class App extends Facade
      *
      * @return string
      */
-    public static function getFacadeAccessor(): string
+    protected static function getFacadeAccessor(): string
     {
         return 'app';
     }
