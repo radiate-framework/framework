@@ -2,7 +2,8 @@
 
 namespace Radiate\WordPress;
 
-use Radiate\Support\Facades\View;
+use Radiate\Foundation\Application;
+use Radiate\View\View;
 
 abstract class Shortcode
 {
@@ -35,11 +36,29 @@ abstract class Shortcode
     protected $content;
 
     /**
-     * Create the shortcode instance
+     * The app instance
+     *
+     * @var \Radiate\Foundation\Application
      */
-    public function __construct()
+    protected $app;
+
+    /**
+     * The view instance
+     *
+     * @var \Radiate\View\View
+     */
+    protected $view;
+
+    /**
+     * Create the shortcode instance
+     *
+     * @param \Radiate\Foundation\Application $app
+     * @param \Radiate\View\View $view
+     */
+    public function __construct(Application $app, View $view)
     {
-        $this->register();
+        $this->app = $app;
+        $this->view = $view;
     }
 
     /**
@@ -57,7 +76,7 @@ abstract class Shortcode
      *
      * @return void
      */
-    protected function register()
+    public function register()
     {
         if (!$this->exists()) {
             add_shortcode($this->name, function ($attrs, $content) {
@@ -83,15 +102,8 @@ abstract class Shortcode
 
         $this->content = $content;
 
-        return $this->do($this->handle());
+        return $this->do($this->app->call([$this, 'handle']));
     }
-
-    /**
-     * handle the shortcode
-     *
-     * @return mixed
-     */
-    abstract protected function handle();
 
     /**
      * make a view
@@ -102,7 +114,7 @@ abstract class Shortcode
      */
     protected function view(string $path, array $attrs = [])
     {
-        return View::make($path, array_merge($attrs, ['shortcode' => $this]));
+        return $this->view->make($path, array_merge($attrs, ['shortcode' => $this]));
     }
 
     /**
