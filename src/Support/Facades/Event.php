@@ -19,7 +19,7 @@ class Event extends Facade
      *
      * @return string
      */
-    public static function getFacadeAccessor(): string
+    protected static function getFacadeAccessor(): string
     {
         return 'events';
     }
