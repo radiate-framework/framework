@@ -47,12 +47,11 @@ abstract class PostType
     protected $options = [];
 
     /**
-     * Register the post type and taxonomies
+     * Create the post type instance
      */
     public function __construct()
     {
-        $this->register();
-        $this->registerTaxonomies();
+        //
     }
 
     /**
@@ -60,11 +59,13 @@ abstract class PostType
      *
      * @return void
      */
-    protected function register()
+    public function register()
     {
         if (!$this->exists()) {
             register_post_type($this->name(), $this->options());
         }
+
+        $this->registerTaxonomies();
     }
 
     /**

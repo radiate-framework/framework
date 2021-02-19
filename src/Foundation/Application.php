@@ -2,7 +2,7 @@
 
 namespace Radiate\Foundation;
 
-use Radiate\Container\Container;
+use Illuminate\Container\Container;
 use Radiate\Events\EventServiceProvider;
 use Radiate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Radiate\Foundation\Providers\ConsoleServiceProvider;
@@ -63,6 +63,7 @@ class Application extends Container
 
         $this->registerBaseBindings();
         $this->registerCoreProviders();
+        $this->registerContainerAliases();
         $this->setFacadeRoot();
     }
 
@@ -86,16 +87,6 @@ class Application extends Container
     }
 
     /**
-     * Set the facade root
-     *
-     * @return void
-     */
-    protected function setFacadeRoot()
-    {
-        Facade::setFacadeApplication($this);
-    }
-
-    /**
      * Register the core service providers
      *
      * @return void
@@ -108,6 +99,44 @@ class Application extends Container
         if ($this->runningInConsole()) {
             $this->register(ConsoleServiceProvider::class);
         }
+    }
+
+    /**
+     * Register the container aliases
+     *
+     * @return void
+     */
+    protected function registerContainerAliases()
+    {
+        foreach ([
+            'app' => [
+                self::class,
+                \Illuminate\Container\Container::class,
+                \Illuminate\Contracts\Container\Container::class,
+                \Psr\Container\ContainerInterface::class,
+            ],
+            'auth' => [\Radiate\Auth\AuthManager::class],
+            'events' => [\Radiate\Events\Dispatcher::class],
+            'files' => [\Radiate\Filesystem\Filesystem::class],
+            'mailer' => [\Radiate\Mail\Mailer::class],
+            'request' => [\Radiate\Http\Request::class],
+            'router' => [\Radiate\Routing\Router::class],
+            'view' => [\Radiate\View\View::class],
+        ] as $alias => $abstracts) {
+            foreach ($abstracts as $abstract) {
+                $this->alias($alias, $abstract);
+            }
+        }
+    }
+
+    /**
+     * Set the facade root
+     *
+     * @return void
+     */
+    protected function setFacadeRoot()
+    {
+        Facade::setFacadeApplication($this);
     }
 
     /**

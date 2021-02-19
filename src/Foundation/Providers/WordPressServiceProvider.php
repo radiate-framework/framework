@@ -29,11 +29,11 @@ class WordPressServiceProvider extends ServiceProvider
     {
         $this->app['events']->listen('init', function () {
             foreach ($this->postTypes as $postType) {
-                new $postType();
+                $this->app->make($postType)->register();
             }
 
             foreach ($this->shortcodes as $shortcode) {
-                new $shortcode();
+                $this->app->make($shortcode)->register();
             }
         });
     }
