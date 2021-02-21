@@ -5,9 +5,12 @@ namespace Radiate\Http;
 use ArrayAccess;
 use Closure;
 use JsonSerializable;
+use Radiate\Support\Traits\Macroable;
 
 class Request implements ArrayAccess, JsonSerializable
 {
+    use Macroable;
+
     /**
      * The request attributes
      *
