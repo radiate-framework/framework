@@ -121,6 +121,7 @@ class Application extends Container
             'mailer' => [\Radiate\Mail\Mailer::class],
             'request' => [\Radiate\Http\Request::class],
             'router' => [\Radiate\Routing\Router::class],
+            'validator' => [\Radiate\Validation\Factory::class],
             'view' => [\Radiate\View\View::class],
         ] as $alias => $abstracts) {
             foreach ($abstracts as $abstract) {

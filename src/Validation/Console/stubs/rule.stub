@@ -1,0 +1,30 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\Validation\Rules\Rule;
+
+class {{ class }} implements Rule
+{
+    /**
+     * Determine if the validation rule passes.
+     *
+     * @param string $attribute
+     * @param mixed $value
+     * @return bool
+     */
+    public function passes(string $attribute, $value): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation error message.
+     *
+     * @return string|array
+     */
+    public function message()
+    {
+        return ':Attribute is valid';
+    }
+}

@@ -82,11 +82,7 @@ abstract class ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             foreach ($commands as $command) {
-                $this->app->singleton($command, function ($app) use ($command) {
-                    return new $command($app, $app['files']);
-                });
-
-                $this->app[$command]->register();
+                $this->app->make($command)->register();
             }
         }
     }

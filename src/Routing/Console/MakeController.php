@@ -20,6 +20,7 @@ class MakeController extends GeneratorCommand
      */
     protected $signature = 'make:controller {name : The name of the controller}
                                             {--resource : Create a resource controller}
+                                            {--api : Exclude the create and edit methods from the resource controller}
                                             {--force : Overwrite the controller if it exists}';
 
     /**
@@ -38,9 +39,11 @@ class MakeController extends GeneratorCommand
     {
         if ($this->option('resource')) {
             return __DIR__ . '/stubs/controller.resource.stub';
+        } elseif ($this->option('api')) {
+            return __DIR__ . '/stubs/controller.api.stub';
+        } else {
+            return __DIR__ . '/stubs/controller.stub';
         }
-
-        return __DIR__ . '/stubs/controller.stub';
     }
 
     /**
