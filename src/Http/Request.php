@@ -81,6 +81,28 @@ class Request implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Create a new request from this one
+     *
+     * @param self $from
+     * @param \Radiate\Http\Request|null $to
+     * @return \Radiate\Http\Request
+     */
+    public static function createFrom(self $from, ?Request $to = null)
+    {
+        $request = $to ?: new static;
+
+        $request->request = $from->request;
+        $request->cookies = $from->cookies;
+        $request->files = $from->files;
+        $request->server = $from->server;
+        $request->headers = $from->headers;
+
+        $request->setUserResolver($from->getUserResolver());
+
+        return $request;
+    }
+
+    /**
      * Get the headers from the server global
      *
      * @param array $server

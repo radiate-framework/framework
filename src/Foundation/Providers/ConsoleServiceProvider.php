@@ -15,6 +15,7 @@ class ConsoleServiceProvider extends ServiceProvider
     {
         $this->commands([
             \Radiate\Foundation\Console\MakeProvider::class,
+            \Radiate\Foundation\Console\MakeRequest::class,
             \Radiate\Foundation\Console\VendorPublish::class,
         ]);
     }
