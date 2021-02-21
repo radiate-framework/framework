@@ -5,7 +5,9 @@
 
 # Radiate Framework
 
-A WordPress plugin and theme framework
+A WordPress plugin and theme framework.
+
+Read the full [Radiate framework documentation](https://radiate-framework.github.io/).
 
 ## Installation
 
