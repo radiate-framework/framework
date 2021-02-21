@@ -185,7 +185,7 @@ class Validator
      * @param string $attribute
      * @return void
      */
-    public function validateInput(Rule $rule, string $attribute)
+    protected function validateInput(Rule $rule, string $attribute)
     {
         $value = $this->getValue($attribute);
 
@@ -203,7 +203,7 @@ class Validator
      * @param \Radiate\Validation\Rules\Rule $rule
      * @return void
      */
-    public function addErrorMessage(string $attribute, Rule $rule)
+    protected function addErrorMessage(string $attribute, Rule $rule)
     {
         if (!isset($this->errorBag[$attribute])) {
             $this->errorBag[$attribute] = [];
@@ -227,7 +227,7 @@ class Validator
      * @param string $attribute
      * @return mixed
      */
-    public function getValue(string $attribute)
+    protected function getValue(string $attribute)
     {
         return $this->inputs[$attribute];
     }
@@ -274,7 +274,7 @@ class Validator
      * @param  string  $attribute
      * @return string
      */
-    public function getDisplayableAttribute(string $attribute)
+    protected function getDisplayableAttribute(string $attribute)
     {
         return str_replace('_', ' ', Str::snake($attribute));
     }
@@ -285,7 +285,7 @@ class Validator
      * @param mixed $value
      * @return string
      */
-    public function getDisplayableValue($value)
+    protected function getDisplayableValue($value)
     {
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
@@ -366,7 +366,7 @@ class Validator
      * @param \Radiate\Validation\Rules\Rule|\Closure|array|string $rules
      * @return array
      */
-    public function parseRules($rules)
+    protected function parseRules($rules)
     {
         if (is_string($rules)) {
             $rules = explode('|', $rules);
@@ -381,7 +381,7 @@ class Validator
      * @param \Radiate\Validation\Rules\Rule|\Closure|string $rule
      * @return \Radiate\Validation\Rules\Rule|null
      */
-    public function parseRule($rule)
+    protected function parseRule($rule)
     {
         if ($rule instanceof Closure) {
             return new Rules\ClosureRule($rule);
@@ -394,10 +394,10 @@ class Validator
         $parts = explode(':', $rule);
 
         if (in_array($parts[0], ['regex'])) {
-            return $this->resolveRule($parts[0], [$parts[1]]);
+            $parameters = [$parts[1]];
+        } else {
+            $parameters = $parts[1] ? explode(',', $parts[1]) : [];
         }
-
-        $parameters = $parts[1] ? explode(',', $parts[1]) : [];
 
         return $this->resolveRule($parts[0], $parameters);
     }
@@ -409,7 +409,7 @@ class Validator
      * @param array $parameters
      * @return \Radiate\Validation\Rules\Rule|null
      */
-    public function resolveRule(string $rule, array $parameters)
+    protected function resolveRule(string $rule, array $parameters)
     {
         if ($rule = $this->rules[$rule]) {
             if (class_exists($rule)) {
