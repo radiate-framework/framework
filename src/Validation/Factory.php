@@ -48,13 +48,6 @@ class Factory
             $messages
         );
 
-        // Next we'll set the IoC container instance of the validator, which is used to
-        // resolve out class based validator extensions. If it is not set then these
-        // types of extensions will not be possible on these validation instances.
-        if (!is_null($this->container)) {
-            #$validator->setContainer($this->container);
-        }
-
         return $validator;
     }
 
