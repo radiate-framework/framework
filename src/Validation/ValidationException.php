@@ -19,7 +19,7 @@ class ValidationException extends HttpResponseException
      * @param \Radiate\Validation\Validator $validator
      * @return void
      */
-    public function __construct($validator)
+    public function __construct(Validator $validator)
     {
         parent::__construct('The given data was invalid.', 422);
 
