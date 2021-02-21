@@ -209,7 +209,9 @@ class Validator
             $this->errorBag[$attribute] = [];
         }
 
-        if (in_array(get_class($rule), $this->sizeRules)) {
+        if (isset($this->customMessages[$atrribute])) {
+            $message = $this->customMessages[$atrribute];
+        } elseif (in_array(get_class($rule), $this->sizeRules)) {
             $message = $this->getSizeMessage($attribute, $rule);
         } else {
             $message = $rule->message();
