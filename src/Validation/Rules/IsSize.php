@@ -2,8 +2,17 @@
 
 namespace Radiate\Validation\Rules;
 
+use Radiate\Validation\Validator;
+
 class IsSize implements Rule
 {
+    /**
+     * The validator
+     *
+     * @var \Radiate\Validation\Validator
+     */
+    protected $validator;
+
     /**
      * The size
      *
@@ -30,13 +39,7 @@ class IsSize implements Rule
      */
     public function passes(string $attribute, $value): bool
     {
-        if (is_numeric($value)) {
-            $value = 0 + $value;
-        } elseif (is_array($value)) {
-            $value = count($value);
-        } else {
-            $value = mb_strlen($value);
-        }
+        $value = $this->validator->getSize($attribute, $value);
 
         return $value == $this->size;
     }
@@ -53,5 +56,16 @@ class IsSize implements Rule
             'string'  => ":Attribute must be {$this->size} characters",
             'array'   => ":Attribute must contain {$this->size} items",
         ];
+    }
+
+    /**
+     * Set the validator
+     *
+     * @param \Radiate\Validation\Validator $validator
+     * @return void
+     */
+    public function setValidator(Validator $validator)
+    {
+        $this->validator = $validator;
     }
 }

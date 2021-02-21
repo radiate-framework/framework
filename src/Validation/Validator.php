@@ -163,6 +163,10 @@ class Validator
                     continue;
                 }
 
+                if (method_exists($rule, 'setValidator')) {
+                    $rule->setValidator($this);
+                }
+
                 if ($required) {
                     $this->validateInput($rule, $attribute);
                 } elseif ($this->getValue($attribute)) {
@@ -319,6 +323,26 @@ class Validator
         }
 
         return 'string';
+    }
+
+    /**
+     * Get the size of an attribute.
+     *
+     * @param string $attribute
+     * @param mixed $value
+     * @return mixed
+     */
+    public function getSize(string $attribute, $value)
+    {
+        $hasNumeric = $this->hasRule($attribute, $this->numericRules);
+
+        if (is_numeric($value) && $hasNumeric) {
+            return $value;
+        } elseif (is_array($value)) {
+            return count($value);
+        }
+
+        return mb_strlen($value);
     }
 
     /**

@@ -13,8 +13,8 @@ class ValidationServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton('validator', function () {
-            return new Factory();
+        $this->app->singleton('validator', function ($app) {
+            return new Factory($app);
         });
     }
 }

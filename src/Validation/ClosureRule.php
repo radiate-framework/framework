@@ -1,6 +1,6 @@
 <?php
 
-namespace Radiate\Validation\Rules;
+namespace Radiate\Validation;
 
 class ClosureRule implements Rule
 {

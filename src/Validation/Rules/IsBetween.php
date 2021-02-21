@@ -2,8 +2,17 @@
 
 namespace Radiate\Validation\Rules;
 
+use Radiate\Validation\Validator;
+
 class IsBetween implements Rule
 {
+    /**
+     * The validator
+     *
+     * @var \Radiate\Validation\Validator
+     */
+    protected $validator;
+
     /**
      * The minimum number
      *
@@ -39,13 +48,7 @@ class IsBetween implements Rule
      */
     public function passes(string $attribute, $value): bool
     {
-        if (is_numeric($value)) {
-            $value = 0 + $value;
-        } elseif (is_array($value)) {
-            $value = count($value);
-        } else {
-            $value = mb_strlen($value);
-        }
+        $value = $this->validator->getSize($attribute, $value);
 
         return $value >= $this->min && $value <= $this->max;
     }
@@ -62,5 +65,16 @@ class IsBetween implements Rule
             'string'  => ":Attribute must be between {$this->min} and {$this->max} characters",
             'array'   => ":Attribute must have between {$this->min} and {$this->max} items",
         ];
+    }
+
+    /**
+     * Set the validator
+     *
+     * @param \Radiate\Validation\Validator $validator
+     * @return void
+     */
+    public function setValidator(Validator $validator)
+    {
+        $this->validator = $validator;
     }
 }

@@ -2,8 +2,17 @@
 
 namespace Radiate\Validation\Rules;
 
+use Radiate\Validation\Validator;
+
 class IsMin implements Rule
 {
+    /**
+     * The validator
+     *
+     * @var \Radiate\Validation\Validator
+     */
+    protected $validator;
+
     /**
      * The minimum number
      *
@@ -30,13 +39,7 @@ class IsMin implements Rule
      */
     public function passes(string $attribute, $value): bool
     {
-        if (is_numeric($value)) {
-            $value = 0 + $value;
-        } elseif (is_array($value)) {
-            $value = count($value);
-        } else {
-            $value = mb_strlen($value);
-        }
+        $value = $this->validator->getSize($attribute, $value);
 
         return $value >= $this->min;
     }
@@ -53,5 +56,16 @@ class IsMin implements Rule
             'string'  => ":Attribute must be at least {$this->min} characters",
             'array'   => ":Attribute must have at least {$this->min} items",
         ];
+    }
+
+    /**
+     * Set the validator
+     *
+     * @param \Radiate\Validation\Validator $validator
+     * @return void
+     */
+    public function setValidator(Validator $validator)
+    {
+        $this->validator = $validator;
     }
 }

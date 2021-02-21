@@ -2,8 +2,17 @@
 
 namespace Radiate\Validation\Rules;
 
+use Radiate\Validation\Validator;
+
 class IsMax implements Rule
 {
+    /**
+     * The validator
+     *
+     * @var \Radiate\Validation\Validator
+     */
+    protected $validator;
+
     /**
      * The maximum number
      *
@@ -30,13 +39,7 @@ class IsMax implements Rule
      */
     public function passes(string $attribute, $value): bool
     {
-        if (is_numeric($value)) {
-            $value = 0 + $value;
-        } elseif (is_array($value)) {
-            $value = count($value);
-        } else {
-            $value = mb_strlen($value);
-        }
+        $value = $this->validator->getSize($attribute, $value);
 
         return $value <= $this->max;
     }
@@ -53,5 +56,16 @@ class IsMax implements Rule
             'string'  => ":Attribute may not be greater than {$this->max} characters",
             'array'   => ":Attribute may not have more than {$this->max} items",
         ];
+    }
+
+    /**
+     * Set the validator
+     *
+     * @param \Radiate\Validation\Validator $validator
+     * @return void
+     */
+    public function setValidator(Validator $validator)
+    {
+        $this->validator = $validator;
     }
 }
