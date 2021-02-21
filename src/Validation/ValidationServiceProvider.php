@@ -21,18 +21,31 @@ class ValidationServiceProvider extends ServiceProvider
     }
 
     /**
-     * Add the validate method to the request
+     * Boot the service provider
      *
      * @return void
      */
     public function boot()
     {
-        Request::macro('validate', function (array $rules, $messages = []) {
-            try {
-                return Validator::make($this->all(), $rules, $messages)->validate();
-            } catch (ValidationException $e) {
-                return $e->errors();
-            }
+        $this->registerRequestValidation();
+
+        $this->commands([
+            \Radiate\Validation\Console\MakeRule::class,
+        ]);
+    }
+
+    /**
+     * Register the "validate" macro on the request.
+     *
+     * @return void
+     */
+    protected function registerRequestValidation()
+    {
+        Request::macro('validate', function (array $rules, array $messages = []) {
+            /**
+             * @var \Radiate\Http\Request $this
+             */
+            return Validator::make($this->all(), $rules, $messages)->validate();
         });
     }
 }

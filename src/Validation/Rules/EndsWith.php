@@ -3,9 +3,8 @@
 namespace Radiate\Validation\Rules;
 
 use Radiate\Support\Facades\Str;
-use Radiate\Validation\RequiredRule;
 
-class EndsWith implements RequiredRule
+class EndsWith implements Rule
 {
     /**
      * The needles to search form

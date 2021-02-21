@@ -2,9 +2,9 @@
 
 namespace Radiate\Validation;
 
-use Exception;
+use Radiate\Foundation\Http\Exceptions\HttpResponseException;
 
-class ValidationException extends Exception
+class ValidationException extends HttpResponseException
 {
     /**
      * The validator instance.
@@ -14,20 +14,6 @@ class ValidationException extends Exception
     public $validator;
 
     /**
-     * The status code to use for the response.
-     *
-     * @var int
-     */
-    public $status = 422;
-
-    /**
-     * The path the client should be redirected to.
-     *
-     * @var string
-     */
-    public $redirectTo;
-
-    /**
      * Create a new exception instance.
      *
      * @param \Radiate\Validation\Validator $validator
@@ -35,44 +21,20 @@ class ValidationException extends Exception
      */
     public function __construct($validator)
     {
-        parent::__construct('The given data was invalid.');
+        parent::__construct('The given data was invalid.', 422);
 
         $this->validator = $validator;
     }
 
     /**
-     * Get all of the validation error messages.
+     * Set the status header and return the message.
      *
-     * @return array
+     * @return string
      */
-    public function errors()
+    public function getResponse()
     {
-        return $this->validator->errors();
-    }
+        status_header($this->getCode(), $this->getMessage());
 
-    /**
-     * Set the HTTP status code to be used for the response.
-     *
-     * @param  int  $status
-     * @return $this
-     */
-    public function status(int $status)
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
-    /**
-     * Set the URL to redirect to on a validation error.
-     *
-     * @param string $url
-     * @return $this
-     */
-    public function redirectTo(string $url)
-    {
-        $this->redirectTo = $url;
-
-        return $this;
+        return json_encode(['errors' => $this->validator->errors()]);
     }
 }

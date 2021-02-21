@@ -4,7 +4,7 @@ namespace Radiate\Validation\Rules;
 
 use Radiate\Support\Facades\Str;
 
-class StartsWith implements RequiredRule
+class StartsWith implements Rule
 {
     /**
      * The needles to search form
