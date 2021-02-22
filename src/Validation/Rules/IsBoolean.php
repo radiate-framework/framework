@@ -13,7 +13,7 @@ class IsBoolean implements Rule
      */
     public function passes(string $attribute, $value): bool
     {
-        return in_array($value, [true, false, 0, 1, '0', '1'], true);
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN) !== false;
     }
 
     /**

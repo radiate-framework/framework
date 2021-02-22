@@ -7,11 +7,11 @@ class AuthManager
     /**
      * Attempt a login
      *
-     * @param array $credentials
+     * @param \ArrayAccess|array $credentials
      * @param bool $remember
      * @return bool
      */
-    public function attempt(array $credentials, bool $remember = false): bool
+    public function attempt($credentials, bool $remember = false): bool
     {
         return $this->login($credentials, $remember);
     }
@@ -19,11 +19,11 @@ class AuthManager
     /**
      * Log in
      *
-     * @param array $credentials
+     * @param \ArrayAccess|array $credentials
      * @param bool $remember
      * @return bool
      */
-    public function login(array $credentials, bool $remember = false): bool
+    public function login($credentials, bool $remember = false): bool
     {
         $user = wp_signon([
             'user_login'    => $credentials['username'],

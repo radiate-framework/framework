@@ -55,6 +55,10 @@ class VendorPublish extends Command
         $paths = ServiceProvider::pathsToPublish($this->option('provider'), $this->option('tag'));
 
         foreach ($paths as $from => $to) {
+            if (!$to) {
+                continue;
+            }
+
             if ($this->files->copyDirectory($from, $to)) {
                 $this->status($from, $to, 'Directory');
             }

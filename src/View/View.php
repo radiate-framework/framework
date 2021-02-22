@@ -5,39 +5,72 @@ namespace Radiate\View;
 class View
 {
     /**
-     * The views base path
+     * The view.
      *
      * @var string
      */
-    protected $basePath;
+    protected $view;
 
     /**
-     * Create the view instance
+     * The view directory.
      *
-     * @param string $basePath
+     * @var string
      */
-    public function __construct(string $basePath)
+    protected $path;
+
+    /**
+     * The view data.
+     *
+     * @var array
+     */
+    protected $data;
+
+    /**
+     * Set the view directory.
+     *
+     * @param string $view
+     * @param string $path
+     * @param array $data
+     */
+    public function __construct(string $view, string $path, array $data = [])
     {
-        $this->basePath = $basePath;
+        $this->view = $view;
+        $this->path = $path;
+        $this->data = $data;
     }
 
     /**
-     * Make a view
+     * Get the string contents of the view.
      *
-     * @param string $path
-     * @param array $args
      * @return string
      */
-    public function make(string $path, array $args = []): string
+    public function render(): string
     {
-        $path = str_replace('.', DIRECTORY_SEPARATOR, $path) . '.php';
+        return $this->evaluatePath($this->path, $this->data);
+    }
 
+    /**
+     * Get the evaluated contents of the view at the given path.
+     *
+     * @param string $__path
+     * @param array $__data
+     * @return string
+     */
+    protected function evaluatePath(string $__path, array $__data): string
+    {
         ob_start();
+        extract($__data, EXTR_SKIP);
+        include $__path;
+        return ltrim(ob_get_clean());
+    }
 
-        extract($args);
-
-        require $this->basePath . DIRECTORY_SEPARATOR . $path;
-
-        return ob_get_clean();
+    /**
+     * Return the view.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->render();
     }
 }

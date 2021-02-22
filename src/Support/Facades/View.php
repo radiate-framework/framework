@@ -3,9 +3,9 @@
 namespace Radiate\Support\Facades;
 
 /**
- * @method static string make(string $path, array $args = []) Make a view
+ * @method static \Radiate\View\View make(string $view, array $data = []) Make a view
  *
- * @see \Radiate\View\View
+ * @see \Radiate\View\Factory
  */
 class View extends Facade
 {
