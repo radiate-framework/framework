@@ -5,6 +5,7 @@ namespace Radiate\Filesystem;
 use ErrorException;
 use FilesystemIterator;
 use Radiate\Filesystem\Exceptions\FileNotFoundException;
+use Symfony\Component\Finder\Finder;
 
 class Filesystem
 {
@@ -255,7 +256,7 @@ class Filesystem
      */
     public function link(string $target, string $link): void
     {
-        if (!windows_os()) {
+        if (!PHP_OS_FAMILY === 'Windows') {
             symlink($target, $link);
         }
 
@@ -406,6 +407,52 @@ class Filesystem
     public function glob(string $pattern, int $flags = 0): array
     {
         return glob($pattern, $flags);
+    }
+    /**
+     * Get an array of all files in a directory.
+     *
+     * @param string $directory
+     * @param bool $hidden
+     * @return \Symfony\Component\Finder\SplFileInfo[]
+     */
+    public function files(string $directory, bool $hidden = false)
+    {
+        return iterator_to_array(
+            Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->depth(0)->sortByName(),
+            false
+        );
+    }
+
+    /**
+     * Get all of the files from the given directory (recursive).
+     *
+     * @param string $directory
+     * @param bool $hidden
+     * @return \Symfony\Component\Finder\SplFileInfo[]
+     */
+    public function allFiles(string $directory, bool $hidden = false)
+    {
+        return iterator_to_array(
+            Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->sortByName(),
+            false
+        );
+    }
+
+    /**
+     * Get all of the directories within a given directory.
+     *
+     * @param string $directory
+     * @return array
+     */
+    public function directories(string $directory): array
+    {
+        $directories = [];
+
+        foreach (Finder::create()->in($directory)->directories()->depth(0)->sortByName() as $dir) {
+            $directories[] = $dir->getPathname();
+        }
+
+        return $directories;
     }
 
     /**

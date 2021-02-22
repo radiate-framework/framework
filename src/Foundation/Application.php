@@ -2,6 +2,7 @@
 
 namespace Radiate\Foundation;
 
+use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Radiate\Events\EventServiceProvider;
 use Radiate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -11,6 +12,8 @@ use Radiate\Http\Request;
 use Radiate\Support\Facades\Facade;
 use Radiate\Support\Pipeline;
 use RuntimeException;
+use SplFileInfo;
+use Symfony\Component\Finder\Finder;
 use Throwable;
 
 class Application extends Container
@@ -64,6 +67,7 @@ class Application extends Container
         $this->registerBaseBindings();
         $this->registerCoreProviders();
         $this->registerContainerAliases();
+        $this->loadConfigurationFiles();
         $this->setFacadeRoot();
     }
 
@@ -116,6 +120,10 @@ class Application extends Container
                 \Psr\Container\ContainerInterface::class,
             ],
             'auth' => [\Radiate\Auth\AuthManager::class],
+            'config' => [
+                \Illuminate\Config\Repository::class,
+                \Illuminate\Contracts\Config\Repository::class,
+            ],
             'events' => [\Radiate\Events\Dispatcher::class],
             'files' => [\Radiate\Filesystem\Filesystem::class],
             'mailer' => [\Radiate\Mail\Mailer::class],
@@ -131,6 +139,20 @@ class Application extends Container
     }
 
     /**
+     * Load the configuration items from all of the files.
+     *
+     * @return void
+     */
+    protected function loadConfigurationFiles()
+    {
+        $this->instance('config', $repository = new Repository());
+
+        foreach ($this->getConfigurationFiles() as $key => $path) {
+            $repository->set($key, require $path);
+        }
+    }
+
+    /**
      * Set the facade root
      *
      * @return void
@@ -138,6 +160,46 @@ class Application extends Container
     protected function setFacadeRoot()
     {
         Facade::setFacadeApplication($this);
+    }
+
+    /**
+     * Get all of the configuration files for the application.
+     *
+     * @return array
+     */
+    protected function getConfigurationFiles(): array
+    {
+        $files = [];
+
+        $configPath = realpath($this->basePath('config'));
+
+        foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
+            $directory = $this->getNestedDirectory($file, $configPath);
+
+            $files[$directory . basename($file->getRealPath(), '.php')] = $file->getRealPath();
+        }
+
+        ksort($files, SORT_NATURAL);
+
+        return $files;
+    }
+
+    /**
+     * Get the configuration file nesting path.
+     *
+     * @param \SplFileInfo $file
+     * @param string $configPath
+     * @return string
+     */
+    protected function getNestedDirectory(SplFileInfo $file, string $configPath): string
+    {
+        $directory = $file->getPath();
+
+        if ($nested = trim(str_replace($configPath, '', $directory), DIRECTORY_SEPARATOR)) {
+            $nested = str_replace(DIRECTORY_SEPARATOR, '.', $nested) . '.';
+        }
+
+        return $nested;
     }
 
     /**
