@@ -44,7 +44,7 @@ class View
      *
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         return $this->evaluatePath($this->path, $this->data);
     }

@@ -181,7 +181,7 @@ abstract class Mailable
      */
     public function text(string $path, array $data = []): self
     {
-        $this->text = View::make($path, $this->buildViewData($data));
+        $this->text = View::make($path, $this->buildViewData($data))->render();
 
         return $this;
     }
@@ -195,7 +195,7 @@ abstract class Mailable
      */
     public function view(string $path, array $data = []): self
     {
-        $this->html = View::make($path, $this->buildViewData($data));
+        $this->html = View::make($path, $this->buildViewData($data))->render();
 
         return $this;
     }

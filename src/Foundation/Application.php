@@ -130,7 +130,7 @@ class Application extends Container
             'request' => [\Radiate\Http\Request::class],
             'router' => [\Radiate\Routing\Router::class],
             'validator' => [\Radiate\Validation\Factory::class],
-            'view' => [\Radiate\View\View::class],
+            'view' => [\Radiate\View\Factory::class],
         ] as $alias => $abstracts) {
             foreach ($abstracts as $abstract) {
                 $this->alias($alias, $abstract);
