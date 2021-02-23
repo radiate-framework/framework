@@ -21,6 +21,7 @@
     "illuminate/container": "^8.28",
     "illuminate/config": "^8.28",
     "symfony/finder": "^5.2",
-    "illuminate/collections": "^8.28"
+    "illuminate/collections": "^8.28",
+    "illuminate/macroable": "^8.28"
   }
 }
