@@ -3,6 +3,8 @@
 namespace Radiate\Console;
 
 use Radiate\Foundation\Application;
+use Radiate\Support\Collection;
+use Radiate\Support\Str;
 use WP_CLI;
 
 abstract class Command
@@ -110,6 +112,8 @@ abstract class Command
         $this->options = $options;
 
         $this->handle();
+
+        die;
     }
 
     /**
@@ -136,25 +140,52 @@ abstract class Command
     }
 
     /**
-     * Display a success message
-     *
-     * @param string $message
-     * @return void
-     */
-    protected function success(string $message)
-    {
-        WP_CLI::success($message);
-    }
-
-    /**
      * Display a message
      *
      * @param string $message
      * @return void
      */
-    protected function line(string $message)
+    protected function line(string $message, string $style = null)
     {
-        WP_CLI::log($message);
+        $message  = $style ? $style . $message . '%n' : $message;
+
+        WP_CLI::log(WP_CLI::colorize($message));
+    }
+
+    /**
+     * Output new lines
+     *
+     * @param integer $lines The number of new lines to output
+     * @return void
+     */
+    protected function newLine(int $lines = 1)
+    {
+        while ($lines > 0) {
+            $this->line('');
+            $lines--;
+        }
+    }
+
+    /**
+     * Display an error message
+     *
+     * @param string $message
+     * @return void
+     */
+    protected function info(string $message)
+    {
+        $this->line($message, '%B');
+    }
+
+    /**
+     * Display an error message
+     *
+     * @param string $message
+     * @return void
+     */
+    protected function comment(string $message)
+    {
+        $this->line($message);
     }
 
     /**
@@ -165,7 +196,118 @@ abstract class Command
      */
     protected function error(string $message)
     {
-        WP_CLI::error($message);
+        $this->line($message, '%R');
+    }
+
+    /**
+     * Display an error message
+     *
+     * @param string $message
+     * @return void
+     */
+    protected function warn(string $message)
+    {
+        $this->line($message, '%Y');
+    }
+
+    /**
+     * Display an error message
+     *
+     * @param string $message
+     * @return void
+     */
+    protected function alert(string $message)
+    {
+        $length = Str::length(strip_tags($message)) + 12;
+
+        $this->comment(str_repeat('*', $length));
+        $this->comment('*     ' . $message . '     *');
+        $this->comment(str_repeat('*', $length));
+
+        $this->newLine();
+    }
+
+    /**
+     * Ask the user to confirm an action.
+     *
+     * @param string $question The message to post to the console.
+     * @param bool   $skip     Should the confirm be skipped?
+     * @return bool
+     */
+    protected function confirm(string $question, bool $skip = false): bool
+    {
+        if (!$skip) {
+            $answer = $this->ask($question . ' [y/n]');
+
+            return in_array(strtolower($answer), ['y', 'yes']);
+        }
+
+        return true;
+    }
+
+    /**
+     * Prompt the user with a question and return their answer.
+     *
+     * @param string $question The question to ask the user.
+     * @return string
+     */
+    protected function ask(string $question)
+    {
+        fwrite(STDOUT, $question . ' ');
+
+        return trim(fgets(STDIN));
+    }
+
+    /**
+     * Call a command
+     *
+     * @param string $message
+     * @param array $args
+     * @return void
+     */
+    protected function call(string $command, array $args = [])
+    {
+        $command = Collection::make($args)
+            ->reduceWithKeys(function ($carry, $value, $key) {
+                if (Str::startsWith($key, '--') && $value) {
+                    $value = $value === true ? $key : $key . '=' . $value;
+                }
+                return $carry . ' ' . $value;
+            }, $command);
+
+        $this->run($command);
+    }
+
+    /**
+     * Run a command
+     *
+     * @param string $message
+     * @return void
+     */
+    protected function run(string $command)
+    {
+        WP_CLI::runcommand($command);
+    }
+
+    /**
+     * Get all arguments.
+     *
+     * @return array
+     */
+    protected function arguments()
+    {
+        return $this->arguments;
+    }
+
+    /**
+     * Determine if the argument is present
+     *
+     * @param string $key The argument name.
+     * @return bool
+     */
+    protected function hasArgument(string $key)
+    {
+        return isset($this->arguments[$key]);
     }
 
     /**
@@ -177,6 +319,27 @@ abstract class Command
     protected function argument(string $key)
     {
         return $this->arguments[$key] ?? null;
+    }
+
+    /**
+     * Get all options.
+     *
+     * @return array
+     */
+    protected function options()
+    {
+        return $this->options;
+    }
+
+    /**
+     * Determine if the option is present
+     *
+     * @param string $key The option name.
+     * @return bool
+     */
+    protected function hasOption(string $key)
+    {
+        return isset($this->options[$key]);
     }
 
     /**
