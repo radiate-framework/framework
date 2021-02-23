@@ -2,9 +2,9 @@
 
 namespace Radiate\Support;
 
-use Illuminate\Support\Collection as IlluminateCollection;
+use Illuminate\Support\Collection as BaseCollection;
 
-class Collection extends IlluminateCollection
+class Collection extends BaseCollection
 {
     /**
      * Dump the items.

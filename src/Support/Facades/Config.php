@@ -10,7 +10,7 @@ namespace Radiate\Support\Facades;
  * @method static void prepend($key, $value) Prepend a value onto an array configuration value.
  * @method static void push($key, $value) Push a value onto an array configuration value.
  *
- * @see \Illuminate\Config\Repository
+ * @see \Radiate\Config\Repository
  */
 class Config extends Facade
 {

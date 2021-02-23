@@ -2,8 +2,8 @@
 
 namespace Radiate\Foundation;
 
-use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
+use Radiate\Config\Repository;
 use Radiate\Events\EventServiceProvider;
 use Radiate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Radiate\Foundation\Providers\ConsoleServiceProvider;
@@ -121,6 +121,7 @@ class Application extends Container
             ],
             'auth' => [\Radiate\Auth\AuthManager::class],
             'config' => [
+                \Radiate\Config\Repository::class,
                 \Illuminate\Config\Repository::class,
                 \Illuminate\Contracts\Config\Repository::class,
             ],
