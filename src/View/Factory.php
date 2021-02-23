@@ -14,7 +14,7 @@ class Factory
     /**
      * Set the view directory.
      *
-     * @param string $path
+     * @param \Radiate\View\Finder $path
      */
     public function __construct(Finder $finder)
     {
