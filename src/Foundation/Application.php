@@ -67,8 +67,8 @@ class Application extends Container
         $this->registerBaseBindings();
         $this->registerCoreProviders();
         $this->registerContainerAliases();
-        $this->loadConfigurationFiles();
         $this->setFacadeRoot();
+        $this->loadConfigurationFiles();
     }
 
     /**
