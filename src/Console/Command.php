@@ -2,6 +2,7 @@
 
 namespace Radiate\Console;
 
+use Radiate\Foundation\Application;
 use Radiate\Support\Collection;
 use Radiate\Support\Str;
 use WP_CLI;
@@ -57,6 +58,13 @@ abstract class Command
      * @var array
      */
     protected $options = [];
+
+    /**
+     * The container instance
+     *
+     * @var \Radiate\Foundation\Application
+     */
+    protected $app;
 
     /**
      * Create a new command instance.
@@ -366,5 +374,18 @@ abstract class Command
     protected function option(string $key)
     {
         return $this->options[$key] ?? null;
+    }
+
+    /**
+     * Set the container instance
+     *
+     * @param \Radiate\Foundation\Application $app
+     * @return mixed
+     */
+    public function setContainer(Application $app)
+    {
+        $this->app = $app;
+
+        return $this;
     }
 }
