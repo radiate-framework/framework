@@ -2,8 +2,8 @@
 
 namespace Radiate\Support;
 
-use Illuminate\Support\Arr as IlluminateArr;
+use Illuminate\Support\Arr as BaseArr;
 
-class Arr extends IlluminateArr
+class Arr extends BaseArr
 {
 }
