@@ -6,6 +6,7 @@ use Radiate\Foundation\Application;
 use Radiate\Support\Collection;
 use Radiate\Support\Str;
 use WP_CLI;
+use function WP_CLI\Utils\format_items as wpcli_format_items;
 
 abstract class Command
 {
@@ -256,6 +257,29 @@ abstract class Command
         fwrite(STDOUT, $question . ' ');
 
         return trim(fgets(STDIN));
+    }
+
+    /**
+     * Output a table
+     *
+     * @param array $headers The table headers
+     * @param array $data    The table data
+     * @return void
+     */
+    protected function table(array $headers, array $data)
+    {
+        wpcli_format_items('table', $data, $headers);
+    }
+
+    /**
+     * Create a new progress bar
+     *
+     * @param integer $count The progress bar count
+     * @return \Radiate\Console\ProgressBar
+     */
+    public function createProgressBar(int $count): ProgressBar
+    {
+        return new ProgressBar($count);
     }
 
     /**
