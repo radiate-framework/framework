@@ -2,7 +2,6 @@
 
 namespace Radiate\Console;
 
-use Radiate\Foundation\Application;
 use Radiate\Support\Collection;
 use Radiate\Support\Str;
 use WP_CLI;
@@ -23,6 +22,13 @@ abstract class Command
      * @var string
      */
     protected $name = '';
+
+    /**
+     * The command synopsis.
+     *
+     * @var array
+     */
+    protected $synopsis = [];
 
     /**
      * The command description.
@@ -53,19 +59,13 @@ abstract class Command
     protected $options = [];
 
     /**
-     * The application
+     * Create a new command instance.
      *
-     * @var \Radiate\Foundation\Application
+     * @return void
      */
-    protected $app;
-
-    /**
-     * Create the command instance
-     *
-     */
-    public function __construct(Application $app)
+    public function __construct()
     {
-        $this->app = $app;
+        $this->synopsis = $this->parseSignature();
     }
 
     /**
@@ -75,9 +75,7 @@ abstract class Command
      */
     public function register()
     {
-        $synopsis = $this->parseSignature();
-
-        WP_CLI::add_command('radiate ' . $this->name, $this, $synopsis);
+        WP_CLI::add_command('radiate ' . $this->name, $this, $this->synopsis);
     }
 
     /**
@@ -112,17 +110,10 @@ abstract class Command
 
         $this->options = $options;
 
-        $this->handle();
+        $this->app->call([$this, 'handle']);
 
         die;
     }
-
-    /**
-     * Handle the command call.
-     *
-     * @return void
-     */
-    abstract protected function handle();
 
     /**
      * Parse the arguments into a keyed array.

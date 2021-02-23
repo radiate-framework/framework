@@ -2,7 +2,6 @@
 
 namespace Radiate\Console;
 
-use Radiate\Foundation\Application;
 use Radiate\Filesystem\Filesystem;
 
 abstract class GeneratorCommand extends Command
@@ -100,14 +99,13 @@ abstract class GeneratorCommand extends Command
     /**
      * Assign the filesystem and call the parent contructor.
      *
-     * @param \Radiate\Foundation\Application $app
      * @param \Radiate\Filesystem\Filesystem $files
      */
-    public function __construct(Application $app, Filesystem $files)
+    public function __construct(Filesystem $files)
     {
         $this->files = $files;
 
-        parent::__construct($app);
+        parent::__construct();
     }
 
     /**
@@ -122,7 +120,7 @@ abstract class GeneratorCommand extends Command
      *
      * @return void
      */
-    protected function handle()
+    public function handle()
     {
         // First we need to ensure that the given name is not a reserved word within the PHP
         // language and that the class name will actually be valid. If it is not valid we

@@ -411,11 +411,11 @@ class Filesystem
     /**
      * Get an array of all files in a directory.
      *
-     * @param string $directory
+     * @param string|string[] $directory
      * @param bool $hidden
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
-    public function files(string $directory, bool $hidden = false)
+    public function files($directory, bool $hidden = false)
     {
         return iterator_to_array(
             Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->depth(0)->sortByName(),
@@ -426,11 +426,11 @@ class Filesystem
     /**
      * Get all of the files from the given directory (recursive).
      *
-     * @param string $directory
+     * @param string|string[] $directory
      * @param bool $hidden
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
-    public function allFiles(string $directory, bool $hidden = false)
+    public function allFiles($directory, bool $hidden = false)
     {
         return iterator_to_array(
             Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->sortByName(),
@@ -441,10 +441,10 @@ class Filesystem
     /**
      * Get all of the directories within a given directory.
      *
-     * @param string $directory
+     * @param string|string[] $directory
      * @return array
      */
-    public function directories(string $directory): array
+    public function directories($directory): array
     {
         $directories = [];
 

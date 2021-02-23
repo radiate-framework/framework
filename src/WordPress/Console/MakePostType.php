@@ -19,8 +19,8 @@ class MakePostType extends GeneratorCommand
      *
      * @var string
      */
-    protected $signature = 'make:posttype {name : The name of the post type}
-                                          {--force : Overwrite the post type if it exists}';
+    protected $signature = 'make:post-type {name : The name of the post type}
+                                           {--force : Overwrite the post type if it exists}';
 
     /**
      * The command description.
@@ -64,7 +64,7 @@ class MakePostType extends GeneratorCommand
      *
      * @return void
      */
-    protected function handle()
+    public function handle()
     {
         if ($this->isReservedPostType($name = Str::snake($this->getNameInput()))) {
             $this->error('The name "' . $name . '" is reserved by WordPress.');
