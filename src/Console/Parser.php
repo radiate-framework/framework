@@ -3,7 +3,7 @@
 namespace Radiate\Console;
 
 use Exception;
-use Radiate\Support\Facades\Str;
+use Radiate\Support\Str;
 
 class Parser
 {

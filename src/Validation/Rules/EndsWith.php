@@ -2,7 +2,7 @@
 
 namespace Radiate\Validation\Rules;
 
-use Radiate\Support\Facades\Str;
+use Radiate\Support\Str;
 
 class EndsWith implements Rule
 {

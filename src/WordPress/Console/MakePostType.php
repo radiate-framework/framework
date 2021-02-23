@@ -3,7 +3,7 @@
 namespace Radiate\WordPress\Console;
 
 use Radiate\Console\GeneratorCommand;
-use Radiate\Support\Facades\Str;
+use Radiate\Support\Str;
 
 class MakePostType extends GeneratorCommand
 {

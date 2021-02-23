@@ -1,8 +1,6 @@
 <?php
 
-namespace Radiate\Support\Facades;
-
-use Radiate\Support\Stringable;
+namespace Radiate\Support;
 
 /**
  * @method static \Radiate\Support\Stringable after(string $string, string $search) Return the remainder of a string after the first occurrence of a given value.
