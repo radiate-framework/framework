@@ -82,7 +82,9 @@ abstract class ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             foreach ($commands as $command) {
-                $this->app->make($command)->register();
+                $this->app->make($command)
+                    ->setContainer($this->app)
+                    ->register();
             }
         }
     }

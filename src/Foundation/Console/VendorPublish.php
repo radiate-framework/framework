@@ -4,7 +4,6 @@ namespace Radiate\Foundation\Console;
 
 use Radiate\Console\Command;
 use Radiate\Filesystem\Filesystem;
-use Radiate\Foundation\Application;
 use Radiate\Support\ServiceProvider;
 
 class VendorPublish extends Command
@@ -35,14 +34,13 @@ class VendorPublish extends Command
     /**
      * Assign the filesystem and call the parent contructor.
      *
-     * @param \Radiate\Foundation\Application $app
      * @param \Radiate\Filesystem\Filesystem $files
      */
-    public function __construct(Application $app, Filesystem $files)
+    public function __construct(Filesystem $files)
     {
         $this->files = $files;
 
-        parent::__construct($app);
+        parent::__construct();
     }
 
     /**
@@ -72,7 +70,7 @@ class VendorPublish extends Command
             }
         }
 
-        $this->success('Publishing complete.');
+        $this->info('Publishing complete.');
     }
 
     /**

@@ -19,7 +19,7 @@ class MakeRequest extends GeneratorCommand
      * @var string
      */
     protected $signature = 'make:request {name : The name of the form request}
-                                          {--force : Overwrite the form request if it exists}';
+                                         {--force : Overwrite the form request if it exists}';
 
     /**
      * The command description.

@@ -136,7 +136,7 @@ class MakeTaxonomy extends GeneratorCommand
      *
      * @return void
      */
-    protected function handle()
+    public function handle()
     {
         // First we need to ensure that the given name is not a reserved word within WordPress.
         if ($this->isReservedTaxonomy($name = Str::snake($this->getNameInput()))) {

@@ -14,7 +14,7 @@ class ConsoleServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->commands([
-            \Radiate\Foundation\Console\ListCommand::class,
+            \Radiate\Foundation\Console\MakeCommand::class,
             \Radiate\Foundation\Console\MakeProvider::class,
             \Radiate\Foundation\Console\MakeRequest::class,
             \Radiate\Foundation\Console\VendorPublish::class,
