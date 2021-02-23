@@ -2,7 +2,7 @@
 
 namespace Radiate\Mail;
 
-use Radiate\Support\Facades\Str;
+use Radiate\Support\Str;
 use Radiate\Support\Facades\View;
 use ReflectionClass;
 use ReflectionProperty;

@@ -3,7 +3,7 @@
 namespace Radiate\Validation;
 
 use Closure;
-use Radiate\Support\Facades\Str;
+use Radiate\Support\Str;
 use Radiate\Validation\Rules\Rule;
 
 class Validator
