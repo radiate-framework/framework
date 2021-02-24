@@ -204,7 +204,7 @@ abstract class Command
      */
     protected function error(string $message)
     {
-        $this->line($message, "\033[41m");
+        $this->line(' ' . $message . ' ', "\033[41m");
     }
 
     /**
@@ -261,7 +261,7 @@ abstract class Command
      */
     protected function question(string $question)
     {
-        $this->line($question, "\033[30m\033[106m");
+        $this->line(' ' . $question . ' ', "\033[30m\033[106m");
     }
 
     /**
