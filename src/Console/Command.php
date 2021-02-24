@@ -274,7 +274,11 @@ abstract class Command
     {
         fwrite(STDOUT, "\033[32m" . $question . "\033[0m\n> ");
 
-        return trim(fgets(STDIN));
+        $answer = trim(fgets(STDIN));
+
+        $this->newLine();
+
+        return $answer;
     }
 
     /**
