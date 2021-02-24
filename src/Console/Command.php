@@ -147,9 +147,9 @@ abstract class Command
      */
     protected function line(string $message, string $style = null)
     {
-        $message  = $style ? $style . $message . '%n' : $message;
+        $message  = $style ? $style . $message . "\033[0m" : $message;
 
-        WP_CLI::log(WP_CLI::colorize($message));
+        $this->write($message . PHP_EOL);
     }
 
     /**
@@ -160,10 +160,18 @@ abstract class Command
      */
     protected function newLine(int $lines = 1)
     {
-        while ($lines > 0) {
-            $this->line('');
-            $lines--;
-        }
+        $this->write(str_repeat(PHP_EOL, $lines));
+    }
+
+    /**
+     * Write a message to the terminal
+     *
+     * @param string $message
+     * @return void
+     */
+    protected function write(string $message)
+    {
+        fwrite(STDOUT, $message);
     }
 
     /**
@@ -174,7 +182,7 @@ abstract class Command
      */
     protected function info(string $message)
     {
-        $this->line($message, '%B');
+        $this->line($message, "\033[32m");
     }
 
     /**
@@ -185,7 +193,7 @@ abstract class Command
      */
     protected function comment(string $message)
     {
-        $this->line($message);
+        $this->line($message, "\033[33m");
     }
 
     /**
@@ -196,7 +204,7 @@ abstract class Command
      */
     protected function error(string $message)
     {
-        $this->line($message, '%R');
+        $this->line($message, "\033[41m");
     }
 
     /**
@@ -207,7 +215,7 @@ abstract class Command
      */
     protected function warn(string $message)
     {
-        $this->line($message, '%Y');
+        $this->line($message, "\033[33m");
     }
 
     /**
@@ -237,9 +245,9 @@ abstract class Command
     protected function confirm(string $question, bool $skip = false): bool
     {
         if (!$skip) {
-            $answer = $this->ask($question . ' [y/n]');
+            $answer = $this->ask($question . ' (yes/no)' . " \033[39m[\033[33mno\033[0m]");
 
-            return in_array(strtolower($answer), ['y', 'yes']);
+            return in_array(strtolower($answer), ['yes', 'y']);
         }
 
         return true;
@@ -251,9 +259,20 @@ abstract class Command
      * @param string $question The question to ask the user.
      * @return string
      */
+    protected function question(string $question)
+    {
+        $this->line($question, "\033[30m\033[106m");
+    }
+
+    /**
+     * Prompt the user with a question and return their answer.
+     *
+     * @param string $question The question to ask the user.
+     * @return string
+     */
     protected function ask(string $question)
     {
-        fwrite(STDOUT, $question . ' ');
+        fwrite(STDOUT, "\033[32m" . $question . "\033[0m\n> ");
 
         return trim(fgets(STDIN));
     }
