@@ -16,6 +16,8 @@ class ConsoleServiceProvider extends ServiceProvider
      * @var array
      */
     protected $commands = [
+        \Radiate\Foundation\Console\EnvironmentCommand::class,
+        \Radiate\Foundation\Console\ListCommand::class,
         \Radiate\Foundation\Console\MakeCommand::class,
         \Radiate\Foundation\Console\MakeProvider::class,
         \Radiate\Foundation\Console\MakeRequest::class,
