@@ -149,7 +149,7 @@ abstract class Command
     {
         $message  = $style ? $style . $message . "\033[0m" : $message;
 
-        $this->write($message);
+        $this->write($message . PHP_EOL);
     }
 
     /**
