@@ -48,7 +48,7 @@ class ListCommand extends Command
                 $this->comment($key);
                 $subcommands->each(function ($subcommand) use ($longest) {
                     $padded = Str::padRight($subcommand['name'], $longest + 2);
-                    $this->info("<info>{$padded}</info>{$subcommand['description']}");
+                    $this->info(" <info>{$padded}</info>{$subcommand['description']}");
                 });
             });
     }
