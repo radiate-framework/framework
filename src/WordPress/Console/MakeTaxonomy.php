@@ -27,7 +27,7 @@ class MakeTaxonomy extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Make a new taxonomy class';
+    protected $description = 'Create a new taxonomy class';
 
     /**
      * Reserved taxonomies that cannot be used for generation.
