@@ -47,7 +47,8 @@ class ListCommand extends Command
             ->each(function ($subcommands, $key) use ($longest) {
                 $this->comment($key);
                 $subcommands->each(function ($subcommand) use ($longest) {
-                    $this->info('<info> ' . Str::padRight($subcommand['name'], $longest + 2) . '</info>' . $subcommand['description']);
+                    $padded = Str::padRight($subcommand['name'], $longest + 2);
+                    $this->info("<info>{$padded}</info>{$subcommand['description']}");
                 });
             });
     }
@@ -77,8 +78,8 @@ class ListCommand extends Command
         $group = ($parts = explode(':', $name)) && ($parts[1]) ? $parts[0] : 'Available commands:';
 
         return [
-            'group' => $group,
-            'name' => $name,
+            'group'       => $group,
+            'name'        => $name,
             'description' => $subcommand->get_shortdesc(),
         ];
     }
