@@ -147,9 +147,32 @@ abstract class Command
      */
     protected function line(string $message, string $style = null)
     {
-        $message  = $style ? $style . $message . "\033[0m" : $message;
+        $message  = $style ? "<{$style}>$message</{$style}>" : $message;
 
         $this->write($message . PHP_EOL);
+    }
+
+    /**
+     * Convert <color> tags to the correct format
+     *
+     * @param string $message
+     * @return string
+     */
+    protected function colorize(string $message)
+    {
+        $map = [
+            'error'    => "\033[41m",
+            'info'     => "\033[32m",
+            'warn'     => "\033[33m",
+            'comment'  => "\033[33m",
+            'question' => "\033[30m\033[106m",
+        ];
+
+        $message = preg_replace_callback('#<(.+?)>#', function ($match) use ($map) {
+            return $map[$match[1]] ?? $match[0];
+        }, $message);
+
+        return preg_replace('#</(.+?)>#', "\033[0m", $message);
     }
 
     /**
@@ -171,7 +194,7 @@ abstract class Command
      */
     protected function write(string $message)
     {
-        fwrite(STDOUT, $message);
+        fwrite(STDOUT, $this->colorize($message));
     }
 
     /**
@@ -182,7 +205,7 @@ abstract class Command
      */
     protected function info(string $message)
     {
-        $this->line($message, "\033[32m");
+        $this->line($message, 'info');
     }
 
     /**
@@ -193,7 +216,7 @@ abstract class Command
      */
     protected function comment(string $message)
     {
-        $this->line($message, "\033[33m");
+        $this->line($message, 'comment');
     }
 
     /**
@@ -204,7 +227,7 @@ abstract class Command
      */
     protected function error(string $message)
     {
-        $this->line($message, "\033[41m");
+        $this->line(" {$message} ", 'error');
     }
 
     /**
@@ -215,7 +238,7 @@ abstract class Command
      */
     protected function warn(string $message)
     {
-        $this->line($message, "\033[33m");
+        $this->line($message, 'warn');
     }
 
     /**
@@ -245,7 +268,7 @@ abstract class Command
     protected function confirm(string $question, bool $skip = false): bool
     {
         if (!$skip) {
-            $answer = $this->ask($question . ' (yes/no)' . " \033[39m[\033[33mno\033[0m]");
+            $answer = $this->ask("<info>$question (yes/no)</info> [<comment>no</comment>]");
 
             return in_array(strtolower($answer), ['yes', 'y']);
         }
@@ -261,7 +284,7 @@ abstract class Command
      */
     protected function question(string $question)
     {
-        $this->line($question, "\033[30m\033[106m");
+        $this->line(" {$question} ", 'question');
     }
 
     /**
@@ -272,7 +295,7 @@ abstract class Command
      */
     protected function ask(string $question)
     {
-        fwrite(STDOUT, "\033[32m" . $question . "\033[0m\n> ");
+        $this->write("<info>" . $question . "</info>\n> ");
 
         $answer = trim(fgets(STDIN));
 
