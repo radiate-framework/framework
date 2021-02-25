@@ -86,6 +86,7 @@ class DownCommand extends Command
 
             return (bool) $this->files->put($filePath, $stub);
         }
+
         return true;
     }
 
