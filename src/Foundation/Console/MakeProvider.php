@@ -26,7 +26,7 @@ class MakeProvider extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Make a provider';
+    protected $description = 'Create a new service provider class';
 
     /**
      * Get the stub path.

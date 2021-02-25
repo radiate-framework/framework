@@ -28,7 +28,7 @@ class MakeController extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Make a controller';
+    protected $description = 'Create a new controller class';
 
     /**
      * Get the stub path.

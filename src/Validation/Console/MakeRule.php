@@ -26,7 +26,7 @@ class MakeRule extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Make a rule';
+    protected $description = 'Create a new validation rule';
 
     /**
      * Get the stub path.

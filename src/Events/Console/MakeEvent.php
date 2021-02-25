@@ -18,15 +18,15 @@ class MakeEvent extends GeneratorCommand
      *
      * @var string
      */
-    protected $signature = 'make:event {name : The name of the event}
-                                       {--force : Overwrite the event if it exists}';
+    protected $signature = 'make:event {name : The name of the event class}
+                                       {--force : Overwrite the event class if it exists}';
 
     /**
      * The command description.
      *
      * @var string
      */
-    protected $description = 'Make an event';
+    protected $description = 'Create a new event class';
 
     /**
      * Get the stub path.

@@ -19,15 +19,15 @@ class MakePostType extends GeneratorCommand
      *
      * @var string
      */
-    protected $signature = 'make:post-type {name : The name of the post type}
-                                           {--force : Overwrite the post type if it exists}';
+    protected $signature = 'make:post-type {name : The name of the post type class}
+                                           {--force : Overwrite the post type class if it exists}';
 
     /**
      * The command description.
      *
      * @var string
      */
-    protected $description = 'Make a post type';
+    protected $description = 'Make a new post type class';
 
     /**
      * Reserved post types that cannot be used for generation.
