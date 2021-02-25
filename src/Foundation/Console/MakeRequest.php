@@ -26,7 +26,7 @@ class MakeRequest extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Make a form request';
+    protected $description = 'Create a new form request class';
 
     /**
      * Get the stub path.

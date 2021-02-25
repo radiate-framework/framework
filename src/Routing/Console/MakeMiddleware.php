@@ -26,7 +26,7 @@ class MakeMiddleware extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Make a middleware';
+    protected $description = 'Create a new middleware class';
 
     /**
      * Get the stub path.

@@ -19,7 +19,7 @@ class MakeCommand extends GeneratorCommand
      * @var string
      */
     protected $signature = 'make:command {name : The name of the command}
-                                         {--command=command : The command that should be assigned}
+                                         {--command=command:name : The terminal command that should be assigned}
                                          {--force : Overwrite the command if it exists}';
 
     /**
@@ -27,7 +27,7 @@ class MakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Make a command';
+    protected $description = 'Create a new Radiate command';
 
     /**
      * Replace the class name for the given stub.

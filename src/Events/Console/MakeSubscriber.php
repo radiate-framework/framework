@@ -18,15 +18,15 @@ class MakeSubscriber extends GeneratorCommand
      *
      * @var string
      */
-    protected $signature = 'make:subscriber {name : The name of the subscriber}
-                                            {--force : Overwrite the subscriber if it exists}';
+    protected $signature = 'make:subscriber {name : The name of the subscriber class}
+                                            {--force : Overwrite the subscriber class if it exists}';
 
     /**
      * The command description.
      *
      * @var string
      */
-    protected $description = 'Make a subscriber';
+    protected $description = 'Create a new subscriber class';
 
     /**
      * Get the stub path.

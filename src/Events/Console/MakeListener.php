@@ -18,15 +18,15 @@ class MakeListener extends GeneratorCommand
      *
      * @var string
      */
-    protected $signature = 'make:listener {name : The name of the listener}
-                                          {--force : Overwrite the listener if it exists}';
+    protected $signature = 'make:listener {name : The name of the listener class}
+                                          {--force : Overwrite the listener class if it exists}';
 
     /**
      * The command description.
      *
      * @var string
      */
-    protected $description = 'Make a listener';
+    protected $description = 'Create a new event listener class';
 
     /**
      * Get the stub path.

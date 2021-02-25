@@ -19,15 +19,15 @@ class MakeShortcode extends GeneratorCommand
      *
      * @var string
      */
-    protected $signature = 'make:shortcode {name : The name of the shortcode}
-                                           {--force : Overwrite the shortcode if it exists}';
+    protected $signature = 'make:shortcode {name : The name of the shortcode class}
+                                           {--force : Overwrite the shortcode class if it exists}';
 
     /**
      * The command description.
      *
      * @var string
      */
-    protected $description = 'Make a shortcode';
+    protected $description = 'Make a new shortcode class';
 
     /**
      * Replace the class name for the given stub.

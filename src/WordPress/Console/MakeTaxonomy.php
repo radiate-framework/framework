@@ -19,15 +19,15 @@ class MakeTaxonomy extends GeneratorCommand
      *
      * @var string
      */
-    protected $signature = 'make:taxonomy {name : The name of the taxonomy}
-                                          {--force : Overwrite the taxonomy if it exists}';
+    protected $signature = 'make:taxonomy {name : The name of the taxonomy class}
+                                          {--force : Overwrite the taxonomy class if it exists}';
 
     /**
      * The command description.
      *
      * @var string
      */
-    protected $description = 'Make a taxonomy';
+    protected $description = 'Make a new taxonomy class';
 
     /**
      * Reserved taxonomies that cannot be used for generation.
@@ -146,8 +146,6 @@ class MakeTaxonomy extends GeneratorCommand
         }
 
         parent::handle();
-
-        flush_rewrite_rules();
     }
 
     /**

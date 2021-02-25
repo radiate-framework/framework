@@ -26,7 +26,7 @@ class MakeMail extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Make a mailable class';
+    protected $description = 'Create a new mailable class';
 
     /**
      * Get the stub path.
