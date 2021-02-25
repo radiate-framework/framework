@@ -73,8 +73,6 @@ class MakePostType extends GeneratorCommand
         }
 
         parent::handle();
-
-        flush_rewrite_rules();
     }
 
     /**

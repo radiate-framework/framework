@@ -146,8 +146,6 @@ class MakeTaxonomy extends GeneratorCommand
         }
 
         parent::handle();
-
-        flush_rewrite_rules();
     }
 
     /**
