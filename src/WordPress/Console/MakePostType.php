@@ -27,7 +27,7 @@ class MakePostType extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Make a new post type class';
+    protected $description = 'Create a new post type class';
 
     /**
      * Reserved post types that cannot be used for generation.

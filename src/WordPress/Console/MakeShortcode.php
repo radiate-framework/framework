@@ -27,7 +27,7 @@ class MakeShortcode extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Make a new shortcode class';
+    protected $description = 'Create a new shortcode class';
 
     /**
      * Replace the class name for the given stub.

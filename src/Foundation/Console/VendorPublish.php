@@ -21,7 +21,7 @@ class VendorPublish extends Command
      * @var string
      */
     protected $signature = 'vendor:publish {--provider : The service provider that has assets you want to publish}
-                                           {--tag : The tag to publish}
+                                           {--tag : A tag that has assets you want to publish}
                                            {--force : Overwrite any existing files}';
 
     /**
