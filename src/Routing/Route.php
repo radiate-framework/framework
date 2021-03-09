@@ -101,13 +101,23 @@ abstract class Route
     }
 
     /**
-     * Get the route middleware
+     * Get or set the route middleware
      *
-     * @return array
+     * @param array|string|null $middleware
+     * @return self|array
      */
-    public function middleware()
+    public function middleware($middleware = null)
     {
-        return $this->attributes['middleware'] ?? [];
+        if (!$middleware) {
+            return $this->attributes['middleware'] ?? [];
+        }
+
+        $this->attributes['middleware'] = array_merge(
+            $this->attributes['middleware'],
+            (array) $middleware
+        );
+
+        return $this;
     }
 
     /**
@@ -181,7 +191,7 @@ abstract class Route
         try {
             $response = (new Pipeline())
                 ->send($request)
-                ->through($this->middleware())
+                ->through($this->gatherMiddleware())
                 ->then(function ($request) use ($parameters) {
                     return $this->app->call($this->action(), $parameters);
                 });
@@ -190,6 +200,28 @@ abstract class Route
         }
 
         return $response;
+    }
+
+    /**
+     * Collect the group and controller middleware
+     *
+     * @return array
+     */
+    protected function gatherMiddleware()
+    {
+        $routeMiddleware = $this->app->getRouteMiddleware();
+
+        $middleware = [];
+
+        foreach ($this->attributes['middleware'] as $alias) {
+            if ($wares = $routeMiddleware[$alias]) {
+                foreach ((array) $wares as $ware) {
+                    $middleware[] = $ware ?? null;
+                }
+            }
+        };
+
+        return array_unique($middleware);
     }
 
     /**
