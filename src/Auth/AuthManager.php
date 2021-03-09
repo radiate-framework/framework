@@ -2,8 +2,23 @@
 
 namespace Radiate\Auth;
 
+use WP_User;
+
 class AuthManager
 {
+    /**
+     * Validate a user's credentials.
+     *
+     * @param array $credentials
+     * @return bool
+     */
+    public function validate(array $credentials = [])
+    {
+        $user = $this->retrieveByCredentials($credentials);
+
+        return $user instanceof WP_User;
+    }
+
     /**
      * Attempt a login
      *
@@ -13,25 +28,65 @@ class AuthManager
      */
     public function attempt($credentials, bool $remember = false): bool
     {
-        return $this->login($credentials, $remember);
+        $user = $this->retrieveByCredentials($credentials);
+
+        if ($user instanceof WP_User) {
+            return $this->login($user, $remember);
+        }
+
+        return false;
     }
 
     /**
      * Log in
      *
-     * @param \ArrayAccess|array $credentials
+     * @param \WP_User $user
      * @param bool $remember
      * @return bool
      */
-    public function login($credentials, bool $remember = false): bool
+    public function login(WP_User $user, bool $remember = false): bool
     {
-        $user = wp_signon([
-            'user_login'    => $credentials['username'],
-            'user_password' => $credentials['password'],
-            'rememberme'    => $remember,
-        ]);
+        if (get_user_by('ID', $user->ID)) {
+            wp_clear_auth_cookie();
+            wp_set_current_user($user->ID);
+            wp_set_auth_cookie($user->ID, $remember);
+            return true;
+        }
 
-        return !is_wp_error($user);
+        return false;
+    }
+
+    /**
+     * Log in by the user ID
+     *
+     * @param int $id
+     * @param bool $remember
+     * @return bool
+     */
+    public function loginUsingId(int $id, bool $remember = false): bool
+    {
+        if ($user = get_user_by('ID', $id)) {
+            return $this->login($user, $remember);
+        }
+
+        return false;
+    }
+
+    /**
+     * Retrieve a user by the given credentials.
+     *
+     * @param array $credentials
+     * @return \WP_User|false
+     */
+    protected function retrieveByCredentials(array $credentials)
+    {
+        $user = wp_authenticate($credentials['username'], $credentials['password']);
+
+        if (!is_wp_error($user)) {
+            return $user;
+        }
+
+        return false;
     }
 
     /**
