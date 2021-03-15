@@ -4,7 +4,9 @@ namespace Radiate\Http\Resources;
 
 use ArrayAccess;
 use JsonSerializable;
+use Radiate\Http\Request;
 use Radiate\Support\Collection;
+use Radiate\Support\Facades\App;
 
 abstract class JsonResource implements ArrayAccess, JsonSerializable
 {
@@ -39,11 +41,31 @@ abstract class JsonResource implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * Transform the resource into an array.
+     * Resolve the resource to an array.
      *
+     * @param  \Radiate\Http\Request|null  $request
      * @return array
      */
-    public function toArray()
+    public function resolve(?Request $request = null)
+    {
+        $data = $this->toArray(
+            $request ?? App::getInstance()->make('request')
+        );
+
+        if ($data instanceof JsonSerializable) {
+            $data = $data->jsonSerialize();
+        }
+
+        return (array) $data;
+    }
+
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Radiate\Http\Request  $request
+     * @return array
+     */
+    public function toArray(Request $request)
     {
         if (is_null($this->resource)) {
             return [];
@@ -61,7 +83,7 @@ abstract class JsonResource implements ArrayAccess, JsonSerializable
      */
     public function jsonSerialize()
     {
-        return $this->toArray();
+        return $this->resolve(App::getInstance()->make('request'));
     }
 
     /**
