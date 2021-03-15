@@ -3,6 +3,7 @@
 namespace Radiate\Foundation\Console;
 
 use Radiate\Console\GeneratorCommand;
+use Radiate\Support\Str;
 
 class MakeResource extends GeneratorCommand
 {
@@ -19,6 +20,7 @@ class MakeResource extends GeneratorCommand
      * @var string
      */
     protected $signature = 'make:resource {name : The name of the resource class}
+                                          {--collection : Create a resource collection}
                                           {--force : Overwrite the resource class if it exists}';
 
     /**
@@ -26,7 +28,32 @@ class MakeResource extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new resource class';
+    protected $description = 'Create a new resource';
+
+    /**
+     * Determine if the command is generating a resource collection.
+     *
+     * @return bool
+     */
+    protected function collection()
+    {
+        return $this->option('collection') ||
+            Str::endsWith($this->argument('name'), 'Collection');
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
+    public function handle()
+    {
+        if ($this->collection()) {
+            $this->type = 'Resource collection';
+        }
+
+        parent::handle();
+    }
 
     /**
      * Get the stub path.
@@ -35,7 +62,9 @@ class MakeResource extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__ . '/stubs/resource.stub';
+        return $this->collection()
+            ? __DIR__ . '/stubs/resource-collection.stub'
+            : __DIR__ . '/stubs/resource.stub';
     }
 
     /**
