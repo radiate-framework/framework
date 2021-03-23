@@ -127,10 +127,10 @@ class MakePostType extends GeneratorCommand
     protected function getStub()
     {
         if ($this->isSpecialPostType(Str::snake($this->getNameInput()))) {
-            return __DIR__ . '/stubs/posttype.reserved.stub';
+            return __DIR__ . '/stubs/post-type.reserved.stub';
         }
 
-        return __DIR__ . '/stubs/posttype.stub';
+        return __DIR__ . '/stubs/post-type.stub';
     }
 
     /**
