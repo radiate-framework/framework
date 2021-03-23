@@ -16,6 +16,10 @@ class RoutingServiceProvider extends ServiceProvider
         $this->app->singleton('router', function ($app) {
             return new Router($app['events'], $app);
         });
+
+        $this->app->singleton('url', function ($app) {
+            return new UrlGenerator($app['request']);
+        });
     }
 
     /**
