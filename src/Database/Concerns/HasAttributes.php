@@ -159,7 +159,7 @@ trait HasAttributes
      */
     public function isDirty(): bool
     {
-        return count($this->getDirty());
+        return !empty($this->getDirty());
     }
 
     /**

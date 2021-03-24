@@ -50,9 +50,9 @@ class Model implements ArrayAccess, JsonSerializable
     {
         $this->bootIfNotBooted();
 
-        $this->fill($attributes);
-
         $this->syncOriginal();
+
+        $this->fill($attributes);
     }
 
     /**
