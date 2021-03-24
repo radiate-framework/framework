@@ -1,0 +1,20 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\Http\Request;
+use Radiate\Http\Resources\ResourceCollection;
+
+class {{ class }} extends ResourceCollection
+{
+    /**
+     * Transform the resource collection into an array.
+     *
+     * @param \Radiate\Http\Request $request
+     * @return array
+     */
+    public function toArray(Request $request)
+    {
+        return parent::toArray($request);
+    }
+}
