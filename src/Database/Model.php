@@ -64,21 +64,9 @@ class Model implements ArrayAccess, JsonSerializable
     {
         if (!isset(static::$booted[static::class])) {
             static::$booted[static::class] = true;
-
-            static::booting();
             static::boot();
             static::booted();
         }
-    }
-
-    /**
-     * Perform any actions required before the model boots.
-     *
-     * @return void
-     */
-    protected static function booting()
-    {
-        //
     }
 
     /**

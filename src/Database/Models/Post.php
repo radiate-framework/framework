@@ -237,7 +237,7 @@ class Post extends Model
      * @param \DateTimeImmutable  $value
      * @return void
      */
-    public function setCreatedAtAttribute($value)
+    public function setCreatedAtAttribute(DateTimeImmutable $value)
     {
         $this->attributes['post_date'] = $value->format('Y-m-d H:i:s');
     }
@@ -258,7 +258,7 @@ class Post extends Model
      * @param \DateTimeImmutable  $value
      * @return void
      */
-    public function setUpdatedAtAttribute($value)
+    public function setUpdatedAtAttribute(DateTimeImmutable $value)
     {
         $this->attributes['post_modified'] = $value->format('Y-m-d H:i:s');
     }

@@ -30,7 +30,7 @@ class User extends Model
      *
      * @return void
      */
-    protected static function booting()
+    protected static function boot()
     {
         require_once ABSPATH . 'wp-admin/includes/user.php';
     }
@@ -120,7 +120,7 @@ class User extends Model
      * @param string $value
      * @return void
      */
-    public function setEmailAttribute($value)
+    public function setEmailAttribute(string $value)
     {
         $this->attributes['user_email'] = $value;
     }
@@ -141,7 +141,7 @@ class User extends Model
      * @param string $value
      * @return void
      */
-    public function setUrlAttribute($value)
+    public function setUrlAttribute(string $value)
     {
         $this->attributes['user_url'] = $value;
     }
@@ -162,7 +162,7 @@ class User extends Model
      * @param \DateTimeImmutable  $value
      * @return void
      */
-    public function setRegisteredAttribute($value)
+    public function setRegisteredAttribute(DateTimeImmutable $value)
     {
         $this->attributes['user_registered'] = $value->format('Y-m-d H:i:s');
     }
@@ -183,7 +183,7 @@ class User extends Model
      * @param string $value
      * @return void
      */
-    public function setLoginAttribute($value)
+    public function setLoginAttribute(string $value)
     {
         $this->attributes['user_login'] = $value;
     }
@@ -204,7 +204,7 @@ class User extends Model
      * @param string $value
      * @return void
      */
-    public function setNameAttribute($value)
+    public function setNameAttribute(string $value)
     {
         $this->attributes['display_name'] = $value;
     }
@@ -225,7 +225,7 @@ class User extends Model
      * @param string $value
      * @return void
      */
-    public function setSlugAttribute($value)
+    public function setSlugAttribute(string $value)
     {
         $this->attributes['user_nicename'] = $value;
     }
