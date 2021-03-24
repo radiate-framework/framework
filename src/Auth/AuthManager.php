@@ -2,150 +2,124 @@
 
 namespace Radiate\Auth;
 
-use WP_User;
+use InvalidArgumentException;
+use Radiate\Foundation\Application;
 
 class AuthManager
 {
     /**
-     * Validate a user's credentials.
+     * The application instance
      *
-     * @param array $credentials
-     * @return bool
+     * @var \Radiate\Foundation\Application
      */
-    public function validate(array $credentials = [])
-    {
-        $user = $this->retrieveByCredentials($credentials);
+    protected $app;
 
-        return $user instanceof WP_User;
+    /**
+     * The registered providers
+     *
+     * @var array
+     */
+    protected $providers = [];
+
+    /**
+     * Create the manager instance
+     *
+     * @param \Radiate\Foundation\Application $app
+     */
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
     }
 
     /**
-     * Attempt a login
+     * Get the auth provider
      *
-     * @param \ArrayAccess|array $credentials
-     * @param bool $remember
-     * @return bool
+     * @param string|null $name
+     * @return \Radiate\Auth\UserProvider
      */
-    public function attempt($credentials, bool $remember = false): bool
+    public function provider(?string $name = null): UserProvider
     {
-        $user = $this->retrieveByCredentials($credentials);
+        $name = $name ?: $this->getDefaultProvider();
 
-        if ($user instanceof WP_User) {
-            return $this->login($user, $remember);
+        return $this->providers[$name] ?? $this->providers[$name] = $this->resolve($name);
+    }
+
+    /**
+     * Resolve the given guard.
+     *
+     * @param string $name
+     * @return \Radiate\Auth\UserProvider
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function resolve(string $name): UserProvider
+    {
+        $config = $this->getConfig($name);
+
+        if (is_null($config)) {
+            throw new InvalidArgumentException("Auth provider [{$name}] is not defined.");
         }
 
-        return false;
-    }
-
-    /**
-     * Log in
-     *
-     * @param \WP_User $user
-     * @param bool $remember
-     * @return bool
-     */
-    public function login(WP_User $user, bool $remember = false): bool
-    {
-        if (get_user_by('ID', $user->ID)) {
-            wp_clear_auth_cookie();
-            wp_set_current_user($user->ID);
-            wp_set_auth_cookie($user->ID, $remember);
-            return true;
+        if (method_exists($this, $method = 'create' . ucfirst($name) . 'Provider')) {
+            return $this->{$method}($config);
         }
 
-        return false;
+        throw new InvalidArgumentException(
+            "Auth driver [{$config['driver']}] for provider [{$name}] is not defined."
+        );
     }
 
     /**
-     * Log in by the user ID
+     * Create a Radiate user provider
      *
-     * @param int $id
-     * @param bool $remember
-     * @return bool
+     * @param array $config
+     * @return \Radiate\Auth\RadiateUserProvider
      */
-    public function loginUsingId(int $id, bool $remember = false): bool
+    public function createRadiateProvider(array $config): RadiateUserProvider
     {
-        if ($user = get_user_by('ID', $id)) {
-            return $this->login($user, $remember);
-        }
-
-        return false;
+        return new RadiateUserProvider($config['model']);
     }
 
     /**
-     * Retrieve a user by the given credentials.
+     * Create a WordPress user provider
      *
-     * @param array $credentials
-     * @return \WP_User|false
+     * @return \Radiate\Auth\WordPressUserProvider
      */
-    protected function retrieveByCredentials(array $credentials)
+    public function createWordpressProvider(): WordPressUserProvider
     {
-        $user = wp_authenticate($credentials['username'], $credentials['password']);
-
-        if (!is_wp_error($user)) {
-            return $user;
-        }
-
-        return false;
+        return new WordPressUserProvider();
     }
 
     /**
-     * Log out
+     * Get the provider configuration.
      *
-     * @return void
+     * @param string $name
+     * @return array
      */
-    public function logout(): void
+    protected function getConfig(string $name): array
     {
-        wp_logout();
+        return $this->app['config']["auth.providers.{$name}"];
     }
 
     /**
-     * Return the user
+     * Get the default authentication provider name.
      *
-     * @return \WP_User|false
+     * @return string
      */
-    public function user()
+    public function getDefaultProvider(): string
     {
-        return $this->check() ? wp_get_current_user() : false;
+        return $this->app['config']['auth.default'] ?? 'radiate';
     }
 
     /**
-     * Return the user id
+     * Dynamically call the auth provider
      *
-     * @return int|bool
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
      */
-    public function id()
+    public function __call(string $method, array $parameters)
     {
-        return ($id = get_current_user_id()) !== 0 ? $id : false;
-    }
-
-    /**
-     * Determine if the user is logged in
-     *
-     * @return boolean
-     */
-    public function check(): bool
-    {
-        return is_user_logged_in();
-    }
-
-    /**
-     * Determine if the user is a guest
-     *
-     * @return bool
-     */
-    public function guest(): bool
-    {
-        return !$this->check();
-    }
-
-    /**
-     * Return the auth guard
-     *
-     * @return self
-     */
-    public function guard(): self
-    {
-        return $this;
+        return $this->provider()->$method(...$parameters);
     }
 }

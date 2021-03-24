@@ -13,8 +13,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton('auth', function () {
-            return new AuthManager();
+        $this->app->singleton('auth', function ($app) {
+            return new AuthManager($app);
         });
 
         $this->app->rebinding('request', function ($app, $request) {
