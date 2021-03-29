@@ -18,7 +18,7 @@ class RoutingServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('url', function ($app) {
-            return new UrlGenerator($app['request']);
+            return new UrlGenerator($app['request'], $app['config']['app.asset_url']);
         });
     }
 
