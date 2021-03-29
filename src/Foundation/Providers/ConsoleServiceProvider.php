@@ -22,6 +22,7 @@ class ConsoleServiceProvider extends ServiceProvider
         \Radiate\Foundation\Console\MakeCommand::class,
         \Radiate\Foundation\Console\MakeProvider::class,
         \Radiate\Foundation\Console\MakeRequest::class,
+        \Radiate\Foundation\Console\MakeResource::class,
         \Radiate\Foundation\Console\UpCommand::class,
         \Radiate\Foundation\Console\VendorPublish::class,
     ];

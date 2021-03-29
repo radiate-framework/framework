@@ -2,95 +2,124 @@
 
 namespace Radiate\Auth;
 
+use InvalidArgumentException;
+use Radiate\Foundation\Application;
+
 class AuthManager
 {
     /**
-     * Attempt a login
+     * The application instance
      *
-     * @param \ArrayAccess|array $credentials
-     * @param bool $remember
-     * @return bool
+     * @var \Radiate\Foundation\Application
      */
-    public function attempt($credentials, bool $remember = false): bool
+    protected $app;
+
+    /**
+     * The registered providers
+     *
+     * @var array
+     */
+    protected $providers = [];
+
+    /**
+     * Create the manager instance
+     *
+     * @param \Radiate\Foundation\Application $app
+     */
+    public function __construct(Application $app)
     {
-        return $this->login($credentials, $remember);
+        $this->app = $app;
     }
 
     /**
-     * Log in
+     * Get the auth provider
      *
-     * @param \ArrayAccess|array $credentials
-     * @param bool $remember
-     * @return bool
+     * @param string|null $name
+     * @return \Radiate\Auth\UserProvider
      */
-    public function login($credentials, bool $remember = false): bool
+    public function provider(?string $name = null): UserProvider
     {
-        $user = wp_signon([
-            'user_login'    => $credentials['username'],
-            'user_password' => $credentials['password'],
-            'rememberme'    => $remember,
-        ]);
+        $name = $name ?: $this->getDefaultProvider();
 
-        return !is_wp_error($user);
+        return $this->providers[$name] ?? $this->providers[$name] = $this->resolve($name);
     }
 
     /**
-     * Log out
+     * Resolve the given guard.
      *
-     * @return void
+     * @param string $name
+     * @return \Radiate\Auth\UserProvider
+     *
+     * @throws \InvalidArgumentException
      */
-    public function logout(): void
+    protected function resolve(string $name): UserProvider
     {
-        wp_logout();
+        $config = $this->getConfig($name);
+
+        if (is_null($config)) {
+            throw new InvalidArgumentException("Auth provider [{$name}] is not defined.");
+        }
+
+        if (method_exists($this, $method = 'create' . ucfirst($name) . 'Provider')) {
+            return $this->{$method}($config);
+        }
+
+        throw new InvalidArgumentException(
+            "Auth driver [{$config['driver']}] for provider [{$name}] is not defined."
+        );
     }
 
     /**
-     * Return the user
+     * Create a Radiate user provider
      *
-     * @return \WP_User|false
+     * @param array $config
+     * @return \Radiate\Auth\RadiateUserProvider
      */
-    public function user()
+    public function createRadiateProvider(array $config): RadiateUserProvider
     {
-        return $this->check() ? wp_get_current_user() : false;
+        return new RadiateUserProvider($config['model']);
     }
 
     /**
-     * Return the user id
+     * Create a WordPress user provider
      *
-     * @return int|bool
+     * @return \Radiate\Auth\WordPressUserProvider
      */
-    public function id()
+    public function createWordpressProvider(): WordPressUserProvider
     {
-        return ($id = get_current_user_id()) !== 0 ? $id : false;
+        return new WordPressUserProvider();
     }
 
     /**
-     * Determine if the user is logged in
+     * Get the provider configuration.
      *
-     * @return boolean
+     * @param string $name
+     * @return array
      */
-    public function check(): bool
+    protected function getConfig(string $name): array
     {
-        return is_user_logged_in();
+        return $this->app['config']["auth.providers.{$name}"];
     }
 
     /**
-     * Determine if the user is a guest
+     * Get the default authentication provider name.
      *
-     * @return bool
+     * @return string
      */
-    public function guest(): bool
+    public function getDefaultProvider(): string
     {
-        return !$this->check();
+        return $this->app['config']['auth.default'] ?? 'radiate';
     }
 
     /**
-     * Return the auth guard
+     * Dynamically call the auth provider
      *
-     * @return self
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
      */
-    public function guard(): self
+    public function __call(string $method, array $parameters)
     {
-        return $this;
+        return $this->provider()->$method(...$parameters);
     }
 }
