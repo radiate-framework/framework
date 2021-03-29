@@ -16,6 +16,7 @@ namespace Radiate\Support\Facades;
  * @method static string ajax(string $action = '') Return the ajax URL
  * @method static string rest(string $path = '') Return the REST URL
  * @method static bool isValidUrl(string $path) Determine if the given path is a valid URL.
+ * @method static string asset(string $path) Generate the URL to an application asset.
  *
  * @see \Radiate\Routing\UrlGenerator
  */
