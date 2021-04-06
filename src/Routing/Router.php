@@ -259,17 +259,11 @@ class Router
      */
     public function getMiddleware()
     {
-        $routeMiddleware = $this->app->getRouteMiddleware();
-
         $middleware = [];
 
         foreach (array_column($this->groupStack, 'middleware') as $aliases) {
             foreach ($aliases as $alias) {
-                if ($wares = $routeMiddleware[$alias]) {
-                    foreach ((array) $wares as $ware) {
-                        $middleware[] = $ware ?? null;
-                    }
-                }
+                $middleware[] = $alias;
             }
         };
 
