@@ -30,7 +30,7 @@ class PendingRequest
      *
      * @var array
      */
-    protected $cookies;
+    protected $cookies = [];
 
     /**
      * The request options.
@@ -83,7 +83,7 @@ class PendingRequest
      */
     public function asJson()
     {
-        return $this->contentType('application/json');
+        return $this->bodyFormat('json')->contentType('application/json');
     }
 
     /**
@@ -93,7 +93,7 @@ class PendingRequest
      */
     public function asForm()
     {
-        return $this->contentType('application/x-www-form-urlencoded');
+        return $this->bodyFormat('form')->contentType('application/x-www-form-urlencoded');
     }
 
     /**
