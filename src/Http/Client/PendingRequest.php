@@ -310,7 +310,7 @@ class PendingRequest
     {
         $url = trim($this->baseUrl, '/') . '/' . ltrim($url, '/');
 
-        if ($this->bodyFormat === 'json') {
+        if ($this->bodyFormat === 'json' && $options['body']) {
             $options['body'] = json_encode($options['body']);
         }
 
