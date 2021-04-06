@@ -308,7 +308,7 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options = [])
     {
-        $url = trim($this->baseUrl, '/') . '/' . ltrim($url, '/');
+        $url = ltrim(rtrim($this->baseUrl, '/') . '/' . ltrim($url, '/'), '/');
 
         if ($this->bodyFormat === 'json' && $options['body']) {
             $options['body'] = json_encode($options['body']);
