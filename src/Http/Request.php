@@ -6,6 +6,7 @@ use ArrayAccess;
 use Closure;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
+use Radiate\Support\Str;
 
 class Request implements ArrayAccess, JsonSerializable
 {
@@ -45,6 +46,20 @@ class Request implements ArrayAccess, JsonSerializable
      * @var array
      */
     protected $headers;
+
+    /**
+     * The request content
+     *
+     * @var array
+     */
+    protected $content;
+
+    /**
+     * The request json
+     *
+     * @var array
+     */
+    protected $json;
 
     /**
      * The user resolver
@@ -96,10 +111,23 @@ class Request implements ArrayAccess, JsonSerializable
         $request->files = $from->files;
         $request->server = $from->server;
         $request->headers = $from->headers;
+        $request->content = $from->content;
+        $request->json = $from->json;
 
         $request->setUserResolver($from->getUserResolver());
 
         return $request;
+    }
+
+    /**
+     * Normalize the header key
+     *
+     * @param string $key
+     * @return string
+     */
+    protected function normalizeHeaderKeys(string $key): string
+    {
+        return Str::of($key)->lower->replace('_', '-');
     }
 
     /**
@@ -114,9 +142,9 @@ class Request implements ArrayAccess, JsonSerializable
 
         foreach ($server as $key => $value) {
             if (strpos($key, 'HTTP_') === 0) {
-                $headers[substr($key, 5)] = $value;
+                $headers[$this->normalizeHeaderKeys(substr($key, 5))] = $value;
             } elseif (in_array($key, ['CONTENT_TYPE', 'CONTENT_LENGTH', 'CONTENT_MD5'])) {
-                $headers[$key] = $value;
+                $headers[$this->normalizeHeaderKeys($key)] = $value;
             }
         }
 
@@ -144,7 +172,7 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function header(string $key, $default = null)
     {
-        return $this->headers[$key] ?? $default;
+        return $this->headers[$this->normalizeHeaderKeys($key)] ?? $default;
     }
 
     /**
@@ -211,6 +239,16 @@ class Request implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Determine if the request is sending JSON.
+     *
+     * @return bool
+     */
+    public function isJson()
+    {
+        return Str::contains($this->header('CONTENT_TYPE'), ['/json', '+json']);
+    }
+
+    /**
      * Determine if the request expects a JSON response
      *
      * @return bool
@@ -221,6 +259,68 @@ class Request implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Get the JSON payload for the request.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function json(?string $key = null, $default = null)
+    {
+        if (!$this->json) {
+            $this->json = json_decode($this->getContent(), true);
+        }
+
+        if (is_null($key)) {
+            return $this->json;
+        }
+
+        return $this->json[$key] ?? $default;
+    }
+
+    /**
+     * Returns the request body content.
+     *
+     * @return string
+     */
+    public function getContent()
+    {
+        if (null === $this->content || false === $this->content) {
+            $this->content = file_get_contents('php://input');
+        }
+
+        return $this->content;
+    }
+
+    /**
+     * Get the input source for the request.
+     *
+     * @return array
+     */
+    protected function getInputSource()
+    {
+        if ($this->isJson()) {
+            return $this->json();
+        }
+
+        return $this->request;
+    }
+
+    /**
+     * Get the bearer token from the request headers.
+     *
+     * @return string|null
+     */
+    public function bearerToken()
+    {
+        $header = $this->header('Authorization', '');
+
+        if (Str::startsWith($header, 'Bearer ')) {
+            return Str::substr($header, 7);
+        }
+    }
+
+    /**
      * Determine if the attribute exists
      *
      * @param string $key
@@ -228,7 +328,7 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function has(string $key)
     {
-        return isset($this->request[$key]);
+        return isset($this->getInputSource()[$key]);
     }
 
     /**
@@ -240,7 +340,7 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function get(string $key, $default = null)
     {
-        return $this->request[$key] ?? $default;
+        return $this->getInputSource()[$key] ?? $default;
     }
 
     /**
