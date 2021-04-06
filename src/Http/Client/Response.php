@@ -4,6 +4,7 @@ namespace Radiate\Http\Client;
 
 use ArrayAccess;
 use LogicException;
+use Radiate\Support\Collection;
 use WP_HTTP_Requests_Response;
 
 class Response implements ArrayAccess
@@ -55,6 +56,17 @@ class Response implements ArrayAccess
         }
 
         return $this->decoded;
+    }
+
+    /**
+     * Get the JSON decoded body of the response as a collection.
+     *
+     * @param  string|null  $key
+     * @return \Radiate\Support\Collection
+     */
+    public function collect($key = null)
+    {
+        return Collection::make($this->json($key));
     }
 
     /**
