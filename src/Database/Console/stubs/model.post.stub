@@ -1,0 +1,15 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\Database\Models\Post as Model;
+
+class {{ class }} extends Model
+{
+    /**
+     * The post type
+     *
+     * @var string
+     */
+    protected static $postType = '{{ postType }}';
+}
