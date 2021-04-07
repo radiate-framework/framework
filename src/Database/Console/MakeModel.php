@@ -3,6 +3,7 @@
 namespace Radiate\Database\Console;
 
 use Radiate\Console\GeneratorCommand;
+use Radiate\Support\Str;
 
 class MakeModel extends GeneratorCommand
 {
@@ -28,6 +29,22 @@ class MakeModel extends GeneratorCommand
      * @var string
      */
     protected $description = 'Create a model';
+
+    /**
+     * Replace the class name for the given stub.
+     *
+     * @param  string  $stub
+     * @param  string  $name
+     * @return string
+     */
+    protected function replaceClass(string $stub, string $name): string
+    {
+        $stub = parent::replaceClass($stub, $name);
+
+        $type = Str::snake($this->getNameInput());
+
+        return str_replace('{{ type }}', $type, $stub);
+    }
 
     /**
      * Get the stub path.

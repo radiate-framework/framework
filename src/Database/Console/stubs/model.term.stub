@@ -11,5 +11,5 @@ class {{ class }} extends Model
      *
      * @var string
      */
-    protected static $taxonomy = '{{ taxonomy }}';
+    protected static $taxonomy = '{{ type }}';
 }
