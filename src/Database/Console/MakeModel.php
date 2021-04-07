@@ -20,8 +20,7 @@ class MakeModel extends GeneratorCommand
      * @var string
      */
     protected $signature = 'make:model {name : The name of the model}
-                                       {--user : Extend the base User model}
-                                       {--term : Extend the base Term model}
+                                       {--type=post : Extend the Post, User or Term models}
                                        {--force : Overwrite the model if it exists}';
 
     /**
@@ -54,9 +53,9 @@ class MakeModel extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ($this->option('term')) {
+        if ($this->option('type') == 'term') {
             return __DIR__ . '/stubs/model.term.stub';
-        } elseif ($this->option('user')) {
+        } elseif ($this->option('type') == 'user') {
             return __DIR__ . '/stubs/model.user.stub';
         } else {
             return __DIR__ . '/stubs/model.post.stub';
