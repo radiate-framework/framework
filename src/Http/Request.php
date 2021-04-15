@@ -315,7 +315,7 @@ class Request implements ArrayAccess, JsonSerializable
     {
         $https = $this->server('HTTPS');
 
-        return !empty($https) && strtolower($https) !== 'off';
+        return $https && strtolower($https) !== 'off';
     }
 
     /**
