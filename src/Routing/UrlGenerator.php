@@ -14,13 +14,22 @@ class UrlGenerator
     protected $request;
 
     /**
+     * The asset root
+     *
+     * @var string|null
+     */
+    protected $assetRoot;
+
+    /**
      * Assign the request object to the instance.
      *
-     * @return void
+     * @param \Radiate\Http\Request $request
+     * @param string|null $assetRoot
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, ?string $assetRoot = null)
     {
         $this->request = $request;
+        $this->assetRoot = $assetRoot;
     }
 
     /**
@@ -179,5 +188,21 @@ class UrlGenerator
         }
 
         return true;
+    }
+
+    /**
+     * Generate the URL to an application asset.
+     *
+     * @param string $path
+     * @return string
+     */
+    public function asset(string $path): string
+    {
+        if ($this->isValidUrl($path)) {
+            return $path;
+        }
+        $root = $this->assetRoot ?? site_url();
+
+        return trim($root, '/') . '/' . trim($path, '/');
     }
 }
