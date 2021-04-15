@@ -339,7 +339,7 @@ class Request implements ArrayAccess, JsonSerializable
             return $this->server('SERVER_PORT');
         }
 
-        return ($this->isSecure() ? 443 : 80);
+        return $this->isSecure() ? 443 : 80;
     }
 
     /**
@@ -352,7 +352,7 @@ class Request implements ArrayAccess, JsonSerializable
         $scheme = $this->getScheme();
         $port = $this->getPort();
 
-        if (('http' == $scheme && 80 == $port) || ('https' == $scheme && 443 == $port)) {
+        if (($scheme == 'http' && $port == 80) || ($scheme == 'https' && $port == 443)) {
             return $this->getHost();
         }
 
@@ -366,10 +366,7 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function getHost(): string
     {
-        return $this->header(
-            'host',
-            $this->server('SERVER_NAME', $this->server('SERVER_ADDR'))
-        );
+        return $this->header('host', $this->server('SERVER_NAME', $this->server('SERVER_ADDR')));
     }
 
     /**
@@ -385,11 +382,11 @@ class Request implements ArrayAccess, JsonSerializable
     /**
      * Get the query string
      *
-     * @return string|null
+     * @return string
      */
-    public function getQueryString(): ?string
+    public function getQueryString(): string
     {
-        return $this->server('QUERY_STRING') ?: null;
+        return $this->server('QUERY_STRING', '');
     }
 
     /**
