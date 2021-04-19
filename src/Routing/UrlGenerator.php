@@ -127,6 +127,10 @@ class UrlGenerator
      */
     public function to(string $path): string
     {
+        if ($this->isValidUrl($path)) {
+            return $path;
+        }
+        
         return $this->home($path);
     }
 
@@ -201,6 +205,7 @@ class UrlGenerator
         if ($this->isValidUrl($path)) {
             return $path;
         }
+        
         $root = $this->assetRoot ?? site_url();
 
         return trim($root, '/') . '/' . trim($path, '/');
