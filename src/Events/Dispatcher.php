@@ -53,11 +53,17 @@ class Dispatcher
      * Forget the event listeners
      *
      * @param string $event
+     * @param string|null $listener
+     * @param int|null $priority
      * @return void
      */
-    public function forget(string $event): void
+    public function forget(string $event, ?string $listener = null, ?int $priority = 10): void
     {
-        remove_all_filters($event);
+        if ($listener) {
+            remove_filter($event, $listener, $priority);
+        } else {
+            remove_all_filters($event);            
+        }
     }
 
     /**
