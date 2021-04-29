@@ -117,4 +117,14 @@ class Term extends Model
     {
         $this->attributes['term_id'] = $value;
     }
+    
+    /**
+     * Get the tag permalink
+     *
+     * @return string
+     */
+    public function permalink()
+    {
+        return get_term_link($this->getKey(), static::$taxonomy);
+    }
 }
