@@ -2,10 +2,13 @@
 
 namespace Radiate\Routing;
 
+use Illuminate\Support\Traits\Macroable;
 use Radiate\Http\Request;
 
 class UrlGenerator
 {
+    use Macroable;
+
     /**
      * The request instance
      *
@@ -109,6 +112,16 @@ class UrlGenerator
     }
 
     /**
+     * Return the privacy policy page if it is published.
+     *
+     * @return string
+     */
+    public function privacyPolicy(): string
+    {
+        return get_privacy_policy_url();
+    }
+
+    /**
      * Return the home URL
      *
      * @param string $path The path to append to the home URL
@@ -130,7 +143,7 @@ class UrlGenerator
         if ($this->isValidUrl($path)) {
             return $path;
         }
-        
+
         return $this->home($path);
     }
 
@@ -205,7 +218,7 @@ class UrlGenerator
         if ($this->isValidUrl($path)) {
             return $path;
         }
-        
+
         $root = $this->assetRoot ?? site_url();
 
         return trim($root, '/') . '/' . trim($path, '/');
