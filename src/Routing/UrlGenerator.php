@@ -125,21 +125,25 @@ class UrlGenerator
      * Return the home URL
      *
      * @param string $path The path to append to the home URL
+     * @param array $parameters The parameters to append to the home URL
      * @return string
      */
-    public function home(string $path = ''): string
+    public function home(string $path = '', array $parameters = []): string
     {
-        return home_url($path);
+        return home_url($path . $this->formatParameters($parameters));
     }
 
     /**
      * Return the URL to the path specified
      *
      * @param string $path The path to append to the home URL
+     * @param array $parameters parameters to pass to the URL
      * @return string
      */
-    public function to(string $path): string
+    public function to(string $path, array $parameters = []): string
     {
+        $path =  $path . $this->formatParameters($parameters);
+
         if ($this->isValidUrl($path)) {
             return $path;
         }
@@ -163,33 +167,38 @@ class UrlGenerator
      * Return the admin URL
      *
      * @param string $path The path to append to the admin URL
+     * @param array $parameters The parameters to append to the admin URL
      * @return string
      */
-    public function admin(string $path = ''): string
+    public function admin(string $path = '', array $parameters = []): string
     {
-        return admin_url($path);
+        return admin_url($path . $this->formatParameters($parameters));
     }
 
     /**
      * Return the ajax URL
      *
      * @param string $action The ajax action
+     * @param array $parameters The parameters to append to the ajax URL
      * @return string
      */
-    public function ajax(string $action = ''): string
+    public function ajax(string $action = '', array $parameters = []): string
     {
-        return $this->admin('admin-ajax.php' . ($action ? '?action=' . $action : ''));
+        $parameters['action'] = $action;
+
+        return $this->admin('admin-ajax.php', $parameters);
     }
 
     /**
      * Return the REST URL
      *
      * @param string $path The path to append to the admin URL
+     * @param array $parameters The parameters to append to the rest URL
      * @return string
      */
-    public function rest(string $path = ''): string
+    public function rest(string $path = '', array $parameters = []): string
     {
-        return rest_url($path);
+        return rest_url($path . $this->formatParameters($parameters));
     }
 
     /**
@@ -205,6 +214,17 @@ class UrlGenerator
         }
 
         return true;
+    }
+
+    /**
+     * Return a formatted query string
+     *
+     * @param array $parameters
+     * @return string
+     */
+    public function formatParameters(array $parameters = []): string
+    {
+        return $parameters ? '?' . http_build_query($parameters) : '';
     }
 
     /**
