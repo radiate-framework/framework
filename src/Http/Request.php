@@ -210,7 +210,7 @@ class Request implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * Get the query attributes
+     * Get the request attributes
      *
      * @param string|null $key
      * @param mixed|null $default
