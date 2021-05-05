@@ -26,7 +26,7 @@ class AjaxRoute extends Route
      * Dispatch the route
      *
      * @param \Radiate\Http\Request $request
-     * @return void
+     * @return \Closure
      */
     public function handle(Request $request)
     {
