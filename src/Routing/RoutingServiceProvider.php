@@ -2,6 +2,8 @@
 
 namespace Radiate\Routing;
 
+use Radiate\Support\Facades\Request;
+use Radiate\Support\Facades\Url;
 use Radiate\Support\ServiceProvider;
 
 class RoutingServiceProvider extends ServiceProvider
@@ -18,7 +20,13 @@ class RoutingServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('url', function ($app) {
-            return new UrlGenerator($app['request'], $app['config']['app.asset_url']);
+            $url = new UrlGenerator($app['request'], $app['config']['app.asset_url']);
+
+            $url->setKeyResolver(function () use ($app) {
+                return $app['config']['app.key'];
+            });
+
+            return $url;
         });
     }
 
@@ -29,9 +37,26 @@ class RoutingServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->registerRequestSignatureValidation();
+
         $this->commands([
             \Radiate\Routing\Console\MakeController::class,
             \Radiate\Routing\Console\MakeMiddleware::class,
         ]);
+    }
+
+    /**
+     * Register the "hasValidSignature" macro on the request.
+     *
+     * @return void
+     */
+    protected function registerRequestSignatureValidation()
+    {
+        Request::macro('hasValidSignature', function (): bool {
+            /**
+             * @var \Radiate\Http\Request $this
+             */
+            return Url::hasValidSignature($this);
+        });
     }
 }

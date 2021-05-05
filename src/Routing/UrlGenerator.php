@@ -2,8 +2,10 @@
 
 namespace Radiate\Routing;
 
+use DateTime;
 use Illuminate\Support\Traits\Macroable;
 use Radiate\Http\Request;
+use Radiate\Support\Arr;
 
 class UrlGenerator
 {
@@ -22,6 +24,13 @@ class UrlGenerator
      * @var string|null
      */
     protected $assetRoot;
+
+    /**
+     * The encryption key resolver callable.
+     *
+     * @var callable
+     */
+    protected $keyResolver;
 
     /**
      * Assign the request object to the instance.
@@ -119,6 +128,17 @@ class UrlGenerator
     public function privacyPolicy(): string
     {
         return get_privacy_policy_url();
+    }
+
+    /**
+     * Get the archive link
+     *
+     * @param string $postType
+     * @return string
+     */
+    public function archive(string $postType = 'post'): string
+    {
+        return get_post_type_archive_link($postType) ?? '';
     }
 
     /**
@@ -242,5 +262,96 @@ class UrlGenerator
         $root = $this->assetRoot ?? site_url();
 
         return trim($root, '/') . '/' . trim($path, '/');
+    }
+
+    /**
+     * Determine if the request URL has a valid signature
+     *
+     * @param \Radiate\Http\Request $request
+     * @return boolean
+     */
+    public function hasValidSignature(Request $request)
+    {
+        return $this->hasCorrectSignature($request)
+            && $this->signatureHasNotExpired($request);
+    }
+
+    /**
+     * Determine if the request URL has a correct signature
+     *
+     * @param \Radiate\Http\Request $request
+     * @return boolean
+     */
+    public function hasCorrectSignature(Request $request)
+    {
+        $original = rtrim($request->url() . '?' . Arr::query(
+            Arr::except($request->query(), 'signature')
+        ), '?');
+
+        $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
+
+        return hash_equals($signature, (string) $request->query('signature', ''));
+    }
+
+    /**
+     * Determine if the request URL is expired
+     *
+     * @param \Radiate\Http\Request $request
+     * @return boolean
+     */
+    public function signatureHasNotExpired(Request $request)
+    {
+        $expires = $request->query('expires');
+
+        return !($expires && (new DateTime())->getTimestamp() > $expires);
+    }
+
+    /**
+     * Create a signed URL
+     *
+     * @param string $path
+     * @param array $parameters
+     * @param integer|null $expiration
+     * @return string
+     */
+    public function signedUrl(string $path, array $parameters = [], ?int $expiration = null): string
+    {
+        ksort($parameters);
+
+        if ($expiration) {
+            $parameters['expires'] = (new DateTime())->getTimestamp() + $expiration;
+        }
+
+        $key = call_user_func($this->keyResolver);
+
+        $parameters['signature'] = hash_hmac('sha256', $this->to($path, $parameters), $key);
+
+        return $this->to($path, $parameters);
+    }
+
+    /**
+     * Get a temporary signed URL
+     *
+     * @param string $path
+     * @param integer $expiration
+     * @param array $parameters
+     * @return string
+     */
+    public function temporarySignedUrl(string $path, int $expiration, array $parameters = []): string
+    {
+        return $this->signedUrl($path, $parameters, $expiration);
+    }
+
+    /**
+     * Set the encryption key resolver.
+     *
+     * @param callable $keyResolver
+     * @return static
+     */
+    public function setKeyResolver(callable $keyResolver)
+    {
+        $this->keyResolver = $keyResolver;
+
+        return $this;
     }
 }

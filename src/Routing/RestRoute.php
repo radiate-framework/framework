@@ -28,14 +28,19 @@ class RestRoute extends Route
      * Dispatch the route
      *
      * @param \Radiate\Http\Request $request
-     * @return void
+     * @return \Closure
      */
     public function handle(Request $request)
     {
         return function (WP_REST_Request $wpRequest) use ($request) {
+
+            $request->setRouteResolver(function () {
+                return $this;
+            });
+
             die($this->runRequestThroughStack(
-                $request->merge($parameters = $wpRequest->get_url_params()),
-                $parameters
+                $request,
+                $this->parameters = $wpRequest->get_url_params()
             ));
         };
     }
