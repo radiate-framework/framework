@@ -204,7 +204,9 @@ class UrlGenerator
      */
     public function ajax(string $action = '', array $parameters = []): string
     {
-        $parameters['action'] = $action;
+        if ($action) {
+            $parameters['action'] = $action;
+        }
 
         return $this->admin('admin-ajax.php', $parameters);
     }
