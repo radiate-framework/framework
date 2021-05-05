@@ -13,6 +13,13 @@ class Request implements ArrayAccess, JsonSerializable
     use Macroable;
 
     /**
+     * The query attributes
+     *
+     * @var array
+     */
+    protected $query;
+
+    /**
      * The request attributes
      *
      * @var array
@@ -71,13 +78,15 @@ class Request implements ArrayAccess, JsonSerializable
     /**
      * Create the request instance
      *
+     * @param array $query
      * @param array $request
      * @param array $cookies
      * @param array $files
      * @param array $server
      */
-    public function __construct(array $request = [], array $cookies = [], array $files = [], array $server = [])
+    public function __construct(array $query = [], array $request = [], array $cookies = [], array $files = [], array $server = [])
     {
+        $this->query = $query;
         $this->request = $request;
         $this->cookies = $cookies;
         $this->files = $files;
@@ -92,7 +101,7 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public static function capture()
     {
-        return new static($_REQUEST, $_COOKIE, $_FILES, $_SERVER);
+        return new static($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER);
     }
 
     /**
@@ -106,6 +115,7 @@ class Request implements ArrayAccess, JsonSerializable
     {
         $request = $to ?: new static;
 
+        $request->query = $from->query;
         $request->request = $from->request;
         $request->cookies = $from->cookies;
         $request->files = $from->files;
@@ -176,6 +186,38 @@ class Request implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Get the query attributes
+     *
+     * @param string|null $key
+     * @param mixed|null $default
+     * @return mixed
+     */
+    public function query(?string $key = null, $default = null)
+    {
+        if ($key) {
+            return $this->query[$key] ?? $default;
+        }
+
+        return $this->query;
+    }
+
+    /**
+     * Get the query attributes
+     *
+     * @param string|null $key
+     * @param mixed|null $default
+     * @return mixed
+     */
+    public function post(?string $key = null, $default = null)
+    {
+        if ($key) {
+            return $this->request[$key] ?? $default;
+        }
+
+        return $this->request;
+    }
+
+    /**
      * Determine if the method matches the given method
      *
      * @return bool
@@ -213,7 +255,9 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function merge(array $attributes)
     {
-        $this->request = array_merge($this->request, $attributes);
+        foreach ($attributes as $key => $value) {
+            $this->add($key, $value);
+        }
 
         return $this;
     }
@@ -303,7 +347,9 @@ class Request implements ArrayAccess, JsonSerializable
             return $this->json();
         }
 
-        return $this->request;
+        return in_array($this->realMethod(), ['GET', 'HEAD'])
+            ? $this->query
+            : $this->request;
     }
 
     /**
@@ -467,7 +513,9 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function add(string $key, $value)
     {
-        $this->request[$key] = $value;
+        return in_array($this->realMethod(), ['GET', 'HEAD'])
+            ? $this->query[$key] = $value
+            : $this->request[$key] = $value;
     }
 
     /**
@@ -478,7 +526,11 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function remove(string $key)
     {
-        unset($this->request[$key]);
+        if (in_array($this->realMethod(), ['GET', 'HEAD'])) {
+            unset($this->query[$key]);
+        } else {
+            unset($this->request[$key]);
+        }
     }
 
     /**
@@ -578,7 +630,7 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function toArray(): array
     {
-        return $this->request;
+        return array_merge($this->request, $this->query);
     }
 
     /**
@@ -588,7 +640,7 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function toJson(): string
     {
-        return json_encode($this->request);
+        return json_encode($this->all());
     }
 
     /**
@@ -598,7 +650,7 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return $this->request;
+        return $this->all();
     }
 
     /**
