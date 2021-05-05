@@ -76,6 +76,13 @@ class Request implements ArrayAccess, JsonSerializable
     protected $userResolver;
 
     /**
+     * The route resolver
+     *
+     * @var \Closure
+     */
+    protected $routeResolver;
+
+    /**
      * Create the request instance
      *
      * @param array $query
@@ -125,6 +132,7 @@ class Request implements ArrayAccess, JsonSerializable
         $request->json = $from->json;
 
         $request->setUserResolver($from->getUserResolver());
+        $request->setRouteResolver($from->getRouteResolver());
 
         return $request;
     }
@@ -489,7 +497,9 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function has(string $key)
     {
-        return isset($this->getInputSource()[$key]);
+        return isset(
+            array_merge($this->getInputSource(), $this->route()->parameters())[$key]
+        );
     }
 
     /**
@@ -564,6 +574,49 @@ class Request implements ArrayAccess, JsonSerializable
     public function getUserResolver()
     {
         return $this->userResolver ?: function () {
+            //
+        };
+    }
+
+    /**
+     * Get the request route
+     *
+     * @param string|null $parameters
+     * @param mixed|null $default
+     * @return \Radiate\Routing\Route|mixed
+     */
+    public function route(?string $parameter = null, $default = null)
+    {
+        $route = call_user_func($this->getRouteResolver());
+
+        if (is_null($route) || is_null($parameter)) {
+            return $route;
+        }
+
+        return $route->parameter($parameter, $default);
+    }
+
+    /**
+     * Set the route resolver
+     *
+     * @param \Closure $resolver
+     * @return self
+     */
+    public function setRouteResolver(Closure $resolver)
+    {
+        $this->routeResolver = $resolver;
+
+        return $this;
+    }
+
+    /**
+     * Get the route resolver
+     *
+     * @return \Closure
+     */
+    public function getRouteResolver()
+    {
+        return $this->routeResolver ?: function () {
             //
         };
     }
@@ -695,5 +748,16 @@ class Request implements ArrayAccess, JsonSerializable
     public function __set(string $key, $value)
     {
         $this->add($key, $value);
+    }
+
+    /**
+     * Remove an attribute from the request
+     *
+     * @param string $key
+     * @return void
+     */
+    public function __unset(string $key)
+    {
+        $this->remove($key);
     }
 }
