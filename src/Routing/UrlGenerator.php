@@ -277,7 +277,6 @@ class UrlGenerator
      */
     public function hasCorrectSignature(Request $request)
     {
-
         $original = rtrim($request->url() . '?' . Arr::query(
             Arr::except($request->query(), 'signature')
         ), '?');
