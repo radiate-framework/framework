@@ -131,6 +131,17 @@ class UrlGenerator
     }
 
     /**
+     * Get the archive link
+     *
+     * @param string $postType
+     * @return string
+     */
+    public function archive(string $postType = 'post'): string
+    {
+        return get_post_type_archive_link($postType) ?? '';
+    }
+
+    /**
      * Return the home URL
      *
      * @param string $path The path to append to the home URL
@@ -252,10 +263,6 @@ class UrlGenerator
 
         return trim($root, '/') . '/' . trim($path, '/');
     }
-
-
-
-
 
     /**
      * Determine if the request URL has a valid signature
