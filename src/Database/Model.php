@@ -194,21 +194,6 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * Create a new model instance
-     *
-     * @param array $attributes
-     * @return \Radiate\Database\Model
-     */
-    public static function __create(array $attributes)
-    {
-        $model = new static($attributes);
-
-        $model->save();
-
-        return $model;
-    }
-
-    /**
      * Save the model to the database.
      *
      * @param  array  $options
