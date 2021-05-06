@@ -20,6 +20,13 @@ class Model implements ArrayAccess, JsonSerializable
     protected $primaryKey = 'ID';
 
     /**
+     * The object type
+     *
+     * @var string
+     */
+    protected $objectType = '';
+
+    /**
      * The array of booted models.
      *
      * @var array
@@ -110,6 +117,16 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Get the model's object type.
+     *
+     * @return string
+     */
+    public function getObjectType()
+    {
+        return $this->objectType;
+    }
+
+    /**
      * Get all of the models from the database.
      *
      * @param array|mixed $columns
@@ -191,21 +208,6 @@ class Model implements ArrayAccess, JsonSerializable
     public function newCollection(array $models = [])
     {
         return new Collection($models);
-    }
-
-    /**
-     * Create a new model instance
-     *
-     * @param array $attributes
-     * @return \Radiate\Database\Model
-     */
-    public static function __create(array $attributes)
-    {
-        $model = new static($attributes);
-
-        $model->save();
-
-        return $model;
     }
 
     /**
