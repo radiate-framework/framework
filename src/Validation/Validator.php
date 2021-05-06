@@ -37,6 +37,13 @@ class Validator
     protected $parsedRules = [];
 
     /**
+     * The valid inputs
+     *
+     * @var array
+     */
+    protected $validInputs = [];
+
+    /**
      * The error bag
      *
      * @var array

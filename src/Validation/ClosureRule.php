@@ -2,6 +2,8 @@
 
 namespace Radiate\Validation;
 
+use Closure;
+
 class ClosureRule implements Rule
 {
     /**
@@ -31,7 +33,7 @@ class ClosureRule implements Rule
      * @param \Closure $callback
      * @return void
      */
-    public function __construct(\Closure $callback)
+    public function __construct(Closure $callback)
     {
         $this->callback = $callback;
     }
@@ -59,7 +61,7 @@ class ClosureRule implements Rule
     /**
      * Get the validation error message.
      *
-     * @return string|array
+     * @return string|array|null
      */
     public function message()
     {
