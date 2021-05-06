@@ -21,7 +21,7 @@ class {{ class }} extends Mailable
      *
      * @return \Radiate\Mail\Mailable
      */
-    public function build(): self
+    public function build(): Mailable
     {
         return $this->markdown('emails.message');
     }
