@@ -20,6 +20,13 @@ class Model implements ArrayAccess, JsonSerializable
     protected $primaryKey = 'ID';
 
     /**
+     * The object type
+     *
+     * @var string
+     */
+    protected $objectType = '';
+
+    /**
      * The array of booted models.
      *
      * @var array
@@ -107,6 +114,16 @@ class Model implements ArrayAccess, JsonSerializable
     public function getKey()
     {
         return $this->getAttribute($this->getKeyName());
+    }
+
+    /**
+     * Get the model's object type.
+     *
+     * @return string
+     */
+    public function getObjectType()
+    {
+        return $this->objectType;
     }
 
     /**
