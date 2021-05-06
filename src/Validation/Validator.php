@@ -403,7 +403,7 @@ class Validator
     protected function parseRule($rule)
     {
         if ($rule instanceof Closure) {
-            return new Rules\ClosureRule($rule);
+            return new ClosureRule($rule);
         }
 
         if ($rule instanceof Rule) {

@@ -2,6 +2,7 @@
 
 namespace Radiate\Foundation\Http;
 
+use Radiate\Foundation\Http\Exceptions\HttpResponseException;
 use Radiate\Http\Request;
 
 class FormRequest extends Request
@@ -13,7 +14,25 @@ class FormRequest extends Request
      */
     public function validateResolved()
     {
-        $this->validate($this->rules());
+        if (!$this->passesAuthorization()) {
+            $this->failedAuthorization();
+        }
+
+        $this->validate($this->rules(), $this->messages());
+    }
+
+    /**
+     * Determine if the request passes the authorization check.
+     *
+     * @return bool
+     */
+    protected function passesAuthorization()
+    {
+        if (method_exists($this, 'authorize')) {
+            return $this->authorize();
+        }
+
+        return true;
     }
 
     /**
@@ -24,5 +43,27 @@ class FormRequest extends Request
     public function rules()
     {
         return [];
+    }
+
+    /**
+     * The rules to define on the form request
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [];
+    }
+
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @return void
+     *
+     * @throws \Radiate\Foundation\Http\Exceptions\HttpResponseException
+     */
+    protected function failedAuthorization()
+    {
+        throw new HttpResponseException('Unauthorised.', 401);
     }
 }
