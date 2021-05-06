@@ -7,24 +7,147 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use JsonSerializable;
+use Radiate\Database\Concerns\HasAttributes;
+use Radiate\Database\Model;
 
 class Meta implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable
 {
+    use HasAttributes;
+
     /**
-     * The meta attributes
+     * The model instance
      *
-     * @var array
+     * @var \Radiate\Database\Model
      */
-    protected $attributes = [];
+    protected $model;
 
     /**
      * Create the meta instance
      *
      * @param array $attributes
      */
-    public function __construct(array $attributes)
+    public function __construct(Model $model)
     {
-        $this->attributes = $attributes;
+        $this->model = $model;
+    }
+
+    /**
+     * Hydrate the attributes
+     *
+     * @return static
+     */
+    public function hydrate()
+    {
+        $meta = get_metadata($this->model->getObjectType(), $this->model->getKey()) ?? [];
+
+        $this->setRawAttributes($this->unserializeMeta($meta), true);
+
+        return $this;
+    }
+
+    /**
+     * Fill the attributes
+     *
+     * @param  array  $attributes
+     * @return static
+     */
+    public function fill(array $attributes = [])
+    {
+        foreach ($attributes as $key => $value) {
+            $this->setAttribute($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Save the model to the database.
+     *
+     * @return bool
+     */
+    public function save()
+    {
+        $saved = $this->isDirty() ? $this->performUpdate() : true;
+
+        if ($saved) {
+            $this->syncOriginal();
+        }
+
+        return $saved;
+    }
+
+    /**
+     * Update the model in the database.
+     *
+     * @param array $attributes
+     * @return bool
+     */
+    public function update(array $attributes = [])
+    {
+        return $this->fill($attributes)->save();
+    }
+
+    /**
+     * Perform a model update operation.
+     *
+     * @return bool
+     */
+    protected function performUpdate()
+    {
+        foreach ($this->getDirty() as $key => $value) {
+            update_metadata(
+                $this->model->getObjectType(),
+                (int) $this->model->getKey(),
+                $key,
+                $value
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Delete the model from the database.
+     *
+     * @param string|array $keys
+     * @return bool|null
+     */
+    public function delete($keys)
+    {
+        foreach ((array) $keys as $key) {
+            $this->offsetUnset($key);
+
+            delete_metadata(
+                $this->model->getObjectType(),
+                (int) $this->model->getKey(),
+                $key
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Unserialize the object meta
+     *
+     * @param array $meta
+     * @return array
+     */
+    protected function unserializeMeta(array $meta)
+    {
+        $unserialized = [];
+
+        foreach ($meta as $key => $values) {
+            $newValues = [];
+
+            foreach ($values as $value) {
+                $newValues[] = maybe_unserialize($value);
+            }
+
+            $unserialized[$key] = count($newValues) !== 1 ? $newValues : $newValues[0];
+        }
+
+        return $unserialized;
     }
 
     /**
@@ -45,6 +168,51 @@ class Meta implements ArrayAccess, Countable, IteratorAggregate, JsonSerializabl
     public function getIterator()
     {
         return new ArrayIterator($this->attributes);
+    }
+
+    /**
+     * Dynamically retrieve attributes on the model.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function get(string $key)
+    {
+        return $this->offsetGet($key);
+    }
+
+    /**
+     * Dynamically set attributes on the model.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    public function set(string $key, $value)
+    {
+        $this->offsetSet($key, $value);
+    }
+
+    /**
+     * Determine if an attribute or relation exists on the model.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has(string $key)
+    {
+        return $this->offsetExists($key);
+    }
+
+    /**
+     * Unset an attribute on the model.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public function remove(string $key)
+    {
+        $this->offsetUnset($key);
     }
 
     /**
