@@ -165,7 +165,6 @@ class Validator
             }));
 
             foreach ($rules as $rule) {
-
                 if (!$rule) {
                     continue;
                 }
