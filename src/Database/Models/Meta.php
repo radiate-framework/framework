@@ -38,7 +38,7 @@ class Meta implements ArrayAccess, Countable, IteratorAggregate, JsonSerializabl
      */
     public function hydrate()
     {
-        $meta = get_metadata($this->model->getObjectType(), $this->model->getKey()) ?? [];
+        $meta = get_metadata($this->model->getObjectType(), $this->model->getKey()) ?: [];
 
         $this->setRawAttributes($this->unserializeMeta($meta), true);
 
