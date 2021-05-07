@@ -233,15 +233,16 @@ class Validator
     /**
      * Get the custom error message if set
      *
+     * @param string $rule $attribute
      * @param \Radiate\Validation\Rules\Rule $rule
      * @return string|null
      */
     protected function getCustomErrorMessage(string $attribute, Rule $rule)
     {
-        $key = array_search(get_class($rule), $this->rules);
+        $key = $attribute . '.' . array_search(get_class($rule), $this->rules);
 
-        if (isset($this->customMessages[$attribute . '.' . $key])) {
-            return $this->customMessages[$attribute . '.' . $key];
+        if (isset($this->customMessages[$key])) {
+            return $this->customMessages[$key];
         }
 
         return null;
