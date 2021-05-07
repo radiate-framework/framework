@@ -216,7 +216,7 @@ class Validator
             $this->errorBag[$attribute] = [];
         }
 
-        if ($customMessage = $this->getCustomErrorMessage($rule)) {
+        if ($customMessage = $this->getCustomErrorMessage($attribute, $rule)) {
             $message = $customMessage;
         } elseif (in_array(get_class($rule), $this->sizeRules)) {
             $message = $this->getSizeMessage($attribute, $rule);
@@ -233,12 +233,13 @@ class Validator
     /**
      * Get the custom error message if set
      *
+     * @param string $rule $attribute
      * @param \Radiate\Validation\Rules\Rule $rule
      * @return string|null
      */
-    protected function getCustomErrorMessage(Rule $rule)
+    protected function getCustomErrorMessage(string $attribute, Rule $rule)
     {
-        $key = array_search(get_class($rule), $this->rules);
+        $key = $attribute . '.' . array_search(get_class($rule), $this->rules);
 
         if (isset($this->customMessages[$key])) {
             return $this->customMessages[$key];
