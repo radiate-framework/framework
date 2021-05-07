@@ -131,13 +131,25 @@ class UserQueryBuilder extends Builder
     /**
      * Find by the ID
      *
-     * @param mixed $id
+     * @param int $id
      * @param string $column
      * @return static
      */
-    public function find($id)
+    public function find(int $id)
     {
         return $this->where('include', $id)->first();
+    }
+
+    /**
+     * Find by the IDs
+     *
+     * @param array $ids
+     * @param string $column
+     * @return static
+     */
+    public function findMany(array $ids)
+    {
+        return $this->where('include', $ids)->get();
     }
 
     /**
