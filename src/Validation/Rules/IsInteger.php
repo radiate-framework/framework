@@ -13,7 +13,7 @@ class IsInteger implements Rule
      */
     public function passes(string $attribute, $value): bool
     {
-        return is_integer($value);
+        return filter_var($value, FILTER_VALIDATE_INT) !== false;
     }
 
     /**
