@@ -46,7 +46,7 @@ class Dispatcher
             return apply_filters(get_class($event), $event);
         }
 
-        return apply_filters($event, ...$payload);
+        return apply_filters($event, ...$payload ?: [null]);
     }
 
     /**
@@ -62,7 +62,7 @@ class Dispatcher
         if ($listener) {
             remove_filter($event, $listener, $priority);
         } else {
-            remove_all_filters($event);            
+            remove_all_filters($event);
         }
     }
 
