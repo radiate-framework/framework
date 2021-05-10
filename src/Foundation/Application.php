@@ -120,6 +120,7 @@ class Application extends Container
                 \Psr\Container\ContainerInterface::class,
             ],
             'auth' => [\Radiate\Auth\AuthManager::class],
+            'cache' => [\Radiate\Cache\Repository::class],
             'config' => [
                 \Radiate\Config\Repository::class,
                 \Illuminate\Config\Repository::class,
