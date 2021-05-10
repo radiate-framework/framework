@@ -1,10 +1,10 @@
 <?php
 
-namespace Radiate\Database;
+namespace Radiate\Cache;
 
 use Radiate\Support\ServiceProvider;
 
-class DatabaseServiceProvider extends ServiceProvider
+class CacheServiceProvider extends ServiceProvider
 {
     /**
      * Register the service provider.
@@ -13,10 +13,8 @@ class DatabaseServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton('db', function () {
-            global $wpdb;
-
-            return $wpdb;
+        $this->app->singleton('cache', function ($app) {
+            return new Repository($app['db']);
         });
     }
 
@@ -28,7 +26,7 @@ class DatabaseServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->commands([
-            \Radiate\Database\Console\MakeModel::class,
+            \Radiate\Cache\Console\CacheClear::class,
         ]);
     }
 }
