@@ -13,10 +13,12 @@ class DatabaseServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton('db', function () {
+        $this->app->singleton('db.connection', function () {
             global $wpdb;
-
             return $wpdb;
+        });
+        $this->app->singleton('db', function () {
+            // return the builder instance
         });
     }
 
