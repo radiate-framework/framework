@@ -3,7 +3,7 @@
 namespace Radiate\Routing;
 
 use Radiate\Support\Facades\Request;
-use Radiate\Support\Facades\Url;
+use Radiate\Support\Facades\URL;
 use Radiate\Support\ServiceProvider;
 
 class RoutingServiceProvider extends ServiceProvider
@@ -56,7 +56,7 @@ class RoutingServiceProvider extends ServiceProvider
             /**
              * @var \Radiate\Http\Request $this
              */
-            return Url::hasValidSignature($this);
+            return URL::hasValidSignature($this);
         });
     }
 }

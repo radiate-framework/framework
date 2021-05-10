@@ -20,7 +20,7 @@ namespace Radiate\Support\Facades;
  *
  * @see \Radiate\Routing\UrlGenerator
  */
-class Url extends Facade
+class URL extends Facade
 {
     /**
      * Get the name of the component
