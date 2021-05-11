@@ -228,6 +228,49 @@ class Repository implements ArrayAccess
     }
 
     /**
+     * Retrieve multiple items from the cache by key.
+     *
+     * Items not found in the cache will have a null value.
+     *
+     * @param  array  $keys
+     * @return array
+     */
+    public function many(array $keys)
+    {
+        $return = [];
+
+        $keys = collect($keys)->mapWithKeys(function ($value, $key) {
+            return [is_string($key) ? $key : $value => is_string($key) ? $value : null];
+        })->all();
+
+        foreach ($keys as $key => $default) {
+            $return[$key] = $this->get($key, $default);
+        }
+
+        return $return;
+    }
+
+    /**
+     * Store multiple items in the cache for a given number of seconds.
+     *
+     * @param  array  $values
+     * @param  int  $ttl
+     * @return bool
+     */
+    public function putMany(array $values, int $ttl = 0)
+    {
+        $manyResult = null;
+
+        foreach ($values as $key => $value) {
+            $result = $this->put($key, $value, $ttl);
+
+            $manyResult = is_null($manyResult) ? $result : $result && $manyResult;
+        }
+
+        return $manyResult ?: false;
+    }
+
+    /**
      * Determine if a cached value exists.
      *
      * @param  string  $key
