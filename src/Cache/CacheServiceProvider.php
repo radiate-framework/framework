@@ -27,6 +27,7 @@ class CacheServiceProvider extends ServiceProvider
     {
         $this->commands([
             \Radiate\Cache\Console\CacheClear::class,
+            \Radiate\Cache\Console\CacheForget::class,
         ]);
     }
 }

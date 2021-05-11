@@ -4,6 +4,7 @@ namespace Radiate\Cache;
 
 use ArrayAccess;
 use Closure;
+use wpdb;
 
 class Repository implements ArrayAccess
 {
@@ -24,9 +25,9 @@ class Repository implements ArrayAccess
     /**
      * Create the repository instance
      *
-     * @param object $wpdb
+     * @param \wpdb $wpdb
      */
-    public function __construct(object $wpdb)
+    public function __construct(wpdb $wpdb)
     {
         $this->wpdb = $wpdb;
     }
@@ -225,6 +226,68 @@ class Repository implements ArrayAccess
         $this->forever($key, $value = $callback());
 
         return $value;
+    }
+
+    /**
+     * Retrieve multiple items from the cache by key.
+     *
+     * Items not found in the cache will have a null value.
+     *
+     * @param  array  $keys
+     * @return array
+     */
+    public function many(array $keys)
+    {
+        $return = [];
+
+        $keys = collect($keys)->mapWithKeys(function ($value, $key) {
+            return [is_string($key) ? $key : $value => is_string($key) ? $value : null];
+        })->all();
+
+        foreach ($keys as $key => $default) {
+            $return[$key] = $this->get($key, $default);
+        }
+
+        return $return;
+    }
+
+    /**
+     * Store multiple items in the cache for a given number of seconds.
+     *
+     * @param  array  $values
+     * @param  int  $ttl
+     * @return bool
+     */
+    public function putMany(array $values, int $ttl = 0)
+    {
+        $manyResult = null;
+
+        foreach ($values as $key => $value) {
+            $result = $this->put($key, $value, $ttl);
+
+            $manyResult = is_null($manyResult) ? $result : $result && $manyResult;
+        }
+
+        return $manyResult ?: false;
+    }
+
+    /**
+     * Delete many keys from the cache
+     *
+     * @param array $keys
+     * @return bool
+     */
+    public function deleteMany(array $keys)
+    {
+        $result = true;
+
+        foreach ($keys as $key) {
+            if (!$this->delete($key)) {
+                $result = false;
+            }
+        }
+
+        return $result;
     }
 
     /**
