@@ -272,6 +272,25 @@ class Repository implements ArrayAccess
     }
 
     /**
+     * Delete many keys from the cache
+     *
+     * @param array $keys
+     * @return bool
+     */
+    public function deleteMany(array $keys)
+    {
+        $result = true;
+
+        foreach ($keys as $key) {
+            if (!$this->delete($key)) {
+                $result = false;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Determine if a cached value exists.
      *
      * @param  string  $key
