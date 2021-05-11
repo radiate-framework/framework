@@ -18,9 +18,9 @@ class Repository implements ArrayAccess
     /**
      * The wpdb instance
      *
-     * @var object
+     * @var \wpdb
      */
-    protected $wpdb = 3600;
+    protected $wpdb;
 
     /**
      * Create the repository instance

@@ -27,6 +27,6 @@ class CacheClear extends Command
      */
     public function handle()
     {
-        $this->call('transient delete --expired');
+        $this->call('transient delete --all');
     }
 }
