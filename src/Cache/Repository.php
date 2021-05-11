@@ -4,7 +4,7 @@ namespace Radiate\Cache;
 
 use ArrayAccess;
 use Closure;
-use wpdb;
+use Radiate\Database\Connection;
 
 class Repository implements ArrayAccess
 {
@@ -16,20 +16,20 @@ class Repository implements ArrayAccess
     protected $default = 3600;
 
     /**
-     * The wpdb instance
+     * The connection instance
      *
-     * @var \wpdb
+     * @var \Radiate\Database\Connection
      */
-    protected $wpdb;
+    protected $connection;
 
     /**
      * Create the repository instance
      *
-     * @param \wpdb $wpdb
+     * @param \Radiate\Database\Connection $connection
      */
-    public function __construct(wpdb $wpdb)
+    public function __construct(Connection $connection)
     {
-        $this->wpdb = $wpdb;
+        $this->connection = $connection;
     }
 
     /**
@@ -39,8 +39,8 @@ class Repository implements ArrayAccess
      */
     public function flush(): bool
     {
-        $flush = $this->wpdb->query(
-            "DELETE FROM {$this->wpdb->options} WHERE option_name LIKE ('%\_transient\_%')"
+        $flush = $this->connection->query(
+            "DELETE FROM {$this->connection->options} WHERE option_name LIKE ('%\_transient\_%')"
         );
 
         return $flush !== false;
