@@ -4,6 +4,7 @@ namespace Radiate\Cache;
 
 use ArrayAccess;
 use Closure;
+use wpdb;
 
 class Repository implements ArrayAccess
 {
@@ -24,9 +25,9 @@ class Repository implements ArrayAccess
     /**
      * Create the repository instance
      *
-     * @param object $wpdb
+     * @param \wpdb $wpdb
      */
-    public function __construct(object $wpdb)
+    public function __construct(wpdb $wpdb)
     {
         $this->wpdb = $wpdb;
     }
