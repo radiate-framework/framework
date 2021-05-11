@@ -54,6 +54,13 @@ class Application extends Container
     protected $routeMiddleware = [];
 
     /**
+     * The registered class aliases
+     *
+     * @var array
+     */
+    protected $registeredClassAliases = [];
+
+    /**
      * Create the applicaiton
      *
      * @param string $basePath
@@ -121,7 +128,7 @@ class Application extends Container
             ],
             'db' => [\Radiate\Database\DatabaseManager::class],
             'db.connection' => [
-                \Radiate\Database\Connection::class, 
+                \Radiate\Database\Connection::class,
                 \wpdb::class,
             ],
             'auth' => [\Radiate\Auth\AuthManager::class],
@@ -167,6 +174,24 @@ class Application extends Container
     protected function setFacadeRoot()
     {
         Facade::setFacadeApplication($this);
+    }
+
+    /**
+     * Register the class aliases
+     *
+     * @param array $aliases
+     * @return void
+     */
+    public function aliases(array $aliases = [])
+    {
+        foreach ($aliases as $alias => $class) {
+            if ($this->registeredClassAliases[$alias]) {
+                return;
+            }
+            if (class_alias($class, $alias)) {
+                $this->registeredClassAliases[$alias] = $class;
+            };
+        }
     }
 
     /**
