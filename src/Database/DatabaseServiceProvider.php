@@ -15,10 +15,11 @@ class DatabaseServiceProvider extends ServiceProvider
     {
         $this->app->singleton('db.connection', function () {
             global $wpdb;
-            return $wpdb;
+            return new Connection($wpdb);
         });
-        $this->app->singleton('db', function () {
-            // return the builder instance
+
+        $this->app->singleton('db', function ($app) {
+            return new DatabaseManager($app['db.connection']);
         });
     }
 

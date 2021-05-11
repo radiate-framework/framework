@@ -119,7 +119,7 @@ class Application extends Container
                 \Illuminate\Contracts\Container\Container::class,
                 \Psr\Container\ContainerInterface::class,
             ],
-            'db.connection' => [\wpdb::class],
+            'db.connection' => [\Radiate\Database\Connection::class],
             'auth' => [\Radiate\Auth\AuthManager::class],
             'cache' => [\Radiate\Cache\Repository::class],
             'config' => [
