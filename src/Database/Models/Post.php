@@ -268,7 +268,7 @@ class Post extends Model
      *
      * @return string|null
      */
-    public function getAuthorId()
+    public function getAuthorIdAttribute()
     {
         return $this->attributes['post_author'];
     }
@@ -279,7 +279,7 @@ class Post extends Model
      * @param string $value
      * @return void
      */
-    public function setAuthorId(string $value): void
+    public function setAuthorIdAttribute(string $value): void
     {
         $this->attributes['post_author'] = $value;
     }
