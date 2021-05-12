@@ -22,6 +22,15 @@ class AuthManager
     protected $providers = [];
 
     /**
+     * The user resolver shared by various services.
+     *
+     * Determines the default user for Gate, Request, and the Authenticatable contract.
+     *
+     * @var \Closure
+     */
+    protected $userResolver;
+
+    /**
      * Create the manager instance
      *
      * @param \Radiate\Foundation\Application $app
@@ -29,6 +38,10 @@ class AuthManager
     public function __construct(Application $app)
     {
         $this->app = $app;
+
+        $this->userResolver = function () {
+            return $this->user();
+        };
     }
 
     /**
@@ -121,5 +134,15 @@ class AuthManager
     public function __call(string $method, array $parameters)
     {
         return $this->provider()->$method(...$parameters);
+    }
+
+    /**
+     * Get the user resolver callback.
+     *
+     * @return \Closure
+     */
+    public function userResolver()
+    {
+        return $this->userResolver;
     }
 }
