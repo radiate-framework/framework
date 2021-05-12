@@ -250,4 +250,14 @@ class User extends Model
     {
         return in_array($role, $this->roles());
     }
+
+    /**
+     * Get the user capabilities
+     *
+     * @return array
+     */
+    public function capabilities()
+    {
+        return get_userdata($this->getKey())->allcaps;
+    }
 }
