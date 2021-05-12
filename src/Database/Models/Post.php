@@ -264,6 +264,27 @@ class Post extends Model
     }
 
     /**
+     * Get the author id
+     *
+     * @return string|null
+     */
+    public function getAuthorId()
+    {
+        return $this->attributes['post_author'];
+    }
+
+    /**
+     * Set the author id
+     *
+     * @param string $value
+     * @return void
+     */
+    public function setAuthorId(string $value): void
+    {
+        $this->attributes['post_author'] = $value;
+    }
+
+    /**
      * Get the permalink
      *
      * @return string
