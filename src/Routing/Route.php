@@ -2,6 +2,7 @@
 
 namespace Radiate\Routing;
 
+use Closure;
 use Radiate\Foundation\Application;
 use Radiate\Http\Request;
 use Radiate\Support\Pipeline;
@@ -89,9 +90,16 @@ abstract class Route
      */
     public function action()
     {
-        if (is_callable($this->action)) {
+        if ($this->action instanceof Closure) {
             return $this->action;
         }
+
+        if (is_array($this->action)) {
+            $class = is_object($a = $this->action[0]) ? $a : new $a;
+
+            return [$class, $this->action[1]];
+        }
+
         if (is_string($this->action) && class_exists($this->action)) {
             return [new $this->action, '__invoke'];
         }

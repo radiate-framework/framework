@@ -8,6 +8,7 @@ use Radiate\Foundation\Application;
 use Radiate\Foundation\Http\Exceptions\HttpResponseException;
 use Radiate\Support\Arr;
 use Radiate\Support\Collection;
+use Radiate\Support\Str;
 
 class Gate
 {
@@ -163,11 +164,160 @@ class Gate
 
         $result = $user && $this->hasCoreCapability($user, $ability, $arguments);
 
-        if (!$callback = $this->abilities[$ability]) {
+        if (!$this->has($ability) && !$this->hasPolicy($arguments)) {
             return $result;
         }
 
+        return $this->callAuthCallback($user, $ability, $arguments);
+    }
+
+    /**
+     * Determine if the first argument is a policy
+     *
+     * @param array $arguments
+     * @return boolean
+     */
+    protected function hasPolicy(array $arguments)
+    {
+        return isset($arguments[0]) && !is_null($this->getPolicyFor($arguments[0]));
+    }
+
+    /**
+     * Resolve and call the appropriate authorization callback.
+     *
+     * @param  \Radiate\Database\Models\User|null  $user
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function callAuthCallback(?User $user, string $ability, array $arguments)
+    {
+        $callback = $this->resolveAuthCallback($user, $ability, $arguments);
+
         return $callback($user, ...$arguments);
+    }
+
+    /**
+     * Resolve the callable for the given ability and arguments.
+     *
+     * @param  \Radiate\Database\Models\User|null  $user
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return callable
+     */
+    protected function resolveAuthCallback(?User $user, string $ability, array $arguments)
+    {
+        if (
+            isset($arguments[0]) &&
+            !is_null($policy = $this->getPolicyFor($arguments[0])) &&
+            $callback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)
+        ) {
+            return $callback;
+        }
+
+        if ($this->has($ability)) {
+            return $this->abilities[$ability];
+        }
+
+        return function () {
+            //
+        };
+    }
+
+    /**
+     * Resolve the callback for a policy check.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @param  mixed  $policy
+     * @return bool|callable
+     */
+    protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
+    {
+        if (!is_callable([$policy, $this->formatAbilityToMethod($ability)])) {
+            return false;
+        }
+
+        return function () use ($user, $ability, $arguments, $policy) {
+            $method = $this->formatAbilityToMethod($ability);
+
+            return $this->callPolicyMethod($policy, $method, $user, $arguments);
+        };
+    }
+
+    /**
+     * Format the policy ability into a method name.
+     *
+     * @param  string  $ability
+     * @return string
+     */
+    protected function formatAbilityToMethod(string $ability)
+    {
+        return Str::camel($ability);
+    }
+
+    /**
+     * Call the appropriate method on the given policy.
+     *
+     * @param  mixed  $policy
+     * @param  string  $method
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  array  $arguments
+     * @return mixed
+     */
+    protected function callPolicyMethod($policy, $method, $user, array $arguments)
+    {
+        // If this first argument is a string, that means they are passing a class name
+        // to the policy. We will remove the first argument from this argument array
+        // because this policy already knows what type of models it can authorize.
+        if (isset($arguments[0]) && is_string($arguments[0])) {
+            array_shift($arguments);
+        }
+
+        if (!is_callable([$policy, $method])) {
+            return;
+        }
+
+        return $policy->{$method}($user, ...$arguments);
+    }
+
+    /**
+     * Get a policy instance for a given class.
+     *
+     * @param  object|string  $class
+     * @return mixed
+     */
+    public function getPolicyFor($class)
+    {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        if (!is_string($class)) {
+            return;
+        }
+
+        if (isset($this->policies[$class])) {
+            return $this->resolvePolicy($this->policies[$class]);
+        }
+
+        foreach ($this->policies as $expected => $policy) {
+            if (is_subclass_of($class, $expected)) {
+                return $this->resolvePolicy($policy);
+            }
+        }
+    }
+
+    /**
+     * Build a policy class instance of the given type.
+     *
+     * @param  object|string  $class
+     * @return mixed
+     */
+    public function resolvePolicy($class)
+    {
+        return $this->app->make($class);
     }
 
     /**
@@ -224,7 +374,7 @@ class Gate
         };
 
         return new static(
-            $this->container,
+            $this->app,
             $callback,
             $this->abilities,
             $this->policies

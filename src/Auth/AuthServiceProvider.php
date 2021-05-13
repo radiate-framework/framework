@@ -38,6 +38,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->commands([
+            \Radiate\Auth\Console\MakePolicy::class,
+        ]);
     }
 }
