@@ -60,9 +60,7 @@ class MakePolicy extends GeneratorCommand
             throw new LogicException('The [' . $provider . '] provider is not defined in your "auth" configuration file.');
         }
 
-        return $config->get(
-            'auth.providers.' . $provider . '.model'
-        );
+        return $config->get('auth.providers.' . $provider . '.model');
     }
 
     /**
