@@ -18,6 +18,8 @@ namespace Radiate\Support\Facades;
  * @method static bool has(string $ability): Determine if a given ability has been defined.
  * @method static bool raw(string $ability, array|mixed $arguments = []) Get the raw result from the authorization callback.
  * @method static bool hasCoreCapability(\Radiate\Database\Models\User $user, string $ability, array $arguments = []) Determine if the user has a core capability
+ * @method static mixed getPolicyFor(object|string $class) Get a policy instance for a given class.
+ * @method static mixed resolvePolicy(object|string $class) Build a policy class instance of the given type.
  *
  * @see \Radiate\Auth\Access\Gate
  */
