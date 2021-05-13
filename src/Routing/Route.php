@@ -204,7 +204,7 @@ abstract class Route
     protected function runRequestThroughStack(Request $request, array $parameters = [])
     {
         try {
-            $response = (new Pipeline())
+            $response = (new Pipeline($this->app))
                 ->send($request)
                 ->through($this->gatherMiddleware())
                 ->then(function ($request) use ($parameters) {
