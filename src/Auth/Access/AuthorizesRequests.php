@@ -15,7 +15,7 @@ trait AuthorizesRequests
      *
      * @throws \Radiate\Foundation\Http\Exceptions\HttpResponseException
      */
-    public function authorize($ability, $arguments = [])
+    public function authorize(string $ability, $arguments = [])
     {
         return Gate::authorize($ability, $arguments);
     }
@@ -30,7 +30,7 @@ trait AuthorizesRequests
      *
      * @throws \Radiate\Foundation\Http\Exceptions\HttpResponseException
      */
-    public function authorizeForUser($user, $ability, $arguments = [])
+    public function authorizeForUser($user, string $ability, $arguments = [])
     {
         return Gate::forUser($user)->authorize($ability, $arguments);
     }
