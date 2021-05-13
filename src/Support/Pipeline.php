@@ -3,9 +3,17 @@
 namespace Radiate\Support;
 
 use Closure;
+use Illuminate\Contracts\Container\Container;
 
 class Pipeline
 {
+    /**
+     * The container implementation.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
     /**
      * The object being passed through the pipeline.
      *
@@ -26,6 +34,16 @@ class Pipeline
      * @var string
      */
     protected $method = 'handle';
+
+    /**
+     * Create the pipeline instance
+     *
+     * @param \Illuminate\Contracts\Container\Container $container
+     */
+    public function __construct(?Container $container = null)
+    {
+        $this->container = $container;
+    }
 
     /**
      * Set the object being sent through the pipeline.
@@ -122,7 +140,7 @@ class Pipeline
                     return $pipe($passable, $stack);
                 }
                 if (is_string($pipe) && class_exists($pipe)) {
-                    $pipe = new $pipe;
+                    $pipe = $this->container ? $this->container->make($pipe) : new $pipe;
 
                     return method_exists($pipe, $this->method)
                         ? $pipe->{$this->method}($passable, $stack)
