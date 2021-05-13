@@ -27,7 +27,7 @@ class MakePolicy extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Create a new policy class';
 
     /**
      * Replace the class name for the given stub.
