@@ -18,6 +18,7 @@ class ConsoleServiceProvider extends ServiceProvider
     protected $commands = [
         \Radiate\Foundation\Console\DownCommand::class,
         \Radiate\Foundation\Console\EnvironmentCommand::class,
+        \Radiate\Foundation\Console\KeyGenerate::class,
         \Radiate\Foundation\Console\ListCommand::class,
         \Radiate\Foundation\Console\MakeCommand::class,
         \Radiate\Foundation\Console\MakeProvider::class,
