@@ -1,6 +1,6 @@
 <?php
 
-namespace Theme\Auth\Console;
+namespace Radiate\Auth\Console;
 
 use LogicException;
 use Radiate\Console\GeneratorCommand;
