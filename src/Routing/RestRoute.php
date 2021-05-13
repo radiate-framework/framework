@@ -33,7 +33,6 @@ class RestRoute extends Route
     public function handle(Request $request)
     {
         return function (WP_REST_Request $wpRequest) use ($request) {
-
             $request->setRouteResolver(function () {
                 return $this;
             });
