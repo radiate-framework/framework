@@ -240,7 +240,6 @@ class Gate
         }
 
         return function () use ($user, $ability, $arguments, $policy) {
-
             $method = $this->formatAbilityToMethod($ability);
 
             return $this->callPolicyMethod($policy, $method, $user, $arguments);
