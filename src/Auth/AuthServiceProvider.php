@@ -2,6 +2,7 @@
 
 namespace Radiate\Auth;
 
+use Radiate\Auth\Access\Gate;
 use Radiate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -15,6 +16,12 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->app->singleton('auth', function ($app) {
             return new AuthManager($app);
+        });
+
+        $this->app->singleton('gate', function ($app) {
+            return new Gate($app, function () use ($app) {
+                return call_user_func($app['auth']->userResolver());
+            });
         });
 
         $this->app->rebinding('request', function ($app, $request) {
