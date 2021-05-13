@@ -447,7 +447,7 @@ class Model implements ArrayAccess, JsonSerializable
      * @param  array  $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call(string $method, array $parameters = [])
     {
         return $this->getQueryBuilder()->$method(...$parameters);
     }
@@ -459,7 +459,7 @@ class Model implements ArrayAccess, JsonSerializable
      * @param  array  $parameters
      * @return mixed
      */
-    public static function __callStatic($method, $parameters)
+    public static function __callStatic(string $method, array $parameters = [])
     {
         return (new static)->$method(...$parameters);
     }
