@@ -266,22 +266,22 @@ class Post extends Model
     /**
      * Get the author id
      *
-     * @return string|null
+     * @return int
      */
     public function getAuthorIdAttribute()
     {
-        return $this->attributes['post_author'];
+        return (int) $this->attributes['post_author'];
     }
 
     /**
      * Set the author id
      *
-     * @param string $value
+     * @param int $value
      * @return void
      */
-    public function setAuthorIdAttribute(string $value): void
+    public function setAuthorIdAttribute(int $value): void
     {
-        $this->attributes['post_author'] = $value;
+        $this->attributes['post_author'] = (int) $value;
     }
 
     /**
