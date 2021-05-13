@@ -224,7 +224,7 @@ class Gate
         };
 
         return new static(
-            $this->container,
+            $this->app,
             $callback,
             $this->abilities,
             $this->policies
