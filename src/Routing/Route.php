@@ -39,6 +39,13 @@ abstract class Route
     protected $uri;
 
     /**
+     * The route name
+     *
+     * @var string
+     */
+    protected $name = '';
+
+    /**
      * The route action
      *
      * @var mixed
@@ -106,6 +113,33 @@ abstract class Route
     }
 
     /**
+     * Get the action name for the route.
+     *
+     * @return string
+     */
+    public function getActionName()
+    {
+        if ($this->action instanceof Closure) {
+            return 'Closure';
+        }
+        if (is_string($this->action)) {
+            return $this->action;
+        }
+        if (is_object($this->action)) {
+            return get_class($this->action);
+        }
+        if (is_array($this->action)) {
+            $class =  is_string($this->action[0])
+                ? $this->action[0]
+                : get_class($this->action[0]);
+
+            return $class . '@' . $this->action[1];
+        }
+
+        return '';
+    }
+
+    /**
      * Return the route methods
      *
      * @return array
@@ -145,6 +179,29 @@ abstract class Route
     public function prefix(string $path = '')
     {
         return trim($this->attributes['prefix'] . ($path ? '/' . $path : $path), '/');
+    }
+
+    /**
+     * Set the route name
+     *
+     * @param string $name
+     * @return static
+     */
+    public function name(string $name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get the route name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
