@@ -38,4 +38,16 @@ class AjaxRoute extends Route
             die($this->runRequestThroughStack($request));
         };
     }
+
+    /**
+     * Generate a URL for the route
+     *
+     * @param \Radiate\Routing\UrlGenerator $url
+     * @param array $parameters
+     * @return string
+     */
+    public function generateUrl(UrlGenerator $url, array $parameters = [])
+    {
+        return $url->ajax($this->uri(), $parameters);
+    }
 }
