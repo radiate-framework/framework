@@ -54,4 +54,26 @@ class RestRoute extends Route
     {
         return preg_replace('@\/\{([\w]+?)(\?)?\}@', '\/?(?P<$1>[\w-]+)$2', $uri);
     }
+
+    /**
+     * Generate a URL for the route
+     *
+     * @param \Radiate\Routing\UrlGenerator $url
+     * @param array $parameters
+     * @return string
+     */
+    public function generateUrl(UrlGenerator $url, array $parameters = [])
+    {
+        $path = preg_replace_callback('/\{(.*?)\}/', function ($matches) use (&$parameters) {
+            if ($value = $parameters[$matches[1]]) {
+                unset($parameters[$matches[1]]);
+
+                return $value;
+            }
+
+            return $matches[0];
+        }, $this->uri());
+
+        return $url->rest($path, $parameters);
+    }
 }

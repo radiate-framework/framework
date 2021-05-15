@@ -56,6 +56,10 @@ class RouteList extends Command
      */
     public function handle()
     {
+        if (empty($this->getRoutes())) {
+            return $this->error("Your application doesn't have any routes.");
+        }
+
         $this->table($this->getHeaders(), $this->getRoutes());
     }
 
