@@ -39,6 +39,13 @@ abstract class Route
     protected $uri;
 
     /**
+     * The route name
+     *
+     * @var string
+     */
+    protected $name = '';
+
+    /**
      * The route action
      *
      * @var mixed
@@ -145,6 +152,29 @@ abstract class Route
     public function prefix(string $path = '')
     {
         return trim($this->attributes['prefix'] . ($path ? '/' . $path : $path), '/');
+    }
+
+    /**
+     * Set the route name
+     *
+     * @param string $name
+     * @return static
+     */
+    public function name(string $name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get the route name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
