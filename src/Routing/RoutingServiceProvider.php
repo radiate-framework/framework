@@ -42,6 +42,7 @@ class RoutingServiceProvider extends ServiceProvider
         $this->commands([
             \Radiate\Routing\Console\MakeController::class,
             \Radiate\Routing\Console\MakeMiddleware::class,
+            \Radiate\Routing\Console\RouteList::class,
         ]);
     }
 

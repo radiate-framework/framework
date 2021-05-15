@@ -113,6 +113,33 @@ abstract class Route
     }
 
     /**
+     * Get the action name for the route.
+     *
+     * @return string
+     */
+    public function getActionName()
+    {
+        if ($this->action instanceof Closure) {
+            return 'Closure';
+        }
+        if (is_string($this->action)) {
+            return $this->action;
+        }
+        if (is_object($this->action)) {
+            return get_class($this->action);
+        }
+        if (is_array($this->action)) {
+            $class =  is_string($this->action[0])
+                ? $this->action[0]
+                : get_class($this->action[0]);
+
+            return $class . '@' . $this->action[1];
+        }
+
+        return '';
+    }
+
+    /**
      * Return the route methods
      *
      * @return array
