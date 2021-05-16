@@ -20,7 +20,9 @@ class RoutingServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('url', function ($app) {
-            $url = new UrlGenerator($app['request'], $app['config']['app.asset_url']);
+            $routes = $app['router']->getRoutes();
+
+            $url = new UrlGenerator($routes, $app['request'], $app['config']['app.asset_url']);
 
             $url->setKeyResolver(function () use ($app) {
                 return $app['config']['app.key'];

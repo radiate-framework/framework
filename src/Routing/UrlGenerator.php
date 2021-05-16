@@ -4,12 +4,21 @@ namespace Radiate\Routing;
 
 use DateTime;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use Radiate\Http\Request;
 use Radiate\Support\Arr;
+use Radiate\Support\Collection;
 
 class UrlGenerator
 {
     use Macroable;
+
+    /**
+     * Theapp routes
+     *
+     * @var \Radiate\Support\Collection
+     */
+    protected $routes;
 
     /**
      * The request instance
@@ -35,11 +44,13 @@ class UrlGenerator
     /**
      * Assign the request object to the instance.
      *
+     * @param \Radiate\Support\Collection $routes
      * @param \Radiate\Http\Request $request
      * @param string|null $assetRoot
      */
-    public function __construct(Request $request, ?string $assetRoot = null)
+    public function __construct(Collection $routes, Request $request, ?string $assetRoot = null)
     {
+        $this->routes = $routes;
         $this->request = $request;
         $this->assetRoot = $assetRoot;
     }
@@ -221,6 +232,28 @@ class UrlGenerator
     public function rest(string $path = '', array $parameters = []): string
     {
         return rest_url($path . $this->formatParameters($parameters));
+    }
+
+    /**
+     * Get a named route URL
+     *
+     * @param string $name
+     * @param array $parameters
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function route(string $name, array $parameters = [])
+    {
+        $route = $this->routes->filter(function ($route) use ($name) {
+            return $route->getName() == $name;
+        })->first();
+
+        if ($route) {
+            return $route->generateUrl($this, $parameters);
+        }
+
+        throw new InvalidArgumentException("Route [{$name}] not defined.");
     }
 
     /**
