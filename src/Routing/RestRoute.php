@@ -75,6 +75,6 @@ class RestRoute extends Route
             return $matches[0];
         }, $this->uri());
 
-        return $url->rest($path, $parameters);
+        return $url->rest($this->namespace() . '/' . $path, $parameters);
     }
 }
