@@ -319,6 +319,18 @@ abstract class Route
     }
 
     /**
+     * Set a parameter
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function setParameter(string $key, $value)
+    {
+        $this->parameters[$key] = $value;
+    }
+
+    /**
      * Dispatch the request to the route
      *
      * @param \Radiate\Http\Request $request
