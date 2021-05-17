@@ -37,10 +37,9 @@ class RestRoute extends Route
                 return $this;
             });
 
-            die($this->runRequestThroughStack(
-                $request,
-                $this->parameters = $wpRequest->get_url_params()
-            ));
+            $this->parameters = $wpRequest->get_url_params();
+
+            die($this->runRequestThroughStack($request));
         };
     }
 

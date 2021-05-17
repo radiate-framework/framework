@@ -255,17 +255,16 @@ abstract class Route
      * Handle the controller action
      *
      * @param \Radiate\Http\Request $request
-     * @param array $parameters
      * @return mixed
      */
-    protected function runRequestThroughStack(Request $request, array $parameters = [])
+    protected function runRequestThroughStack(Request $request)
     {
         try {
             $response = (new Pipeline($this->app))
                 ->send($request)
                 ->through($this->gatherMiddleware())
-                ->then(function ($request) use ($parameters) {
-                    return $this->app->call($this->action(), $parameters);
+                ->then(function () {
+                    return $this->app->call($this->action(), $this->parameters());
                 });
         } catch (Throwable $e) {
             $response = $this->app->renderException($request, $e);
@@ -316,6 +315,18 @@ abstract class Route
     public function parameter(string $key, $default = null)
     {
         return $this->parameters[$key] ?? $default;
+    }
+
+    /**
+     * Set a parameter
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function setParameter(string $key, $value)
+    {
+        $this->parameters[$key] = $value;
     }
 
     /**
