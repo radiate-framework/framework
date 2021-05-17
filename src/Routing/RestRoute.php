@@ -64,7 +64,9 @@ class RestRoute extends Route
     public function generateUrl(UrlGenerator $url, array $parameters = [])
     {
         $path = preg_replace_callback('/\{(.*?)\}/', function ($matches) use (&$parameters) {
-            if (isset($parameters[$matches[1]]) && $value = $parameters[$matches[1]]) {
+            if (isset($parameters[$matches[1]])) {
+                $value = $parameters[$matches[1]];
+
                 unset($parameters[$matches[1]]);
 
                 return $value;
