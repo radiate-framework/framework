@@ -255,7 +255,6 @@ abstract class Route
      * Handle the controller action
      *
      * @param \Radiate\Http\Request $request
-     * @param array $parameters
      * @return mixed
      */
     protected function runRequestThroughStack(Request $request)
