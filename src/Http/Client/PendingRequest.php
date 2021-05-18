@@ -40,6 +40,13 @@ class PendingRequest
     protected $options = [];
 
     /**
+     * Whether the requests should be asynchronous.
+     *
+     * @var bool
+     */
+    protected $async = false;
+
+    /**
      * Create a new HTTP Client instance.
      *
      * @param  \Radiate\Http\Client\Factory|null  $factory
@@ -48,6 +55,19 @@ class PendingRequest
     public function __construct(Factory $factory = null)
     {
         $this->factory = $factory;
+    }
+
+    /**
+     * Toggle asynchronicity in requests.
+     *
+     * @param  bool  $async
+     * @return static
+     */
+    public function async(bool $async = true)
+    {
+        $this->async = $async;
+
+        return $this;
     }
 
     /**
@@ -314,7 +334,9 @@ class PendingRequest
             $options['body'] = json_encode($options['body']);
         }
 
-        return $this->sendRequest($method, $url, $options);
+        if (!$this->async) {
+            return $this->sendRequest($method, $url, $options);
+        }
     }
 
     /**
