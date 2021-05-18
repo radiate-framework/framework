@@ -304,7 +304,7 @@ class PendingRequest
      * @param  array  $options
      * @return \Radiate\Http\Client\Response
      *
-     * @throws \Exception
+     * @throws \Radiate\Http\Client\ConnectionException
      */
     public function send(string $method, string $url, array $options = [])
     {
@@ -314,6 +314,21 @@ class PendingRequest
             $options['body'] = json_encode($options['body']);
         }
 
+        return $this->sendRequest($method, $url, $options);
+    }
+
+    /**
+     * Send the request to the given URL.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return \Radiate\Http\Client\Response
+     *
+     * @throws \Radiate\Http\Client\ConnectionException
+     */
+    protected function sendRequest(string $method, string $url, array $options = [])
+    {
         $response = wp_remote_request($url, $this->mergeOptions([
             'method'  => $method,
         ], $options));
