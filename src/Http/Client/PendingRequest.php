@@ -225,7 +225,7 @@ class PendingRequest
      */
     public function withoutVerifying()
     {
-        $this->options['sslverify'] = 0;
+        $this->options['sslverify'] = false;
 
         return $this;
     }
