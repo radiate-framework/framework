@@ -2,6 +2,12 @@
 
 namespace Radiate\Http\Client;
 
+use Closure;
+use Requests;
+use Requests_Exception;
+use Requests_Response;
+use WP_HTTP_Requests_Response;
+
 class PendingRequest
 {
     /**
@@ -40,6 +46,20 @@ class PendingRequest
     protected $options = [];
 
     /**
+     * Whether the requests should be asynchronous.
+     *
+     * @var bool
+     */
+    protected $async = false;
+
+    /**
+     * The pending request promise.
+     *
+     * @var array
+     */
+    protected $promise;
+
+    /**
      * Create a new HTTP Client instance.
      *
      * @param  \Radiate\Http\Client\Factory|null  $factory
@@ -48,6 +68,29 @@ class PendingRequest
     public function __construct(Factory $factory = null)
     {
         $this->factory = $factory;
+    }
+
+    /**
+     * Toggle asynchronicity in requests.
+     *
+     * @param  bool  $async
+     * @return static
+     */
+    public function async(bool $async = true)
+    {
+        $this->async = $async;
+
+        return $this;
+    }
+
+    /**
+     * Retrieve the pending request promise.
+     *
+     * @return array
+     */
+    public function getPromise()
+    {
+        return $this->promise;
     }
 
     /**
@@ -205,7 +248,8 @@ class PendingRequest
      */
     public function withoutVerifying()
     {
-        $this->options['sslverify'] = 0;
+        $this->options['sslverify'] = false;
+        $this->options['verify'] = false;
 
         return $this;
     }
@@ -302,9 +346,9 @@ class PendingRequest
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
-     * @return \Radiate\Http\Client\Response
+     * @return \Radiate\Http\Client\Response|static
      *
-     * @throws \Exception
+     * @throws \Radiate\Http\Client\ConnectionException
      */
     public function send(string $method, string $url, array $options = [])
     {
@@ -314,8 +358,51 @@ class PendingRequest
             $options['body'] = json_encode($options['body']);
         }
 
+        if ($this->async) {
+            return $this->makePromise($method, $url, $options);
+        }
+
+        return $this->sendRequest($method, $url, $options);
+    }
+
+    /**
+     * Store the request as a promise
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return static
+     */
+    protected function makePromise(string $method, string $url, array $options = [])
+    {
+        $options = $this->mergeOptions($options);
+
+        $this->promise = [
+            'url'     => $url,
+            'headers' => $options['headers'],
+            'data'    => $options['body'],
+            'type'    => $method,
+            'options' => $options,
+            'cookies' => $options['cookies'],
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Send the request to the given URL.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return \Radiate\Http\Client\Response
+     *
+     * @throws \Radiate\Http\Client\ConnectionException
+     */
+    protected function sendRequest(string $method, string $url, array $options = [])
+    {
         $response = wp_remote_request($url, $this->mergeOptions([
-            'method'  => $method,
+            'method' => $method,
         ], $options));
 
         if (!is_wp_error($response)) {
@@ -334,5 +421,50 @@ class PendingRequest
     protected function mergeOptions(...$options)
     {
         return array_merge_recursive($this->options, ...$options);
+    }
+
+    /**
+     * Send a pool of asynchronous requests concurrently.
+     *
+     * @param  callable  $callback
+     * @return array
+     */
+    public function pool(callable $callback)
+    {
+        $promises = [];
+
+        $callback($pool = new Pool());
+
+        foreach ($pool->getRequests() as $key => $item) {
+            $promises[$key] = $item instanceof PendingRequest ? $item->getPromise() : $item;
+        }
+
+        $responses = array_map(
+            [$this, 'resolveResponse'],
+            Requests::request_multiple($promises)
+        );
+
+        ksort($responses);
+
+        return $responses;
+    }
+
+    /**
+     * Resolve the response
+     *
+     * @param \Requests_Response|\Requests_Exception $response
+     * @return \Radiate\Http\Client\Response
+     *
+     * @throws \Radiate\Http\Client\ConnectionException
+     */
+    protected function resolveResponse($response)
+    {
+        if ($response instanceof Requests_Exception) {
+            throw new ConnectionException($response->getMessage());
+        }
+
+        $response = new WP_HTTP_Requests_Response($response);
+
+        return new Response($response);
     }
 }
