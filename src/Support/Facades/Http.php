@@ -25,6 +25,7 @@ use Radiate\Http\Client\Factory;
  * @method static \Radiate\Http\Client\Response patch(string $url, array $data = [])
  * @method static \Radiate\Http\Client\Response delete(string $url, array $data = [])
  * @method static \Radiate\Http\Client\Response send(string $method, string $url, array $options = [])
+ * @method static array pool(callable $callback)
  *
  * @see \Radiate\Http\Client\Factory
  */
