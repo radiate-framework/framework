@@ -383,6 +383,7 @@ class PendingRequest
             'data'    => $options['body'],
             'type'    => $method,
             'options' => $options,
+            'cookies' => $options['cookies'],
         ];
 
         return $this;
