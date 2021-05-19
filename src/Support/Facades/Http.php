@@ -27,7 +27,7 @@ use Radiate\Http\Client\Factory;
  * @method static \Radiate\Http\Client\Response send(string $method, string $url, array $options = [])
  * @method static array pool(callable $callback)
  *
- * @see \Radiate\Http\Client\Factory
+ * @see \Radiate\Http\Client\Factory|\Radiate\Http\Client\PendingRequest
  */
 class Http extends Facade
 {
