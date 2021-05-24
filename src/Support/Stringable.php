@@ -333,6 +333,16 @@ class Stringable
     {
         return !$this->isEmpty();
     }
+    
+    /**
+     * Generate a UUID (version 4).
+     *
+     * @return string
+     */
+    public function uuid(): string
+    {
+        return wp_generate_uuid4();   
+    }
 
     /**
      * Determine if a given string is a valid UUID.
