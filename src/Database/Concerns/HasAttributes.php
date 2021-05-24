@@ -179,7 +179,7 @@ trait HasAttributes
      */
     public function getDirty(): array
     {
-        return array_diff($this->getAttributes(), $this->original);
+        return array_diff_assoc($this->getAttributes(), $this->original);
     }
 
     /**
