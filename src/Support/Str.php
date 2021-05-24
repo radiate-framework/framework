@@ -22,6 +22,7 @@ namespace Radiate\Support;
  * @method static bool isEmpty(string $string) Determine if the given string is empty.
  * @method static bool isNotEmpty(string $string) Determine if the given string is not empty.
  * @method static bool isUuid(string $string) Determine if a given string is a valid UUID.
+ * @method static string uuid() Generate a UUID (version 4).
  * @method static \Radiate\Support\Stringable kebab(string $string) Convert a string to kebab case.
  * @method static int length(string $string, ?string $encoding = null) Return the length of the given string.
  * @method static \Radiate\Support\Stringable limit(string $string, int $limit = 100, string $end = '...') Limit the number of characters in a string.
@@ -86,9 +87,9 @@ class Str
      * @param array $parameters
      * @return mixed
      */
-    public static function __callStatic(string $method, array $parameters)
+    public static function __callStatic(string $method, array $parameters = [])
     {
-        $str = (new Stringable(array_shift($parameters)))->$method(...$parameters);
+        $str = (new Stringable(array_shift($parameters) ?? ''))->$method(...$parameters);
 
         return $str instanceof Stringable ? $str->toString() : $str;
     }
