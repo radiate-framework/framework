@@ -33,7 +33,9 @@ class FormRequest extends Request
             $this->failedAuthorization();
         }
 
-        $this->validatedAttributes = $this->validate($this->container->call([$this, 'rules']), $this->messages());
+        $this->validatedAttributes = $this->validate(
+            $this->container->call([$this, 'rules']), $this->messages()
+        );
     }
     
     /**
