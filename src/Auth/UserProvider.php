@@ -38,6 +38,14 @@ interface UserProvider
      * @return bool
      */
     public function loginUsingId(int $id, bool $remember = false): bool;
+    
+    /**
+     * Retrieve a user by the given credentials.
+     *
+     * @param array $credentials
+     * @return mixed|false
+     */
+    public function retrieveByCredentials(array $credentials);
 
     /**
      * Log out
