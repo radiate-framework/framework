@@ -112,7 +112,7 @@ class RadiateUserProvider implements UserProvider
      * @param array $credentials
      * @return \Radiate\Database\Models\User|false
      */
-    protected function retrieveByCredentials(array $credentials)
+    public function retrieveByCredentials(array $credentials)
     {
         $user = wp_authenticate($credentials['username'], $credentials['password']);
 
