@@ -2,6 +2,7 @@
 
 namespace Radiate\Auth;
 
+use Closure;
 use InvalidArgumentException;
 use Radiate\Foundation\Application;
 
