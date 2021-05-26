@@ -14,6 +14,13 @@ class FormRequest extends Request
      * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
+    
+    /**
+     * The valildated attributes.
+     *
+     * @var array
+     */
+    protected $validatedAttributes = [];
 
     /**
      * Validate the class instance.
@@ -26,7 +33,17 @@ class FormRequest extends Request
             $this->failedAuthorization();
         }
 
-        $this->validate($this->container->call([$this, 'rules']), $this->messages());
+        $this->validatedAttributes = $this->validate($this->container->call([$this, 'rules']), $this->messages());
+    }
+    
+    /**
+     * Get the validated attributes.
+     *
+     * @return array
+     */
+    public function validated()
+    {
+        return $this->validatedAttributes;   
     }
 
     /**
