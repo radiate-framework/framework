@@ -33,7 +33,7 @@ abstract class JsonResource implements ArrayAccess, JsonSerializable
      * @param  mixed  $resource
      * @return \Radiate\Support\Collection
      */
-    public static function collection(array $resources)
+    public static function collection($resources)
     {
         return (new Collection($resources))->map(function ($resource) {
             return new static($resource);

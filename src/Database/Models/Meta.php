@@ -174,11 +174,12 @@ class Meta implements ArrayAccess, Countable, IteratorAggregate, JsonSerializabl
      * Dynamically retrieve attributes on the model.
      *
      * @param  string  $key
+     * @param  mixed   $default
      * @return mixed
      */
-    public function get(string $key)
+    public function get(string $key, $default = null)
     {
-        return $this->offsetGet($key);
+        return $this->offsetGet($key) ?? $default;
     }
 
     /**

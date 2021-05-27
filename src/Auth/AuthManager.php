@@ -2,6 +2,7 @@
 
 namespace Radiate\Auth;
 
+use Closure;
 use InvalidArgumentException;
 use Radiate\Foundation\Application;
 
@@ -144,5 +145,18 @@ class AuthManager
     public function userResolver()
     {
         return $this->userResolver;
+    }
+    
+    /**
+     * Set the callback to be used to resolve users.
+     *
+     * @param  \Closure  $userResolver
+     * @return $this
+     */
+    public function resolveUsersUsing(Closure $userResolver)
+    {
+        $this->userResolver = $userResolver;
+
+        return $this;
     }
 }

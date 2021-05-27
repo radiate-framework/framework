@@ -26,7 +26,7 @@ class AuthServiceProvider extends ServiceProvider
 
         $this->app->rebinding('request', function ($app, $request) {
             $request->setUserResolver(function () use ($app) {
-                return $app['auth']->user();
+                return call_user_func($app['auth']->userResolver());
             });
         });
     }

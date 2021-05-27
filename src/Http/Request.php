@@ -108,7 +108,19 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public static function capture()
     {
-        return new static($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER);
+        $request = new static($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER);
+
+        if (
+            Str::startsWith($request->header('CONTENT_TYPE', ''), 'application/x-www-form-urlencoded') &&
+            in_array($request->realMethod(), ['PUT', 'PATCH', 'DELETE'])
+        ) {
+            parse_str($request->getContent(), $data);
+            $request->request = $data;
+        }
+
+        $request->request = $request->getInputSource();
+
+        return $request;
     }
 
     /**
