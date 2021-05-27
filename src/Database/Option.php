@@ -53,7 +53,7 @@ class Option implements JsonSerializable
     }
 
     /**
-     * Get all the otpinos
+     * Get all the options
      *
      * @return array
      */
