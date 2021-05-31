@@ -107,6 +107,16 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return $this->getKeyName();
+    }
+
+    /**
      * Get the value of the model's primary key.
      *
      * @return mixed

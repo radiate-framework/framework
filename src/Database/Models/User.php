@@ -27,6 +27,16 @@ class User extends Model
     protected $objectType = 'user';
 
     /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'include';
+    }
+
+    /**
      * Perform any actions required before the model boots.
      *
      * @return void

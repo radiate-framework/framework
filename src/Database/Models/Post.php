@@ -34,6 +34,16 @@ class Post extends Model
     protected static $postType = 'post';
 
     /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'p';
+    }
+
+    /**
      * Perform any actions required after the model boots.
      *
      * @return void

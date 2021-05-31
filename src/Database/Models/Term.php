@@ -32,6 +32,16 @@ class Term extends Model
     protected static $taxonomy;
 
     /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'include';
+    }
+
+    /**
      * Perform any actions required after the model boots.
      *
      * @return void
@@ -117,7 +127,7 @@ class Term extends Model
     {
         $this->attributes['term_id'] = $value;
     }
-    
+
     /**
      * Get the tag permalink
      *

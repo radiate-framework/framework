@@ -78,7 +78,7 @@ class SubstituteBindings
         $instance = $this->app->make($model);
 
         if ($instance instanceof Model) {
-            if (!$return = $instance->find($value)) {
+            if (!$return = $instance->where($instance->getRouteKeyName(), $value)->first()) {
                 throw new RuntimeException("No query results for model [{$model}]");
             }
 
