@@ -9,23 +9,64 @@ use Radiate\Schedule\Concerns\ManagesFrequencies;
 class Event
 {
     use ManagesFrequencies;
-    protected $schedule;
+
+    /**
+     * The event callback
+     *
+     * @var callable|string
+     */
     protected $callback;
+
+    /**
+     * Parameters to pass to the event callback
+     *
+     * @var array
+     */
     protected $parameters = [];
+
+    /**
+     * The event timezone
+     *
+     * @var \DateTimeZone|string
+     */
     protected $timezone;
+
+    /**
+     * The CRON expression
+     *
+     * @var string
+     */
     public $expression = '* * * * *';
+
+    /**
+     * The schedule description
+     *
+     * @var string
+     */
     public $description;
 
-    public function __construct($callback, $parameters = [], $timezone = null)
+    public function __construct($callback, array $parameters = [], $timezone = null)
     {
         $this->callback = $callback;
         $this->parameters = $parameters;
         $this->timezone = $timezone;
     }
+
+    /**
+     * Get the CRON expression
+     *
+     * @return string
+     */
     public function getExpression()
     {
         return $this->expression;
     }
+
+    /**
+     * Get the event callback
+     *
+     * @return \Closure
+     */
     public function event()
     {
         return function () {
@@ -39,16 +80,37 @@ class Event
         };
     }
 
+    /**
+     * Set the event name
+     *
+     * @param string $name
+     * @return static
+     */
     public function name(string $name)
     {
         $this->description = $name;
 
         return $this;
     }
+
+    /**
+     * Get the event description
+     *
+     * @return string
+     */
     public function getSummaryForDisplay()
     {
         return $this->description;
     }
+
+    /**
+     * Get the next event run date
+     *
+     * @param string $currentTime
+     * @param integer $nth
+     * @param boolean $allowCurrentDate
+     * @return \DateTime
+     */
     public function nextRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
     {
         return (new CronExpression($this->getExpression()))
