@@ -324,7 +324,7 @@ class Builder
      * Get the first record
      *
      * @param string $column
-     * @return static
+     * @return mixed
      */
     public function first()
     {
@@ -338,7 +338,7 @@ class Builder
      * @param array $parameters
      * @return mixed
      */
-    public function __call(string $method, array $parameters)
+    public function __call(string $method, array $parameters = [])
     {
         if (method_exists($this->model, $scope = 'scope' . ucfirst($method))) {
             return $this->model->$scope($this, ...$parameters);
