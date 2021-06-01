@@ -45,6 +45,13 @@ class Event
      */
     public $description;
 
+    /**
+     * Create the event instance
+     *
+     * @param callable|string $callback
+     * @param array $parameters
+     * @param \DateTimeZone|string $timezone
+     */
     public function __construct($callback, array $parameters = [], $timezone = null)
     {
         $this->callback = $callback;
