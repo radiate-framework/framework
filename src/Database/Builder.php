@@ -324,7 +324,7 @@ class Builder
      * Get the first record
      *
      * @param string $column
-     * @return mixed
+     * @return \Radiate\Database\Model|mixed
      */
     public function first()
     {
