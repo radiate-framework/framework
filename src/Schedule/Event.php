@@ -79,11 +79,9 @@ class Event
         return function () {
             $container = Application::getInstance();
 
-            $response = is_object($this->callback)
+            return is_object($this->callback)
                 ? $container->call([$this->callback, '__invoke'], $this->parameters)
                 : $container->call($this->callback, $this->parameters);
-
-            return $response;
         };
     }
 

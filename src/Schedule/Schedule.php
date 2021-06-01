@@ -7,15 +7,39 @@ use Radiate\Foundation\Application;
 
 class Schedule
 {
+    /**
+     * The application instance
+     *
+     * @var \Radiate\Foundation\Application
+     */
     protected $app;
+
+    /**
+     * The event dispatcher
+     *
+     * @var \Radiate\Events\Dispatcher
+     */
     protected $dispatcher;
+
+    /**
+     * The registered events
+     *
+     * @var array
+     */
     protected $events = [];
 
+    /**
+     * Create the scheduler instance
+     *
+     * @param \Radiate\Foundation\Application $app
+     * @param \Radiate\Events\Dispatcher $dispatcher
+     */
     public function __construct(Application $app, Dispatcher $dispatcher)
     {
         $this->app = $app;
         $this->dispatcher = $dispatcher;
     }
+
     /**
      * Add a new callback event to the schedule.
      *
@@ -25,24 +49,40 @@ class Schedule
      */
     public function call($callback, array $parameters = [])
     {
-        $this->events[] = $event = new Event(
-            $callback,
-            $parameters,
-            $this->timezone
-        );
+        $this->events[] = $event = new Event($callback, $parameters);
 
         return $event;
     }
+
+    /**
+     * Schedule a new job
+     *
+     * @param object|string $job
+     * @return \Radiate\Schedule\Event
+     */
     public function job($job)
     {
         return $this->call($job)->name(is_string($job) ? $job : get_class($job));
     }
+
+    /**
+     * Register the scheduled events
+     *
+     * @return void
+     */
     public function registerScheduledEvents()
     {
         foreach ($this->events as $event) {
             $this->registerScheduledEvent($event);
         }
     }
+
+    /**
+     * Register a scheduled event
+     *
+     * @param \Radiate\Schedule\Event $event
+     * @return void
+     */
     public function registerScheduledEvent(Event $event)
     {
         $this->dispatcher->listen(
