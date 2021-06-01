@@ -230,6 +230,18 @@ class Validator
     }
 
     /**
+     * Add a error message to the validator
+     *
+     * @param string $key
+     * @param string $message
+     * @return void
+     */
+    public function addError(string $key, string $message)
+    {
+        $this->errorBag[$key][] = $message;
+    }
+
+    /**
      * Get the custom error message if set
      *
      * @param string $rule $attribute
