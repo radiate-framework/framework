@@ -116,7 +116,7 @@ class Event
      * @param boolean $allowCurrentDate
      * @return \DateTime
      */
-    public function nextRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
+    public function nextRunDate(string $currentTime = 'now', int $nth = 0, bool $allowCurrentDate = false)
     {
         return (new CronExpression($this->getExpression()))
             ->getNextRunDate($currentTime, $nth, $allowCurrentDate, $this->timezone);
