@@ -27,7 +27,7 @@ class Event
     /**
      * The event timezone
      *
-     * @var \DateTimeZone|string
+     * @var \DateTimeZone|string|null
      */
     protected $timezone;
 
@@ -50,7 +50,7 @@ class Event
      *
      * @param callable|string $callback
      * @param array $parameters
-     * @param \DateTimeZone|string $timezone
+     * @param \DateTimeZone|string|null $timezone
      */
     public function __construct($callback, array $parameters = [], $timezone = null)
     {

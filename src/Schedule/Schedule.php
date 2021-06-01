@@ -45,13 +45,11 @@ class Schedule
      *
      * @param  string|callable  $callback
      * @param  array  $parameters
-     * @return \Illuminate\Console\Scheduling\CallbackEvent
+     * @return \Radiate\Schedule\Event
      */
     public function call($callback, array $parameters = [])
     {
-        $this->events[] = $event = new Event($callback, $parameters);
-
-        return $event;
+        return $this->events[] = new Event($callback, $parameters);
     }
 
     /**
