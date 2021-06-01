@@ -2,7 +2,6 @@
 
 namespace Radiate\Schedule;
 
-use Radiate\Schedule\Schedule;
 use Radiate\Support\ServiceProvider;
 
 class ScheduleServiceProvider extends ServiceProvider
