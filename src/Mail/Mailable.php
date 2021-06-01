@@ -2,6 +2,7 @@
 
 namespace Radiate\Mail;
 
+use Radiate\Database\Models\User;
 use Radiate\Support\Str;
 use Radiate\Support\Facades\View;
 use ReflectionClass;
@@ -284,6 +285,12 @@ abstract class Mailable
             return (object) [
                 'address' => $recipient->user_email,
                 'name'    => $recipient->display_name ?? '',
+            ];
+        }
+        if ($recipient instanceof User) {
+            return (object) [
+                'address' => $recipient->email,
+                'name'    => $recipient->name ?? '',
             ];
         }
         if (is_array($recipient)) {
