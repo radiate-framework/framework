@@ -212,7 +212,9 @@ abstract class Mailable
     {
         $this->text($path, $data);
 
-        $this->html = Str::markdown($this->text);
+        $this->html = View::make('mail.layout', [
+            'markdown' => Str::markdown($this->text),
+        ])->render();
 
         return $this;
     }
