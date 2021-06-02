@@ -41,7 +41,9 @@ class RadiateUserProvider implements UserProvider
      */
     protected function newUserInstance(array $attributes)
     {
-        return $this->model->newInstance($attributes, true);
+        $this->model->setRawAttributes((array) $attributes, true);
+
+        return $this->model;
     }
 
     /**

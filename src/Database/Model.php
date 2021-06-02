@@ -6,6 +6,7 @@ use ArrayAccess;
 use JsonSerializable;
 use Radiate\Database\Concerns\HasAttributes;
 use Radiate\Database\Concerns\HasGlobalScopes;
+use RuntimeException;
 
 class Model implements ArrayAccess, JsonSerializable
 {
@@ -46,6 +47,20 @@ class Model implements ArrayAccess, JsonSerializable
      * @var bool
      */
     public $wasRecentlyCreated = false;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var string[]
+     */
+    protected $fillable = [];
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var string[]
+     */
+    protected $guarded = ['*'];
 
     /**
      * Create a new Eloquent model instance.
@@ -313,10 +328,50 @@ class Model implements ArrayAccess, JsonSerializable
     public function fill(array $attributes)
     {
         foreach ($attributes as $key => $value) {
-            $this->setAttribute($key, $value);
+            if ($this->isFillable($key)) {
+                $this->setAttribute($key, $value);
+            } else {
+                throw new RuntimeException(sprintf(
+                    'Add [%s] to fillable property to allow mass assignment on [%s].',
+                    $key,
+                    get_class($this)
+                ));
+            }
         }
 
         return $this;
+    }
+
+    /**
+     * Set the fillable attributes for the model.
+     *
+     * @param  array  $fillable
+     * @return $this
+     */
+    public function fillable(array $fillable)
+    {
+        $this->fillable = $fillable;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the attribute is fillable
+     *
+     * @param string $key
+     * @return boolean
+     */
+    protected function isFillable(string $key)
+    {
+        if (in_array($key, $this->fillable)) {
+            return true;
+        }
+
+        if (in_array($key, $this->guarded) || in_array('*', $this->guarded)) {
+            return false;
+        }
+
+        return empty($this->fillable);
     }
 
     /**
