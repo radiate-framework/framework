@@ -139,7 +139,7 @@ class User extends Model
     /**
      * Get the url attribute
      *
-     * @return string
+     * @return string|null
      */
     public function getUrlAttribute()
     {
@@ -152,7 +152,7 @@ class User extends Model
      * @param string $value
      * @return void
      */
-    public function setUrlAttribute(string $value)
+    public function setUrlAttribute(?string $value = null)
     {
         $this->attributes['user_url'] = $value;
     }
