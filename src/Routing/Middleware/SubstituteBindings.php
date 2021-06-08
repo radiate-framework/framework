@@ -3,7 +3,6 @@
 namespace Radiate\Routing\Middleware;
 
 use Closure;
-use Exception;
 use Radiate\Database\Model;
 use Radiate\Foundation\Application;
 use Radiate\Foundation\Http\Exceptions\HttpResponseException;
