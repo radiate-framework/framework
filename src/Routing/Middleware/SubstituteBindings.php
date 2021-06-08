@@ -3,8 +3,10 @@
 namespace Radiate\Routing\Middleware;
 
 use Closure;
+use Exception;
 use Radiate\Database\Model;
 use Radiate\Foundation\Application;
+use Radiate\Foundation\Http\Exceptions\HttpResponseException;
 use Radiate\Http\Request;
 use Radiate\Routing\Route;
 use ReflectionFunction;
@@ -79,7 +81,7 @@ class SubstituteBindings
 
         if ($instance instanceof Model) {
             if (!$return = $instance->where($instance->getRouteKeyName(), $value)->first()) {
-                throw new RuntimeException("No query results for model [{$model}]");
+                throw new HttpResponseException("No query results for model [{$model}]", 404);
             }
 
             return $return;
