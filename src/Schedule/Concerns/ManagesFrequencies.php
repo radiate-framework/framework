@@ -2,7 +2,10 @@
 
 namespace Radiate\Schedule\Concerns;
 
+use Closure;
+use DateInterval;
 use DateTime;
+use DateTimeZone;
 
 trait ManagesFrequencies
 {
@@ -19,57 +22,61 @@ trait ManagesFrequencies
         return $this;
     }
 
-    # /**
-    #  * Schedule the event to run between start and end time.
-    #  *
-    #  * @param  string  $startTime
-    #  * @param  string  $endTime
-    #  * @return $this
-    #  */
-    # public function between($startTime, $endTime)
-    # {
-    #     return $this->when($this->inTimeInterval($startTime, $endTime));
-    # }
+    /**
+     * Schedule the event to run between start and end time.
+     *
+     * @param  string  $startTime
+     * @param  string  $endTime
+     * @return static
+     */
+    public function between(string $startTime, string $endTime)
+    {
+        return $this->when($this->inTimeInterval($startTime, $endTime));
+    }
 
-    # /**
-    #  * Schedule the event to not run between start and end time.
-    #  *
-    #  * @param  string  $startTime
-    #  * @param  string  $endTime
-    #  * @return $this
-    #  */
-    # public function unlessBetween($startTime, $endTime)
-    # {
-    #     return $this->skip($this->inTimeInterval($startTime, $endTime));
-    # }
+    /**
+     * Schedule the event to not run between start and end time.
+     *
+     * @param  string  $startTime
+     * @param  string  $endTime
+     * @return static
+     */
+    public function unlessBetween(string $startTime, string $endTime)
+    {
+        return $this->skip($this->inTimeInterval($startTime, $endTime));
+    }
 
-    # /**
-    #  * Schedule the event to run between start and end time.
-    #  *
-    #  * @param  string  $startTime
-    #  * @param  string  $endTime
-    #  * @return \Closure
-    #  */
-    # private function inTimeInterval($startTime, $endTime)
-    # {
-    #     [$now, $startTime, $endTime] = [
-    #         Carbon::now($this->timezone),
-    #         Carbon::parse($startTime, $this->timezone),
-    #         Carbon::parse($endTime, $this->timezone),
-    #     ];
+    /**
+     * Schedule the event to run between start and end time.
+     *
+     * @param  string  $startTime
+     * @param  string  $endTime
+     * @return \Closure
+     */
+    private function inTimeInterval(string $startTime, string $endTime): Closure
+    {
+        $timezone = $this->timezone instanceof DateTimeZone ?: new DateTimeZone($this->timezone);
 
-    #     if ($endTime->lessThan($startTime)) {
-    #         if ($startTime->greaterThan($now)) {
-    #             $startTime->subDay(1);
-    #         } else {
-    #             $endTime->addDay(1);
-    #         }
-    #     }
+        [$now, $startTime, $endTime] = [
+            new DateTime('now', $timezone),
+            DateTime::createFromFormat('H:i', $startTime, $timezone),
+            DateTime::createFromFormat('H:i', $endTime, $timezone),
+        ];
 
-    #     return function () use ($now, $startTime, $endTime) {
-    #         return $now->between($startTime, $endTime);
-    #     };
-    # }
+        $oneDay = new DateInterval('P1D');
+
+        if ($endTime < $startTime) {
+            if ($startTime > $now) {
+                $startTime->sub($oneDay);
+            } else {
+                $endTime->add($oneDay);
+            }
+        }
+
+        return function () use ($now, $startTime, $endTime) {
+            return $now > $startTime && $now < $endTime;
+        };
+    }
 
     /**
      * Schedule the event to run every minute.

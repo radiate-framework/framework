@@ -2,6 +2,7 @@
 
 namespace Radiate\Schedule;
 
+use Closure;
 use Cron\CronExpression;
 use Radiate\Foundation\Application;
 use Radiate\Schedule\Concerns\ManagesFrequencies;
@@ -44,6 +45,20 @@ class Event
      * @var string
      */
     public $description;
+
+    /**
+     * The array of filter callbacks.
+     *
+     * @var array
+     */
+    protected $filters = [];
+
+    /**
+     * The array of reject callbacks.
+     *
+     * @var array
+     */
+    protected $rejects = [];
 
     /**
      * Create the event instance
@@ -120,5 +135,58 @@ class Event
     {
         return (new CronExpression($this->getExpression()))
             ->getNextRunDate($currentTime, $nth, $allowCurrentDate, $this->timezone);
+    }
+
+    /**
+     * Determine if the filters pass for the event.
+     *
+     * @param  \Radiate\Foundation\Application  $app
+     * @return bool
+     */
+    public function filtersPass(Application $app): bool
+    {
+        foreach ($this->filters as $callback) {
+            if (!$app->call($callback)) {
+                return false;
+            }
+        }
+
+        foreach ($this->rejects as $callback) {
+            if ($app->call($callback)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Register a callback to further filter the schedule.
+     *
+     * @param  \Closure|bool  $callback
+     * @return static
+     */
+    public function when($callback)
+    {
+        $this->filters[] = $callback instanceof Closure ? $callback : function () use ($callback) {
+            return $callback;
+        };
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to further filter the schedule.
+     *
+     * @param  \Closure|bool  $callback
+     * @return static
+     */
+    public function skip($callback)
+    {
+        $this->rejects[] = $callback instanceof Closure ? $callback : function () use ($callback) {
+            return $callback;
+        };
+
+        return $this;
     }
 }

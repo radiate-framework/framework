@@ -71,7 +71,9 @@ class Schedule
     public function registerScheduledEvents()
     {
         foreach ($this->events as $event) {
-            $this->registerScheduledEvent($event);
+            if ($event->filtersPass($this->app)) {
+                $this->registerScheduledEvent($event);
+            }
         }
     }
 
