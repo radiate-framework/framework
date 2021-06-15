@@ -3,6 +3,7 @@
 namespace Radiate\Database;
 
 use JsonSerializable;
+use Radiate\Support\Collection;
 
 class Option implements JsonSerializable
 {
@@ -30,6 +31,28 @@ class Option implements JsonSerializable
     }
 
     /**
+     * Get many options
+     *
+     * @param array $keys
+     * @param mixed|null $default
+     * @return array
+     */
+    public function getMany(array $keys, $default = null): array
+    {
+        $return = [];
+
+        $keys = Collection::make($keys)->mapWithKeys(function ($value, $key) use ($default) {
+            return [is_string($key) ? $key : $value => is_string($key) ? $value : $default];
+        })->all();
+
+        foreach ($keys as $key => $default) {
+            $return[$key] = $this->get($key, $default);
+        }
+
+        return $return;
+    }
+
+    /**
      * Set an option
      *
      * @param string $key
@@ -42,6 +65,25 @@ class Option implements JsonSerializable
     }
 
     /**
+     * Set many options
+     *
+     * @param array $options
+     * @return boolean
+     */
+    public function setMany(array $options): bool
+    {
+        $result = true;
+
+        foreach ($options as $key => $value) {
+            if (!$this->set($key, $value)) {
+                $result = false;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Delete an option
      *
      * @param string $key
@@ -50,6 +92,25 @@ class Option implements JsonSerializable
     public function delete(string $key): bool
     {
         return delete_option($key);
+    }
+
+    /**
+     * Delete multiple keys
+     *
+     * @param array $keys
+     * @return boolean
+     */
+    public function deleteMany(array $keys): bool
+    {
+        $result = true;
+
+        foreach ($keys as $key) {
+            if (!$this->delete($key)) {
+                $result = false;
+            }
+        }
+
+        return $result;
     }
 
     /**
