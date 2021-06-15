@@ -12,7 +12,8 @@ class KeyGenerate extends Command
      *
      * @var string
      */
-    protected $signature = 'key:generate';
+    protected $signature = 'key:generate {--show : Display the key instead of modifying files}
+                                         {--force : Force the operation to run when in production}';
 
     /**
      * The console command description.
@@ -29,8 +30,42 @@ class KeyGenerate extends Command
     public function handle()
     {
         $key = $this->generateRandomKey();
+        
+        if ($this->option('show')) {
+            return $this->comment($key);
+        }
+        
+        if (!$this->confirmToProceed()) {
+            return;
+        }
+        
+        $this->call('config set RADIATE_KEY', [$key, '--quiet' => true]);
+        
+        $this->info('Application key set successfully.');
+    }
+    
+    /**
+     * Confirm the action if in production.
+     *
+     * @return boolean
+     */
+    protected function confirmToProceed()
+    {      
+        if ($this->app->isProduction()) {
+            if ($this->hasOption('force') && $this->option('force')) {
+                return true;
+            } 
+            
+            $this->alert('Application In Production!');
 
-        $this->comment($key);
+            if (!$this->confirm('Do you really wish to run this command?')) {
+                $this->comment('Command Cancelled!');
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
