@@ -2,8 +2,27 @@
 
 namespace Radiate\Events;
 
+use Radiate\Foundation\Application;
+
 class Dispatcher
 {
+    /**
+     * The app instance
+     *
+     * @var Radiate\Foundation\Application
+     */
+    protected $app;
+
+    /**
+     * Create the dispatcher instance
+     *
+     * @param \Radiate\Foundation\Application $app
+     */
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+    }
+
     /**
      * Create an event listener
      *
@@ -86,7 +105,7 @@ class Dispatcher
     protected function resolveListener($listener)
     {
         if (is_string($listener) && class_exists($listener)) {
-            return [new $listener, 'handle'];
+            return [$this->app->make($listener), 'handle'];
         }
 
         return $listener;

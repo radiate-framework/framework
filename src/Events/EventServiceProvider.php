@@ -13,8 +13,8 @@ class EventServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton('events', function () {
-            return new Dispatcher();
+        $this->app->singleton('events', function ($app) {
+            return new Dispatcher($app);
         });
     }
 
