@@ -145,6 +145,10 @@ class Application extends Container
             ],
             'events' => [\Radiate\Events\Dispatcher::class],
             'files' => [\Radiate\Filesystem\Filesystem::class],
+            'hash' => [
+                \Radiate\Hashing\Hasher::class,
+                \Illuminate\Contracts\Hashing\Hasher::class,
+            ],
             'mailer' => [\Radiate\Mail\Mailer::class],
             'request' => [\Radiate\Http\Request::class],
             'router' => [\Radiate\Routing\Router::class],
