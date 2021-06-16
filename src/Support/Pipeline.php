@@ -4,8 +4,9 @@ namespace Radiate\Support;
 
 use Closure;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Pipeline\Pipeline as PipelineInterface;
 
-class Pipeline
+class Pipeline implements PipelineInterface
 {
     /**
      * The container implementation.
@@ -77,7 +78,7 @@ class Pipeline
      * @param  string  $method
      * @return $this
      */
-    public function via(string $method): self
+    public function via($method)
     {
         $this->method = $method;
 
