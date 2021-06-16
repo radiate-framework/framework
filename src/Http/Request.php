@@ -4,11 +4,12 @@ namespace Radiate\Http;
 
 use ArrayAccess;
 use Closure;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use Radiate\Support\Str;
 
-class Request implements ArrayAccess, JsonSerializable
+class Request implements Arrayable, ArrayAccess, JsonSerializable
 {
     use Macroable;
 

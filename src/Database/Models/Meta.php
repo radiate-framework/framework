@@ -5,12 +5,13 @@ namespace Radiate\Database\Models;
 use ArrayAccess;
 use ArrayIterator;
 use Countable;
+use Illuminate\Contracts\Support\Arrayable;
 use IteratorAggregate;
 use JsonSerializable;
 use Radiate\Database\Concerns\HasAttributes;
 use Radiate\Database\Model;
 
-class Meta implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable
+class Meta implements Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable
 {
     use HasAttributes;
 

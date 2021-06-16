@@ -3,12 +3,13 @@
 namespace Radiate\Database;
 
 use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 use Radiate\Database\Concerns\HasAttributes;
 use Radiate\Database\Concerns\HasGlobalScopes;
 use RuntimeException;
 
-class Model implements ArrayAccess, JsonSerializable
+class Model implements Arrayable, ArrayAccess, JsonSerializable
 {
     use HasAttributes;
     use HasGlobalScopes;
