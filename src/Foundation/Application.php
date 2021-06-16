@@ -138,9 +138,17 @@ class Application extends Container
                 \Illuminate\Config\Repository::class,
                 \Illuminate\Contracts\Config\Repository::class,
             ],
-            'encrypter' => [\Radiate\Encryption\Encrypter::class],
+            'encrypter' => [
+                \Radiate\Encryption\Encrypter::class,
+                \Illuminate\Contracts\Encryption\Encrypter::class,
+                \Illuminate\Contracts\Encryption\StringEncrypter::class,
+            ],
             'events' => [\Radiate\Events\Dispatcher::class],
             'files' => [\Radiate\Filesystem\Filesystem::class],
+            'hash' => [
+                \Radiate\Hashing\Hasher::class,
+                \Illuminate\Contracts\Hashing\Hasher::class,
+            ],
             'mailer' => [\Radiate\Mail\Mailer::class],
             'request' => [\Radiate\Http\Request::class],
             'router' => [\Radiate\Routing\Router::class],

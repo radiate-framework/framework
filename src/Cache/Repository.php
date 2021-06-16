@@ -5,6 +5,7 @@ namespace Radiate\Cache;
 use ArrayAccess;
 use Closure;
 use Radiate\Database\Connection;
+use Radiate\Support\Collection;
 
 class Repository implements ArrayAccess
 {
@@ -248,7 +249,7 @@ class Repository implements ArrayAccess
     {
         $return = [];
 
-        $keys = collect($keys)->mapWithKeys(function ($value, $key) {
+        $keys = Collection::make($keys)->mapWithKeys(function ($value, $key) {
             return [is_string($key) ? $key : $value => is_string($key) ? $value : null];
         })->all();
 

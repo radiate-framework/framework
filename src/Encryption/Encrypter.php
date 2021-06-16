@@ -2,9 +2,13 @@
 
 namespace Radiate\Encryption;
 
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Contracts\Encryption\EncryptException;
+use Illuminate\Contracts\Encryption\StringEncrypter;
 use RuntimeException;
 
-class Encrypter
+class Encrypter implements EncrypterContract, StringEncrypter
 {
     /**
      * The encryption key.
@@ -51,7 +55,7 @@ class Encrypter
         $length = mb_strlen($key, '8bit');
 
         return ($cipher === 'AES-128-CBC' && $length === 16) ||
-               ($cipher === 'AES-256-CBC' && $length === 32);
+            ($cipher === 'AES-256-CBC' && $length === 32);
     }
 
     /**
@@ -72,9 +76,9 @@ class Encrypter
      * @param  bool  $serialize
      * @return string
      *
-     * @throws \RuntimeException
+     * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encrypt($value, bool $serialize = true)
+    public function encrypt($value, $serialize = true)
     {
         $iv = random_bytes(openssl_cipher_iv_length($this->cipher));
 
@@ -83,11 +87,14 @@ class Encrypter
         // value can be verified later as not having been changed by the users.
         $value = \openssl_encrypt(
             $serialize ? serialize($value) : $value,
-            $this->cipher, $this->key, 0, $iv
+            $this->cipher,
+            $this->key,
+            0,
+            $iv
         );
 
         if ($value === false) {
-            throw new RuntimeException('Could not encrypt the data.');
+            throw new EncryptException('Could not encrypt the data.');
         }
 
         // Once we get the encrypted value we'll go ahead and base64_encode the input
@@ -98,7 +105,7 @@ class Encrypter
         $json = json_encode(compact('iv', 'value', 'mac'), JSON_UNESCAPED_SLASHES);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException('Could not encrypt the data.');
+            throw new EncryptException('Could not encrypt the data.');
         }
 
         return base64_encode($json);
@@ -110,9 +117,9 @@ class Encrypter
      * @param  string  $value
      * @return string
      *
-     * @throws \RuntimeException
+     * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encryptString(string $value)
+    public function encryptString($value)
     {
         return $this->encrypt($value, false);
     }
@@ -124,9 +131,9 @@ class Encrypter
      * @param  bool  $unserialize
      * @return mixed
      *
-     * @throws \RuntimeException
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
-    public function decrypt(string $payload, bool $unserialize = true)
+    public function decrypt($payload, $unserialize = true)
     {
         $payload = $this->getJsonPayload($payload);
 
@@ -136,11 +143,15 @@ class Encrypter
         // we will then unserialize it and return it out to the caller. If we are
         // unable to decrypt this value we will throw out an exception message.
         $decrypted = \openssl_decrypt(
-            $payload['value'], $this->cipher, $this->key, 0, $iv
+            $payload['value'],
+            $this->cipher,
+            $this->key,
+            0,
+            $iv
         );
 
         if ($decrypted === false) {
-            throw new RuntimeException('Could not decrypt the data.');
+            throw new DecryptException('Could not decrypt the data.');
         }
 
         return $unserialize ? unserialize($decrypted) : $decrypted;
@@ -152,9 +163,9 @@ class Encrypter
      * @param  string  $payload
      * @return string
      *
-     * @throws \RuntimeException
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
-    public function decryptString(string $payload)
+    public function decryptString($payload)
     {
         return $this->decrypt($payload, false);
     }
@@ -168,7 +179,7 @@ class Encrypter
      */
     protected function hash(string $iv, $value)
     {
-        return hash_hmac('sha256', $iv.$value, $this->key);
+        return hash_hmac('sha256', $iv . $value, $this->key);
     }
 
     /**
@@ -177,7 +188,7 @@ class Encrypter
      * @param  string  $payload
      * @return array
      *
-     * @throws \RuntimeException
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
     protected function getJsonPayload(string $payload)
     {
@@ -186,12 +197,12 @@ class Encrypter
         // If the payload is not valid JSON or does not have the proper keys set we will
         // assume it is invalid and bail out of the routine since we will not be able
         // to decrypt the given value. We'll also check the MAC for this encryption.
-        if (! $this->validPayload($payload)) {
-            throw new RuntimeException('The payload is invalid.');
+        if (!$this->validPayload($payload)) {
+            throw new DecryptException('The payload is invalid.');
         }
 
-        if (! $this->validMac($payload)) {
-            throw new RuntimeException('The MAC is invalid.');
+        if (!$this->validMac($payload)) {
+            throw new DecryptException('The MAC is invalid.');
         }
 
         return $payload;
@@ -206,7 +217,7 @@ class Encrypter
     protected function validPayload($payload)
     {
         return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']) &&
-               strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
+            strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
     }
 
     /**
@@ -218,7 +229,8 @@ class Encrypter
     protected function validMac(array $payload)
     {
         return hash_equals(
-            $this->hash($payload['iv'], $payload['value']), $payload['mac']
+            $this->hash($payload['iv'], $payload['value']),
+            $payload['mac']
         );
     }
 
