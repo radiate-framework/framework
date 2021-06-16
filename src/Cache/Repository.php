@@ -40,6 +40,16 @@ class Repository implements ArrayAccess
         $this->connection = $connection;
         $this->prefix = $prefix;
     }
+    
+    /**
+     * get the cache key prefix
+     *
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
 
     /**
      * Remove all items from the cache.
