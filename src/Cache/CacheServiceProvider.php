@@ -31,5 +31,9 @@ class CacheServiceProvider extends ServiceProvider
             \Radiate\Cache\Console\CacheClear::class,
             \Radiate\Cache\Console\CacheForget::class,
         ]);
+        
+        $this->publishes([
+            __DIR__ . '/resources/config/cache.php' => $this->app->basePath('config/cache.php'),
+        ], 'config');
     }
 }
