@@ -2,6 +2,7 @@
 
 namespace Radiate\Mail;
 
+use Illuminate\Contracts\Support\Renderable;
 use Radiate\Database\Models\User;
 use Radiate\Support\Str;
 use Radiate\Support\Facades\View;
@@ -9,7 +10,7 @@ use ReflectionClass;
 use ReflectionProperty;
 use WP_User;
 
-abstract class Mailable
+abstract class Mailable implements Renderable
 {
     /**
      * An array of to email addresses
