@@ -23,13 +23,21 @@ class Repository implements ArrayAccess
     protected $connection;
 
     /**
+     * The cache key prefix
+     *
+     * @var string
+     */
+    protected $prefix;
+
+    /**
      * Create the repository instance
      *
      * @param \Radiate\Database\Connection $connection
      */
-    public function __construct(Connection $connection)
+    public function __construct(Connection $connection, string $prefix = '')
     {
         $this->connection = $connection;
+        $this->prefix = $prefix;
     }
 
     /**
@@ -87,7 +95,7 @@ class Repository implements ArrayAccess
      */
     public function delete(string $key): bool
     {
-        return delete_transient($key);
+        return delete_transient($this->prefix.$key);
     }
 
     /**
@@ -134,7 +142,7 @@ class Repository implements ArrayAccess
             return $this->forget($key);
         }
 
-        return set_transient($key, $value, $ttl);
+        return set_transient($this->prefix.$key, $value, $ttl);
     }
 
     /**
@@ -146,7 +154,7 @@ class Repository implements ArrayAccess
      */
     public function get(string $key, $default = null)
     {
-        return get_transient($key) ?: $default;
+        return get_transient($this->prefix.$key) ?: $default;
     }
 
     /**

@@ -14,7 +14,9 @@ class CacheServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton('cache', function ($app) {
-            return new Repository($app['db.connection']);
+            return new Repository(
+                $app['db.connection'], $app['config']['cache.prefix'] ?? ''
+            );
         });
     }
 
