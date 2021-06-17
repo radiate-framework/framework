@@ -5,12 +5,14 @@ namespace Radiate\Database\Models;
 use ArrayAccess;
 use ArrayIterator;
 use Countable;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use IteratorAggregate;
 use JsonSerializable;
 use Radiate\Database\Concerns\HasAttributes;
 use Radiate\Database\Model;
 
-class Meta implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable
+class Meta implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
     use HasAttributes;
 
@@ -322,7 +324,7 @@ class Meta implements ArrayAccess, Countable, IteratorAggregate, JsonSerializabl
      * @param  int  $options
      * @return string
      */
-    public function toJson(int $options = 0)
+    public function toJson($options = 0)
     {
         return json_encode($this->jsonSerialize(), $options);
     }

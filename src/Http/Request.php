@@ -4,11 +4,13 @@ namespace Radiate\Http;
 
 use ArrayAccess;
 use Closure;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use Radiate\Support\Str;
 
-class Request implements ArrayAccess, JsonSerializable
+class Request implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
 {
     use Macroable;
 
@@ -798,11 +800,12 @@ class Request implements ArrayAccess, JsonSerializable
     /**
      * Return the object as a json string
      *
+     * @param int $options
      * @return string
      */
-    public function toJson(): string
+    public function toJson($options = 0): string
     {
-        return json_encode($this->all());
+        return json_encode($this->all(), $options);
     }
 
     /**

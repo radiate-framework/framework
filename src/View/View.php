@@ -2,7 +2,9 @@
 
 namespace Radiate\View;
 
-class View
+use Illuminate\Contracts\Support\Renderable;
+
+class View implements Renderable
 {
     /**
      * The view.

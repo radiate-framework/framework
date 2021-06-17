@@ -3,12 +3,14 @@
 namespace Radiate\Database;
 
 use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 use Radiate\Database\Concerns\HasAttributes;
 use Radiate\Database\Concerns\HasGlobalScopes;
 use RuntimeException;
 
-class Model implements ArrayAccess, JsonSerializable
+class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
 {
     use HasAttributes;
     use HasGlobalScopes;
@@ -480,7 +482,7 @@ class Model implements ArrayAccess, JsonSerializable
      * @param  int  $options
      * @return string
      */
-    public function toJson(int $options = 0)
+    public function toJson($options = 0)
     {
         return json_encode($this->jsonSerialize(), $options);
     }
