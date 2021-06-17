@@ -2,12 +2,12 @@
 
 namespace Radiate\Auth;
 
-use Illuminate\Contracts\Auth\Guard;
+use Radiate\Auth\Contracts\StatefulGuard;
 use Illuminate\Support\Traits\Macroable;
 use Radiate\Auth\Contracts\UserProvider;
 use WP_User;
 
-class SessionGuard implements Guard
+class SessionGuard implements StatefulGuard
 {
     use GuardHelpers, Macroable;
 
@@ -35,7 +35,7 @@ class SessionGuard implements Guard
     /**
      * Get the ID for the currently authenticated user.
      *
-     * @return int|null
+     * @return int|string|null
      */
     public function id()
     {
@@ -111,14 +111,48 @@ class SessionGuard implements Guard
     /**
      * Log the given user ID into the application.
      *
-     * @param  int  $id
+     * @param  int|string|null  $id
      * @param  bool  $remember
      * @return bool
      */
-    public function loginUsingId(int $id, bool $remember = false)
+    public function loginUsingId($id, bool $remember = false)
     {
         if ($user = $this->provider->retrieveById($id)) {
             $this->login($user, $remember);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Log a user into the application without sessions or cookies.
+     *
+     * @param  array  $credentials
+     * @return bool
+     */
+    public function once(array $credentials = [])
+    {
+        if ($user = $this->provider->retrieveByCredentials($credentials)) {
+            $this->setUser($user);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Log the given user ID into the application without sessions or cookies.
+     *
+     * @param  int|string|null  $id
+     * @return bool
+     */
+    public function onceUsingId($id)
+    {
+        if ($user = $this->provider->retrieveById($id)) {
+            $this->setUser($user);
 
             return true;
         }

@@ -26,7 +26,7 @@ class RadiateUserProvider implements UserProvider
     /**
      * Retrieve a user by their unique identifier.
      *
-     * @param  mixed  $identifier
+     * @param  int|string|null  $identifier
      * @return \Radiate\Auth\Contracts\Authenticatable|null
      */
     public function retrieveById($identifier)

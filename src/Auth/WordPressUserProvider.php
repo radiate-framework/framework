@@ -10,7 +10,7 @@ class WordPressUserProvider implements UserProvider
     /**
      * Retrieve a user by their unique identifier.
      *
-     * @param  mixed  $identifier
+     * @param  int|string|null  $identifier
      * @return \WP_User|null
      */
     public function retrieveById($identifier)

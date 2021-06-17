@@ -17,7 +17,7 @@ trait Authenticatable
     /**
      * Get the unique identifier for the user.
      *
-     * @return mixed
+     * @return int|string
      */
     public function getAuthIdentifier()
     {

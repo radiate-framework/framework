@@ -7,7 +7,7 @@ interface UserProvider
     /**
      * Retrieve a user by their unique identifier.
      *
-     * @param  mixed  $identifier
+     * @param  int|string|null  $identifier
      * @return \Radiate\Auth\Contracts\Authenticatable|\WP_User|null
      */
     public function retrieveById($identifier);

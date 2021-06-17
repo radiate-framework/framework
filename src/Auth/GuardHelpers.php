@@ -117,7 +117,7 @@ trait GuardHelpers
      * Get the users' auth identifier
      *
      * @param  \Radiate\Auth\Contracts\Authenticatable|\WP_User  $user
-     * @return mixed
+     * @return int|string|null
      */
     protected function getAuthIdentifier($user)
     {
