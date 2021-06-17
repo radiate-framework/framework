@@ -4,22 +4,34 @@ namespace Radiate\Auth;
 
 use Radiate\Auth\Contracts\StatefulGuard;
 use Illuminate\Support\Traits\Macroable;
+use Radiate\Auth\Contracts\SupportsBasicAuth;
 use Radiate\Auth\Contracts\UserProvider;
+use Radiate\Http\Request;
 use WP_User;
 
-class SessionGuard implements StatefulGuard
+class SessionGuard implements StatefulGuard, SupportsBasicAuth
 {
     use GuardHelpers, Macroable;
+
+    /**
+     * The request
+     *
+     * @var \Radiate\Http\Request
+     */
+    protected $request;
+
 
     /**
      * Create a new authentication guard.
      *
      * @param  \Radiate\Auth\Contracts\UserProvider  $provider
+     * @param  \Radiate\Http\Request  $request
      * @return void
      */
-    public function __construct(UserProvider $provider)
+    public function __construct(UserProvider $provider, Request $request)
     {
         $this->provider = $provider;
+        $this->request = $request;
     }
 
     /**
@@ -185,5 +197,85 @@ class SessionGuard implements StatefulGuard
         wp_set_current_user($this->getAuthIdentifier($user));
 
         return $this;
+    }
+
+    /**
+     * Attempt to authenticate using HTTP Basic Auth.
+     *
+     * @param  string  $field
+     * @return bool
+     */
+    public function basic(string $field = 'email')
+    {
+        if ($this->check()) {
+            return true;
+        }
+
+        return $this->attemptBasic($this->getRequest(), $field);
+    }
+
+    /**
+     * Attempt to authenticate using basic authentication.
+     *
+     * @param  \Radiate\Http\Request  $request
+     * @param  string  $field
+     * @return bool
+     */
+    protected function attemptBasic(Request $request, string $field)
+    {
+        if (!$request->getUser()) {
+            return false;
+        }
+
+        return $this->attempt($this->basicCredentials($request, $field));
+    }
+
+    /**
+     * Perform a stateless HTTP Basic login attempt.
+     *
+     * @param  string  $field
+     * @return bool
+     */
+    public function onceBasic($field = 'email')
+    {
+        return $this->attemptOnceBasic($this->getRequest(), $field);
+    }
+
+    /**
+     * Attempt to authenticate using basic authentication.
+     *
+     * @param  \Radiate\Http\Request  $request
+     * @param  string  $field
+     * @return bool
+     */
+    protected function attemptOnceBasic(Request $request, string $field)
+    {
+        if (!$request->getUser()) {
+            return false;
+        }
+
+        return $this->once($this->basicCredentials($request, $field));
+    }
+
+    /**
+     * Get the current request instance.
+     *
+     * @return \Radiate\Http\Request
+     */
+    public function getRequest()
+    {
+        return $this->request ?: Request::capture();
+    }
+
+    /**
+     * Get the credential array for an HTTP Basic request.
+     *
+     * @param  \Radiate\Http\Request  $request
+     * @param  string  $field
+     * @return array
+     */
+    protected function basicCredentials(Request $request, string $field)
+    {
+        return [$field => $request->getUser(), 'password' => $request->getPassword()];
     }
 }

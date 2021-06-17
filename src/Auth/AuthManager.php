@@ -123,7 +123,7 @@ class AuthManager implements FactoryContract
     {
         $provider = $this->createUserProvider($config['provider'] ?? null);
 
-        return new SessionGuard($provider);
+        return new SessionGuard($provider, $this->app['request']);
     }
 
     /**

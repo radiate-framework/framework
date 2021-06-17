@@ -27,6 +27,8 @@ namespace Radiate\Support\Facades;
  * @method static Illuminate\Contracts\Auth\Guard setUser(\Radiate\Auth\Contracts\Authenticatable|\WP_User $user) Set the current user.
  * @method static \Radiate\Auth\Contracts\UserProvider getProvider() Get the user provider used by the guard.
  * @method static void setProvider(\Radiate\Auth\Contracts\UserProvider $provider) Set the user provider used by the guard.
+ * @method static bool basic(string $field = 'email') Attempt to authenticate using HTTP Basic Auth.
+ * @method static bool onceBasic(string $field = 'email') Perform a stateless HTTP Basic login attempt.
  *
  * @see \Radiate\Auth\AuthManager
  * @see \Radiate\Auth\Contracts\Guard
