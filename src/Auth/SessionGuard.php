@@ -53,7 +53,9 @@ class SessionGuard implements Guard
             return $this->user;
         }
 
-        return $this->user = $this->provider->retrieveById($this->id());
+        if ($id = $this->id()) {
+            return $this->user = $this->provider->retrieveById($id);
+        }
     }
 
     /**
