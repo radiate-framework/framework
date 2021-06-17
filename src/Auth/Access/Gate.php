@@ -3,6 +3,7 @@
 namespace Radiate\Auth\Access;
 
 use Closure;
+use Radiate\Auth\Contracts\Authenticatable;
 use Radiate\Database\Models\User;
 use Radiate\Foundation\Application;
 use Radiate\Foundation\Http\Exceptions\HttpResponseException;
@@ -185,12 +186,12 @@ class Gate
     /**
      * Resolve and call the appropriate authorization callback.
      *
-     * @param  \Radiate\Database\Models\User|null  $user
+     * @param  \Radiate\Auth\Contracts\Authenticatable|null  $user
      * @param  string  $ability
      * @param  array  $arguments
      * @return bool
      */
-    protected function callAuthCallback(?User $user, string $ability, array $arguments)
+    protected function callAuthCallback(?Authenticatable $user, string $ability, array $arguments)
     {
         $callback = $this->resolveAuthCallback($user, $ability, $arguments);
 
@@ -200,12 +201,12 @@ class Gate
     /**
      * Resolve the callable for the given ability and arguments.
      *
-     * @param  \Radiate\Database\Models\User|null  $user
+     * @param  \Radiate\Auth\Contracts\Authenticatable|null  $user
      * @param  string  $ability
      * @param  array  $arguments
      * @return callable
      */
-    protected function resolveAuthCallback(?User $user, string $ability, array $arguments)
+    protected function resolveAuthCallback(?Authenticatable $user, string $ability, array $arguments)
     {
         if (
             isset($arguments[0]) &&
@@ -227,7 +228,7 @@ class Gate
     /**
      * Resolve the callback for a policy check.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Radiate\Auth\Contracts\Authenticatable  $user
      * @param  string  $ability
      * @param  array  $arguments
      * @param  mixed  $policy
@@ -262,7 +263,7 @@ class Gate
      *
      * @param  mixed  $policy
      * @param  string  $method
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  \Radiate\Auth\Contracts\Authenticatable|null  $user
      * @param  array  $arguments
      * @return mixed
      */
@@ -364,10 +365,10 @@ class Gate
     /**
      * Get a gate instance for the given user.
      *
-     * @param  \Radiate\Database\Models\User  $user
+     * @param  \Radiate\Auth\Contracts\Authenticatable  $user
      * @return static
      */
-    public function forUser(User $user)
+    public function forUser(Authenticatable $user)
     {
         $callback = function () use ($user) {
             return $user;
