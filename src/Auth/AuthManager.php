@@ -3,24 +3,34 @@
 namespace Radiate\Auth;
 
 use Closure;
+use Illuminate\Contracts\Auth\Factory as FactoryContract;
 use InvalidArgumentException;
 use Radiate\Foundation\Application;
 
-class AuthManager
+class AuthManager implements FactoryContract
 {
+    use CreatesUserProviders;
+
     /**
-     * The application instance
+     * The application instance.
      *
      * @var \Radiate\Foundation\Application
      */
     protected $app;
 
     /**
-     * The registered providers
+     * The registered custom driver creators.
      *
      * @var array
      */
-    protected $providers = [];
+    protected $customCreators = [];
+
+    /**
+     * The array of created "drivers".
+     *
+     * @var array
+     */
+    protected $guards = [];
 
     /**
      * The user resolver shared by various services.
@@ -32,109 +42,137 @@ class AuthManager
     protected $userResolver;
 
     /**
-     * Create the manager instance
+     * Create a new Auth manager instance.
      *
-     * @param \Radiate\Foundation\Application $app
+     * @param  \Radiate\Foundation\Application  $app
+     * @return void
      */
-    public function __construct(Application $app)
+    public function __construct($app)
     {
         $this->app = $app;
 
-        $this->userResolver = function () {
-            return $this->user();
+        $this->userResolver = function ($guard = null) {
+            return $this->guard($guard)->user();
         };
     }
 
     /**
-     * Get the auth provider
+     * Attempt to get the guard from the local cache.
      *
-     * @param string|null $name
-     * @return \Radiate\Auth\UserProvider
+     * @param  string|null  $name
+     * @return \Illuminate\Contracts\Auth\Guard
      */
-    public function provider(?string $name = null): UserProvider
+    public function guard($name = null)
     {
-        $name = $name ?: $this->getDefaultProvider();
+        $name = $name ?: $this->getDefaultDriver();
 
-        return $this->providers[$name] ?? $this->providers[$name] = $this->resolve($name);
+        return $this->guards[$name] ?? $this->guards[$name] = $this->resolve($name);
     }
 
     /**
      * Resolve the given guard.
      *
-     * @param string $name
-     * @return \Radiate\Auth\UserProvider
+     * @param  string  $name
+     * @return \Illuminate\Contracts\Auth\Guard
      *
      * @throws \InvalidArgumentException
      */
-    protected function resolve(string $name): UserProvider
+    protected function resolve($name)
     {
         $config = $this->getConfig($name);
 
         if (is_null($config)) {
-            throw new InvalidArgumentException("Auth provider [{$name}] is not defined.");
+            throw new InvalidArgumentException("Auth guard [{$name}] is not defined.");
         }
 
-        if (method_exists($this, $method = 'create' . ucfirst($name) . 'Provider')) {
-            return $this->{$method}($config);
+        if (isset($this->customCreators[$config['driver']])) {
+            return $this->callCustomCreator($name, $config);
+        }
+
+        $driverMethod = 'create' . ucfirst($config['driver']) . 'Driver';
+
+        if (method_exists($this, $driverMethod)) {
+            return $this->{$driverMethod}($name, $config);
         }
 
         throw new InvalidArgumentException(
-            "Auth driver [{$config['driver']}] for provider [{$name}] is not defined."
+            "Auth driver [{$config['driver']}] for guard [{$name}] is not defined."
         );
     }
 
     /**
-     * Create a Radiate user provider
+     * Call a custom driver creator.
      *
-     * @param array $config
-     * @return \Radiate\Auth\RadiateUserProvider
+     * @param  string  $name
+     * @param  array  $config
+     * @return mixed
      */
-    public function createRadiateProvider(array $config): RadiateUserProvider
+    protected function callCustomCreator($name, array $config)
     {
-        return new RadiateUserProvider($config['model']);
+        return $this->customCreators[$config['driver']]($this->app, $name, $config);
     }
 
     /**
-     * Create a WordPress user provider
+     * Create a session based authentication guard.
      *
-     * @return \Radiate\Auth\WordPressUserProvider
+     * @param  string  $name
+     * @param  array  $config
+     * @return \Radiate\Auth\SessionGuard
      */
-    public function createWordpressProvider(): WordPressUserProvider
+    public function createSessionDriver($name, $config)
     {
-        return new WordPressUserProvider();
+        $provider = $this->createUserProvider($config['provider'] ?? null);
+
+        return new SessionGuard($provider);
     }
 
     /**
-     * Get the provider configuration.
+     * Get the guard configuration.
      *
-     * @param string $name
+     * @param  string  $name
      * @return array
      */
-    protected function getConfig(string $name): array
+    protected function getConfig($name)
     {
-        return $this->app['config']["auth.providers.{$name}"];
+        return $this->app['config']["auth.guards.{$name}"];
     }
 
     /**
-     * Get the default authentication provider name.
+     * Get the default authentication driver name.
      *
      * @return string
      */
-    public function getDefaultProvider(): string
+    public function getDefaultDriver()
     {
-        return $this->app['config']['auth.default'] ?? 'radiate';
+        return $this->app['config']['auth.defaults.guard'];
     }
 
     /**
-     * Dynamically call the auth provider
+     * Set the default guard driver the factory should serve.
      *
-     * @param string $method
-     * @param array $parameters
-     * @return mixed
+     * @param  string  $name
+     * @return void
      */
-    public function __call(string $method, array $parameters)
+    public function shouldUse($name)
     {
-        return $this->provider()->$method(...$parameters);
+        $name = $name ?: $this->getDefaultDriver();
+
+        $this->setDefaultDriver($name);
+
+        $this->userResolver = function ($name = null) {
+            return $this->guard($name)->user();
+        };
+    }
+
+    /**
+     * Set the default authentication driver name.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function setDefaultDriver($name)
+    {
+        $this->app['config']['auth.defaults.guard'] = $name;
     }
 
     /**
@@ -146,7 +184,7 @@ class AuthManager
     {
         return $this->userResolver;
     }
-    
+
     /**
      * Set the callback to be used to resolve users.
      *
@@ -158,5 +196,80 @@ class AuthManager
         $this->userResolver = $userResolver;
 
         return $this;
+    }
+
+    /**
+     * Register a custom driver creator Closure.
+     *
+     * @param  string  $driver
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function extend(string $driver, Closure $callback)
+    {
+        $this->customCreators[$driver] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register a custom provider creator Closure.
+     *
+     * @param  string  $name
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function provider(string $name, Closure $callback)
+    {
+        $this->customProviderCreators[$name] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Determines if any guards have already been resolved.
+     *
+     * @return bool
+     */
+    public function hasResolvedGuards()
+    {
+        return count($this->guards) > 0;
+    }
+
+    /**
+     * Forget all of the resolved guard instances.
+     *
+     * @return $this
+     */
+    public function forgetGuards()
+    {
+        $this->guards = [];
+
+        return $this;
+    }
+
+    /**
+     * Set the application instance used by the manager.
+     *
+     * @param  \Radiate\Foundation\Application  $app
+     * @return $this
+     */
+    public function setApplication(Application $app)
+    {
+        $this->app = $app;
+
+        return $this;
+    }
+
+    /**
+     * Dynamically call the default driver instance.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call(string $method, array $parameters = [])
+    {
+        return $this->guard()->{$method}(...$parameters);
     }
 }
