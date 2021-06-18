@@ -54,13 +54,15 @@ class MakePolicy extends GeneratorCommand
     {
         $config = $this->app['config'];
 
-        $provider = $config->get('auth.default');
+        $guard = $this->option('guard') ?: $config->get('auth.defaults.guard');
 
-        if (is_null($config->get('auth.providers.' . $provider))) {
-            throw new LogicException('The [' . $provider . '] provider is not defined in your "auth" configuration file.');
+        if (is_null($guardProvider = $config->get('auth.guards.' . $guard . '.provider'))) {
+            throw new LogicException('The [' . $guard . '] guard is not defined in your "auth" configuration file.');
         }
 
-        return $config->get('auth.providers.' . $provider . '.model');
+        return $config->get(
+            'auth.providers.' . $guardProvider . '.model'
+        );
     }
 
     /**

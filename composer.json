@@ -1,28 +1,29 @@
 {
-    "name": "radiate/framework",
-    "description": "A WordPress plugin and theme framework",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Ben Rutland",
-            "email": "info@benrutlandweb.co.uk"
-        }
-    ],
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "autoload": {
-        "psr-4": {
-            "Radiate\\": "src/"
-        }
-    },
-    "require": {
-        "php": "^7.3",
-        "erusev/parsedown": "^1.7",
-        "illuminate/container": "^8.28",
-        "illuminate/config": "^8.28",
-        "symfony/finder": "^5.2",
-        "illuminate/collections": "^8.28",
-        "illuminate/macroable": "^8.28",
-        "dragonmantank/cron-expression": "^3.1"
+  "name": "radiate/framework",
+  "description": "A WordPress plugin and theme framework",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Ben Rutland",
+      "email": "info@benrutlandweb.co.uk"
     }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "Radiate\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^7.3",
+    "erusev/parsedown": "^1.7",
+    "illuminate/container": "^8.28",
+    "illuminate/config": "^8.28",
+    "symfony/finder": "^5.2",
+    "illuminate/collections": "^8.28",
+    "illuminate/macroable": "^8.28",
+    "dragonmantank/cron-expression": "^3.1",
+    "firebase/php-jwt": "^5.3"
+  }
 }

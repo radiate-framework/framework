@@ -3,14 +3,16 @@
 namespace Radiate\Database\Models;
 
 use DateTimeImmutable;
+use Radiate\Auth\Authenticatable;
+use Radiate\Auth\Contracts\Authenticatable as AuthenticatableContract;
 use Radiate\Database\Concerns\HasMeta;
 use Radiate\Database\Model;
 use Radiate\Database\UserQueryBuilder;
 use Radiate\Support\Facades\Gate;
 
-class User extends Model
+class User extends Model implements AuthenticatableContract
 {
-    use HasMeta;
+    use Authenticatable, HasMeta;
 
     /**
      * The primary key for the model.
