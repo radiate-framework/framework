@@ -285,9 +285,11 @@ abstract class Route
         $middleware = [];
 
         foreach ($this->attributes['middleware'] as $alias) {
-            if ($wares = $routeMiddleware[$alias]) {
+            [$name, $parameters] = array_pad(explode(':', $alias, 2), 2, null);
+
+            if ($wares = $routeMiddleware[$name]) {
                 foreach ((array) $wares as $ware) {
-                    $middleware[] = $ware ?? null;
+                    $middleware[] = ($ware . ':' . $parameters) ?? null;
                 }
             }
         };
