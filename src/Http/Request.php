@@ -226,15 +226,13 @@ class Request implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
             }
         }
 
-        if (isset($headers['AUTHORIZATION'])) {
-            return $headers;
-        }
-
-        // PHP_AUTH_USER/PHP_AUTH_PW
-        if (isset($headers['PHP_AUTH_USER'])) {
-            $headers['AUTHORIZATION'] = 'Basic ' . base64_encode($headers['PHP_AUTH_USER'] . ':' . $headers['PHP_AUTH_PW']);
-        } elseif (isset($headers['PHP_AUTH_DIGEST'])) {
-            $headers['AUTHORIZATION'] = $headers['PHP_AUTH_DIGEST'];
+        if (!isset($headers['AUTHORIZATION'])) {
+            // PHP_AUTH_USER/PHP_AUTH_PW
+            if (isset($headers['PHP_AUTH_USER'])) {
+                $headers['AUTHORIZATION'] = 'Basic ' . base64_encode($headers['PHP_AUTH_USER'] . ':' . $headers['PHP_AUTH_PW']);
+            } elseif (isset($headers['PHP_AUTH_DIGEST'])) {
+                $headers['AUTHORIZATION'] = $headers['PHP_AUTH_DIGEST'];
+            }
         }
 
         $return = [];
