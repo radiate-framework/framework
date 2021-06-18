@@ -60,7 +60,7 @@ class AuthManager implements FactoryContract
      * Attempt to get the guard from the local cache.
      *
      * @param  string|null  $name
-     * @return \Radiate\Auth\Contracts\Guard|\Radiate\Auth\Contracts\StatefulGuard
+     * @return \Radiate\Auth\Contracts\Guard|\Radiate\Auth\Contracts\StatefulGuard|\Radiate\Auth\Contracts\SupportsBasicAuth
      */
     public function guard($name = null)
     {
