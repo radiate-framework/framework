@@ -73,7 +73,7 @@ class AuthManager implements FactoryContract
      * Resolve the given guard.
      *
      * @param  string  $name
-     * @return \Radiate\Auth\Contracts\Guard|\Radiate\Auth\Contracts\StatefulGuard
+     * @return \Radiate\Auth\Contracts\Guard|\Radiate\Auth\Contracts\StatefulGuard|\Radiate\Auth\Contracts\SupportsBasicAuth
      *
      * @throws \InvalidArgumentException
      */
