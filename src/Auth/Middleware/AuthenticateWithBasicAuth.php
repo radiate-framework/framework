@@ -7,7 +7,7 @@ use Radiate\Auth\AuthManager;
 use Radiate\Foundation\Http\Exceptions\HttpResponseException;
 use Radiate\Http\Request;
 
-class AuthenticateWIthBasicAuth
+class AuthenticateWithBasicAuth
 {
     /**
      * The auth mananger
