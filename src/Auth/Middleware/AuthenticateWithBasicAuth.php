@@ -37,7 +37,7 @@ class AuthenticateWithBasicAuth
      *
      * @throws \Radiate\Foundation\Http\Exceptions\HttpResponseException
      */
-    public function handle(Request $request, Closure $next, $guard = null, $field = null)
+    public function handle(Request $request, Closure $next, ?string $guard = null, ?string $field = null)
     {
         if ($this->auth->guard($guard)->basic($field ?: 'email')) {
             return $next($request);
