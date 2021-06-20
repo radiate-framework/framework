@@ -138,16 +138,47 @@ class Pipeline implements PipelineInterface
             return function ($passable) use ($stack, $pipe) {
 
                 if (is_callable($pipe)) {
+                    // If the pipe is a callable, then we will call it directly, but otherwise we
+                    // will resolve the pipes out of the dependency container and call it with
+                    // the appropriate method and arguments, returning the results back out.
                     return $pipe($passable, $stack);
-                }
-                if (is_string($pipe) && class_exists($pipe)) {
-                    $pipe = $this->container ? $this->container->make($pipe) : new $pipe;
+                } elseif (!is_object($pipe)) {
+                    [$name, $parameters] = $this->parsePipeString($pipe);
 
-                    return method_exists($pipe, $this->method)
-                        ? $pipe->{$this->method}($passable, $stack)
-                        : $pipe($passable, $stack);
+                    // If the pipe is a string we will parse the string and resolve the class out
+                    // of the dependency injection container. We can then build a callable and
+                    // execute the pipe function giving in the parameters that are required.
+                    $pipe = $this->container->make($name);
+
+                    $parameters = array_merge([$passable, $stack], $parameters);
+                } else {
+                    // If the pipe is already an object we'll just make a callable and pass it to
+                    // the pipe as-is. There is no need to do any extra parsing and formatting
+                    // since the object we're given was already a fully instantiated object.
+                    $parameters = [$passable, $stack];
                 }
+
+                return method_exists($pipe, $this->method)
+                    ? $pipe->{$this->method}(...$parameters)
+                    : $pipe(...$parameters);
             };
         };
+    }
+
+    /**
+     * Parse full pipe string to get name and parameters.
+     *
+     * @param  string  $pipe
+     * @return array
+     */
+    protected function parsePipeString(string $pipe)
+    {
+        [$name, $parameters] = array_pad(explode(':', $pipe, 2), 2, []);
+
+        if (is_string($parameters)) {
+            $parameters = explode(',', $parameters);
+        }
+
+        return [$name, $parameters];
     }
 }

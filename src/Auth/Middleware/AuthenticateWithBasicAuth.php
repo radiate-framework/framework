@@ -7,7 +7,7 @@ use Radiate\Auth\AuthManager;
 use Radiate\Foundation\Http\Exceptions\HttpResponseException;
 use Radiate\Http\Request;
 
-class Authenticate
+class AuthenticateWithBasicAuth
 {
     /**
      * The auth mananger
@@ -32,15 +32,18 @@ class Authenticate
      * @param \Radiate\Http\Request $request
      * @param \Closure $next
      * @param string|null $guard
+     * @param string|null $field
      * @return mixed
      *
      * @throws \Radiate\Foundation\Http\Exceptions\HttpResponseException
      */
-    public function handle(Request $request, Closure $next, ?string $guard = null)
+    public function handle(Request $request, Closure $next, ?string $guard = null, ?string $field = null)
     {
-        if ($this->auth->guard($guard)->check()) {
+        if ($this->auth->guard($guard)->basic($field ?: 'email')) {
             return $next($request);
         }
+
+        header('WWW_Authenticate: Basic');
 
         throw new HttpResponseException('Unauthorised.', 401);
     }

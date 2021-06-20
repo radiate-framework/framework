@@ -131,7 +131,10 @@ class Application extends Container
                 \Radiate\Database\Connection::class,
                 \wpdb::class,
             ],
-            'auth' => [\Radiate\Auth\AuthManager::class],
+            'auth' => [
+                \Radiate\Auth\AuthManager::class,
+                Illuminate\Contracts\Auth\Factory::class,
+            ],
             'cache' => [\Radiate\Cache\Repository::class],
             'config' => [
                 \Radiate\Config\Repository::class,
