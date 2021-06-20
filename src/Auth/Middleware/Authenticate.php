@@ -36,7 +36,7 @@ class Authenticate
      *
      * @throws \Radiate\Foundation\Http\Exceptions\HttpResponseException
      */
-    public function handle(Request $request, Closure $next, $guard = null)
+    public function handle(Request $request, Closure $next, ?string $guard = null)
     {
         if ($this->auth->guard($guard)->check()) {
             return $next($request);
