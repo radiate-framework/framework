@@ -20,7 +20,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('jwt', function ($app) {
-            return new Builder($app);
+            return new Builder($app['encrypter']->getKey());
         });
 
         $this->app->singleton('gate', function ($app) {
