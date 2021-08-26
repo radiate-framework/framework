@@ -2,8 +2,27 @@
 
 namespace Radiate\Events;
 
+use Radiate\Foundation\Application;
+
 class Dispatcher
 {
+    /**
+     * The app instance
+     *
+     * @var Radiate\Foundation\Application
+     */
+    protected $app;
+
+    /**
+     * Create the dispatcher instance
+     *
+     * @param \Radiate\Foundation\Application $app
+     */
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+    }
+
     /**
      * Create an event listener
      *
@@ -46,18 +65,24 @@ class Dispatcher
             return apply_filters(get_class($event), $event);
         }
 
-        return apply_filters($event, ...$payload);
+        return apply_filters($event, ...$payload ?: [null]);
     }
 
     /**
      * Forget the event listeners
      *
      * @param string $event
+     * @param string|null $listener
+     * @param int|null $priority
      * @return void
      */
-    public function forget(string $event): void
+    public function forget(string $event, ?string $listener = null, ?int $priority = 10): void
     {
-        remove_all_filters($event);
+        if ($listener) {
+            remove_filter($event, $listener, $priority);
+        } else {
+            remove_all_filters($event);
+        }
     }
 
     /**
@@ -80,7 +105,7 @@ class Dispatcher
     protected function resolveListener($listener)
     {
         if (is_string($listener) && class_exists($listener)) {
-            return [new $listener, 'handle'];
+            return [$this->app->make($listener), 'handle'];
         }
 
         return $listener;

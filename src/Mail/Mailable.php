@@ -2,13 +2,15 @@
 
 namespace Radiate\Mail;
 
+use Illuminate\Contracts\Support\Renderable;
+use Radiate\Database\Models\User;
 use Radiate\Support\Str;
 use Radiate\Support\Facades\View;
 use ReflectionClass;
 use ReflectionProperty;
 use WP_User;
 
-abstract class Mailable
+abstract class Mailable implements Renderable
 {
     /**
      * An array of to email addresses
@@ -211,7 +213,9 @@ abstract class Mailable
     {
         $this->text($path, $data);
 
-        $this->html = Str::markdown($this->text);
+        $this->html = View::make('mail.layout', [
+            'markdown' => Str::markdown($this->text),
+        ])->render();
 
         return $this;
     }
@@ -284,6 +288,12 @@ abstract class Mailable
             return (object) [
                 'address' => $recipient->user_email,
                 'name'    => $recipient->display_name ?? '',
+            ];
+        }
+        if ($recipient instanceof User) {
+            return (object) [
+                'address' => $recipient->email,
+                'name'    => $recipient->name ?? '',
             ];
         }
         if (is_array($recipient)) {

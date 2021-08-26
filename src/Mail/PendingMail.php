@@ -85,7 +85,7 @@ class PendingMail
      * Send a new mailable message instance.
      *
      * @param \Radiate\Mail\Mailable $mailable
-     * @return void
+     * @return bool
      */
     public function send(Mailable $mailable)
     {

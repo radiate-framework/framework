@@ -2,14 +2,14 @@
 
 namespace Radiate\Auth;
 
-use Radiate\Database\Models\User;
+use Radiate\Auth\Contracts\UserProvider;
 
 class RadiateUserProvider implements UserProvider
 {
     /**
      * The user model
      *
-     * @var \Radiate\Database\Models\User
+     * @var \Radiate\Database\Model
      */
     protected $model;
 
@@ -24,154 +24,44 @@ class RadiateUserProvider implements UserProvider
     }
 
     /**
-     * Get the current user attributes
+     * Retrieve a user by their unique identifier.
      *
-     * @return array
+     * @param  int|string|null  $identifier
+     * @return \Radiate\Auth\Contracts\Authenticatable|null
      */
-    protected function getCurrentUserAttributes(): array
+    public function retrieveById($identifier)
     {
-        return wp_get_current_user()->to_array();
-    }
-
-    /**
-     * Get a new user model
-     *
-     * @param array $attributes
-     * @return \Radiate\Database\Models\User
-     */
-    protected function newUserInstance(array $attributes)
-    {
-        return $this->model->newInstance($attributes, true);
-    }
-
-    /**
-     * Validate a user's credentials.
-     *
-     * @param array $credentials
-     * @return bool
-     */
-    public function validate(array $credentials = [])
-    {
-        $user = $this->retrieveByCredentials($credentials);
-
-        return $user instanceof User;
-    }
-
-    /**
-     * Attempt a login
-     *
-     * @param \ArrayAccess|array $credentials
-     * @param bool $remember
-     * @return bool
-     */
-    public function attempt($credentials, bool $remember = false): bool
-    {
-        $user = $this->retrieveByCredentials($credentials);
-
-        return $user ? $this->login($user, $remember) : false;
-    }
-
-    /**
-     * Log in
-     *
-     * @param \Radiate\Database\Models\User $user
-     * @param bool $remember
-     * @return bool
-     */
-    public function login($user, bool $remember = false): bool
-    {
-        if ($user = User::find($user->id)) {
-            wp_clear_auth_cookie();
-            wp_set_current_user($user->id);
-            wp_set_auth_cookie($user->id, $remember);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Log in by the user ID
-     *
-     * @param int $id
-     * @param bool $remember
-     * @return bool
-     */
-    public function loginUsingId(int $id, bool $remember = false): bool
-    {
-        if ($user = User::find($id)) {
-            return $this->login($user, $remember);
-        }
-
-        return false;
+        return $this->model->find($identifier);
     }
 
     /**
      * Retrieve a user by the given credentials.
      *
-     * @param array $credentials
-     * @return \Radiate\Database\Models\User|false
+     * @param  array  $credentials
+     * @return \Radiate\Auth\Contracts\Authenticatable|null
      */
-    protected function retrieveByCredentials(array $credentials)
+    public function retrieveByCredentials(array $credentials)
     {
-        $user = wp_authenticate($credentials['username'], $credentials['password']);
+        $user = wp_authenticate($credentials['email'], $credentials['password']);
 
         if (!is_wp_error($user)) {
             return $this->newUserInstance($user->to_array());
         }
-
-        return false;
     }
 
     /**
-     * Log out
+     * Validate a user against the given credentials.
      *
-     * @return void
-     */
-    public function logout(): void
-    {
-        wp_logout();
-    }
-
-    /**
-     * Return the user
-     *
-     * @return \Radiate\Database\Models\User|false
-     */
-    public function user()
-    {
-        $user = $this->newUserInstance($this->getCurrentUserAttributes());
-
-        return $this->check() ? $user : false;
-    }
-
-    /**
-     * Return the user id
-     *
-     * @return int|bool
-     */
-    public function id()
-    {
-        return ($id = get_current_user_id()) !== 0 ? $id : false;
-    }
-
-    /**
-     * Determine if the user is logged in
-     *
-     * @return boolean
-     */
-    public function check(): bool
-    {
-        return is_user_logged_in();
-    }
-
-    /**
-     * Determine if the user is a guest
-     *
+     * @param  \Radiate\Auth\Contracts\Authenticatable  $user
+     * @param  array  $credentials
      * @return bool
      */
-    public function guest(): bool
+    public function validateCredentials($user, array $credentials)
     {
-        return !$this->check();
+        return wp_check_password(
+            $credentials['password'],
+            $user->getAuthPassword(),
+            $user->getAuthIdentifier()
+        );
     }
 }

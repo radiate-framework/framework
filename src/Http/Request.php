@@ -4,13 +4,22 @@ namespace Radiate\Http;
 
 use ArrayAccess;
 use Closure;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use Radiate\Support\Str;
 
-class Request implements ArrayAccess, JsonSerializable
+class Request implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
 {
     use Macroable;
+
+    /**
+     * The query attributes
+     *
+     * @var array
+     */
+    protected $query;
 
     /**
      * The request attributes
@@ -69,15 +78,24 @@ class Request implements ArrayAccess, JsonSerializable
     protected $userResolver;
 
     /**
+     * The route resolver
+     *
+     * @var \Closure
+     */
+    protected $routeResolver;
+
+    /**
      * Create the request instance
      *
+     * @param array $query
      * @param array $request
      * @param array $cookies
      * @param array $files
      * @param array $server
      */
-    public function __construct(array $request = [], array $cookies = [], array $files = [], array $server = [])
+    public function __construct(array $query = [], array $request = [], array $cookies = [], array $files = [], array $server = [])
     {
+        $this->query = $query;
         $this->request = $request;
         $this->cookies = $cookies;
         $this->files = $files;
@@ -92,7 +110,19 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public static function capture()
     {
-        return new static($_REQUEST, $_COOKIE, $_FILES, $_SERVER);
+        $request = new static($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER);
+
+        if (
+            Str::startsWith($request->header('CONTENT_TYPE', ''), 'application/x-www-form-urlencoded') &&
+            in_array($request->realMethod(), ['PUT', 'PATCH', 'DELETE'])
+        ) {
+            parse_str($request->getContent(), $data);
+            $request->request = $data;
+        }
+
+        $request->request = $request->getInputSource();
+
+        return $request;
     }
 
     /**
@@ -106,6 +136,7 @@ class Request implements ArrayAccess, JsonSerializable
     {
         $request = $to ?: new static;
 
+        $request->query = $from->query;
         $request->request = $from->request;
         $request->cookies = $from->cookies;
         $request->files = $from->files;
@@ -115,6 +146,7 @@ class Request implements ArrayAccess, JsonSerializable
         $request->json = $from->json;
 
         $request->setUserResolver($from->getUserResolver());
+        $request->setRouteResolver($from->getRouteResolver());
 
         return $request;
     }
@@ -142,13 +174,74 @@ class Request implements ArrayAccess, JsonSerializable
 
         foreach ($server as $key => $value) {
             if (strpos($key, 'HTTP_') === 0) {
-                $headers[$this->normalizeHeaderKeys(substr($key, 5))] = $value;
+                $headers[substr($key, 5)] = $value;
             } elseif (in_array($key, ['CONTENT_TYPE', 'CONTENT_LENGTH', 'CONTENT_MD5'])) {
-                $headers[$this->normalizeHeaderKeys($key)] = $value;
+                $headers[$key] = $value;
             }
         }
 
-        return $headers;
+        if (isset($server['PHP_AUTH_USER'])) {
+            $headers['PHP_AUTH_USER'] = $server['PHP_AUTH_USER'];
+            $headers['PHP_AUTH_PW'] = $server['PHP_AUTH_PW'] ?? '';
+        } else {
+            /*
+             * php-cgi under Apache does not pass HTTP Basic user/pass to PHP by default
+             * For this workaround to work, add these lines to your .htaccess file:
+             * RewriteCond %{HTTP:Authorization} .+
+             * RewriteRule ^ - [E=HTTP_AUTHORIZATION:%0]
+             *
+             * A sample .htaccess file:
+             * RewriteEngine On
+             * RewriteCond %{HTTP:Authorization} .+
+             * RewriteRule ^ - [E=HTTP_AUTHORIZATION:%0]
+             * RewriteCond %{REQUEST_FILENAME} !-f
+             * RewriteRule ^(.*)$ app.php [QSA,L]
+             */
+
+            $authorizationHeader = null;
+            if (isset($server['HTTP_AUTHORIZATION'])) {
+                $authorizationHeader = $server['HTTP_AUTHORIZATION'];
+            } elseif (isset($server['REDIRECT_HTTP_AUTHORIZATION'])) {
+                $authorizationHeader = $server['REDIRECT_HTTP_AUTHORIZATION'];
+            }
+
+            if (null !== $authorizationHeader) {
+                if (0 === stripos($authorizationHeader, 'basic ')) {
+                    // Decode AUTHORIZATION header into PHP_AUTH_USER and PHP_AUTH_PW when authorization header is basic
+                    $exploded = explode(':', base64_decode(substr($authorizationHeader, 6)), 2);
+                    if (2 == \count($exploded)) {
+                        [$headers['PHP_AUTH_USER'], $headers['PHP_AUTH_PW']] = $exploded;
+                    }
+                } elseif (empty($server['PHP_AUTH_DIGEST']) && (0 === stripos($authorizationHeader, 'digest '))) {
+                    // In some circumstances PHP_AUTH_DIGEST needs to be set
+                    $headers['PHP_AUTH_DIGEST'] = $authorizationHeader;
+                } elseif (0 === stripos($authorizationHeader, 'bearer ')) {
+                    /*
+                     * XXX: Since there is no PHP_AUTH_BEARER in PHP predefined variables,
+                     *      I'll just set $headers['AUTHORIZATION'] here.
+                     *      https://php.net/reserved.variables.server
+                     */
+                    $headers['AUTHORIZATION'] = $authorizationHeader;
+                }
+            }
+        }
+
+        if (!isset($headers['AUTHORIZATION'])) {
+            // PHP_AUTH_USER/PHP_AUTH_PW
+            if (isset($headers['PHP_AUTH_USER'])) {
+                $headers['AUTHORIZATION'] = 'Basic ' . base64_encode($headers['PHP_AUTH_USER'] . ':' . $headers['PHP_AUTH_PW']);
+            } elseif (isset($headers['PHP_AUTH_DIGEST'])) {
+                $headers['AUTHORIZATION'] = $headers['PHP_AUTH_DIGEST'];
+            }
+        }
+
+        $return = [];
+
+        foreach ($headers as $key => $value) {
+            $return[$this->normalizeHeaderKeys($key)] = $value;
+        }
+
+        return $return;
     }
 
     /**
@@ -173,6 +266,38 @@ class Request implements ArrayAccess, JsonSerializable
     public function header(string $key, $default = null)
     {
         return $this->headers[$this->normalizeHeaderKeys($key)] ?? $default;
+    }
+
+    /**
+     * Get the query attributes
+     *
+     * @param string|null $key
+     * @param mixed|null $default
+     * @return mixed
+     */
+    public function query(?string $key = null, $default = null)
+    {
+        if ($key) {
+            return $this->query[$key] ?? $default;
+        }
+
+        return $this->query;
+    }
+
+    /**
+     * Get the request attributes
+     *
+     * @param string|null $key
+     * @param mixed|null $default
+     * @return mixed
+     */
+    public function post(?string $key = null, $default = null)
+    {
+        if ($key) {
+            return $this->request[$key] ?? $default;
+        }
+
+        return $this->request;
     }
 
     /**
@@ -213,7 +338,9 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function merge(array $attributes)
     {
-        $this->request = array_merge($this->request, $attributes);
+        foreach ($attributes as $key => $value) {
+            $this->add($key, $value);
+        }
 
         return $this;
     }
@@ -303,7 +430,23 @@ class Request implements ArrayAccess, JsonSerializable
             return $this->json();
         }
 
-        return $this->request;
+        return in_array($this->realMethod(), ['GET', 'HEAD'])
+            ? $this->query
+            : $this->request;
+    }
+
+    /**
+     * Retrieve input as a boolean value.
+     *
+     * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
+     *
+     * @param  string|null  $key
+     * @param  bool  $default
+     * @return bool
+     */
+    public function boolean(?string $key = null, bool $default = false)
+    {
+        return filter_var($this->get($key, $default), FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
@@ -436,6 +579,26 @@ class Request implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Returns the user.
+     *
+     * @return string|null
+     */
+    public function getUser()
+    {
+        return $this->header('PHP_AUTH_USER');
+    }
+
+    /**
+     * Returns the password.
+     *
+     * @return string|null
+     */
+    public function getPassword()
+    {
+        return $this->header('PHP_AUTH_PW');
+    }
+
+    /**
      * Determine if the attribute exists
      *
      * @param string $key
@@ -443,7 +606,9 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function has(string $key)
     {
-        return isset($this->getInputSource()[$key]);
+        return isset(
+            array_merge($this->getInputSource(), $this->route()->parameters())[$key]
+        );
     }
 
     /**
@@ -467,7 +632,9 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function add(string $key, $value)
     {
-        $this->request[$key] = $value;
+        return in_array($this->realMethod(), ['GET', 'HEAD'])
+            ? $this->query[$key] = $value
+            : $this->request[$key] = $value;
     }
 
     /**
@@ -478,7 +645,11 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function remove(string $key)
     {
-        unset($this->request[$key]);
+        if (in_array($this->realMethod(), ['GET', 'HEAD'])) {
+            unset($this->query[$key]);
+        } else {
+            unset($this->request[$key]);
+        }
     }
 
     /**
@@ -512,6 +683,49 @@ class Request implements ArrayAccess, JsonSerializable
     public function getUserResolver()
     {
         return $this->userResolver ?: function () {
+            //
+        };
+    }
+
+    /**
+     * Get the request route
+     *
+     * @param string|null $parameters
+     * @param mixed|null $default
+     * @return \Radiate\Routing\Route|mixed
+     */
+    public function route(?string $parameter = null, $default = null)
+    {
+        $route = call_user_func($this->getRouteResolver());
+
+        if (is_null($route) || is_null($parameter)) {
+            return $route;
+        }
+
+        return $route->parameter($parameter, $default);
+    }
+
+    /**
+     * Set the route resolver
+     *
+     * @param \Closure $resolver
+     * @return self
+     */
+    public function setRouteResolver(Closure $resolver)
+    {
+        $this->routeResolver = $resolver;
+
+        return $this;
+    }
+
+    /**
+     * Get the route resolver
+     *
+     * @return \Closure
+     */
+    public function getRouteResolver()
+    {
+        return $this->routeResolver ?: function () {
             //
         };
     }
@@ -578,17 +792,18 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function toArray(): array
     {
-        return $this->request;
+        return array_merge($this->request, $this->query);
     }
 
     /**
      * Return the object as a json string
      *
+     * @param int $options
      * @return string
      */
-    public function toJson(): string
+    public function toJson($options = 0): string
     {
-        return json_encode($this->request);
+        return json_encode($this->all(), $options);
     }
 
     /**
@@ -598,7 +813,7 @@ class Request implements ArrayAccess, JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return $this->request;
+        return $this->all();
     }
 
     /**
@@ -643,5 +858,16 @@ class Request implements ArrayAccess, JsonSerializable
     public function __set(string $key, $value)
     {
         $this->add($key, $value);
+    }
+
+    /**
+     * Remove an attribute from the request
+     *
+     * @param string $key
+     * @return void
+     */
+    public function __unset(string $key)
+    {
+        $this->remove($key);
     }
 }

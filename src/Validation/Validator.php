@@ -37,6 +37,13 @@ class Validator
     protected $parsedRules = [];
 
     /**
+     * The valid inputs
+     *
+     * @var array
+     */
+    protected $validInputs = [];
+
+    /**
      * The error bag
      *
      * @var array
@@ -158,7 +165,6 @@ class Validator
             }));
 
             foreach ($rules as $rule) {
-
                 if (!$rule) {
                     continue;
                 }
@@ -209,7 +215,7 @@ class Validator
             $this->errorBag[$attribute] = [];
         }
 
-        if ($customMessage = $this->getCustomErrorMessage($rule)) {
+        if ($customMessage = $this->getCustomErrorMessage($attribute, $rule)) {
             $message = $customMessage;
         } elseif (in_array(get_class($rule), $this->sizeRules)) {
             $message = $this->getSizeMessage($attribute, $rule);
@@ -224,14 +230,27 @@ class Validator
     }
 
     /**
+     * Add a error message to the validator
+     *
+     * @param string $key
+     * @param string $message
+     * @return void
+     */
+    public function addError(string $key, string $message)
+    {
+        $this->errorBag[$key][] = $message;
+    }
+
+    /**
      * Get the custom error message if set
      *
+     * @param string $rule $attribute
      * @param \Radiate\Validation\Rules\Rule $rule
      * @return string|null
      */
-    protected function getCustomErrorMessage(Rule $rule)
+    protected function getCustomErrorMessage(string $attribute, Rule $rule)
     {
-        $key = array_search(get_class($rule), $this->rules);
+        $key = $attribute . '.' . array_search(get_class($rule), $this->rules);
 
         if (isset($this->customMessages[$key])) {
             return $this->customMessages[$key];
@@ -403,7 +422,7 @@ class Validator
     protected function parseRule($rule)
     {
         if ($rule instanceof Closure) {
-            return new Rules\ClosureRule($rule);
+            return new ClosureRule($rule);
         }
 
         if ($rule instanceof Rule) {

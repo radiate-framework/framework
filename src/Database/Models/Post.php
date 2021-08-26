@@ -34,6 +34,16 @@ class Post extends Model
     protected static $postType = 'post';
 
     /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'p';
+    }
+
+    /**
      * Perform any actions required after the model boots.
      *
      * @return void
@@ -261,6 +271,27 @@ class Post extends Model
     public function setUpdatedAtAttribute(DateTimeImmutable $value)
     {
         $this->attributes['post_modified'] = $value->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * Get the author id
+     *
+     * @return int
+     */
+    public function getAuthorIdAttribute()
+    {
+        return (int) $this->attributes['post_author'];
+    }
+
+    /**
+     * Set the author id
+     *
+     * @param int $value
+     * @return void
+     */
+    public function setAuthorIdAttribute(int $value): void
+    {
+        $this->attributes['post_author'] = (int) $value;
     }
 
     /**

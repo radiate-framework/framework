@@ -3,13 +3,16 @@
 namespace Radiate\Database\Models;
 
 use DateTimeImmutable;
+use Radiate\Auth\Authenticatable;
+use Radiate\Auth\Contracts\Authenticatable as AuthenticatableContract;
 use Radiate\Database\Concerns\HasMeta;
 use Radiate\Database\Model;
 use Radiate\Database\UserQueryBuilder;
+use Radiate\Support\Facades\Gate;
 
-class User extends Model
+class User extends Model implements AuthenticatableContract
 {
-    use HasMeta;
+    use Authenticatable, HasMeta;
 
     /**
      * The primary key for the model.
@@ -24,6 +27,16 @@ class User extends Model
      * @var string
      */
     protected $objectType = 'user';
+
+    /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'include';
+    }
 
     /**
      * Perform any actions required before the model boots.
@@ -128,7 +141,7 @@ class User extends Model
     /**
      * Get the url attribute
      *
-     * @return string
+     * @return string|null
      */
     public function getUrlAttribute()
     {
@@ -141,7 +154,7 @@ class User extends Model
      * @param string $value
      * @return void
      */
-    public function setUrlAttribute(string $value)
+    public function setUrlAttribute(?string $value = null)
     {
         $this->attributes['user_url'] = $value;
     }
@@ -249,5 +262,63 @@ class User extends Model
     public function hasRole(string $role): bool
     {
         return in_array($role, $this->roles());
+    }
+
+    /**
+     * Get the user capabilities
+     *
+     * @return array
+     */
+    public function capabilities()
+    {
+        return get_userdata($this->getKey())->allcaps;
+    }
+
+    /**
+     * Determine if the entity has the given abilities.
+     *
+     * @param  array|string  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function can($abilities, $arguments = [])
+    {
+        return Gate::forUser($this)->check($abilities, $arguments);
+    }
+
+    /**
+     * Determine if the entity has any of the given abilities.
+     *
+     * @param  array|string  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function canAny($abilities, $arguments = [])
+    {
+        return Gate::forUser($this)->any($abilities, $arguments);
+    }
+
+    /**
+     * Determine if the entity does not have the given abilities.
+     *
+     * @param  array|string  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function cant($abilities, $arguments = [])
+    {
+        return !$this->can($abilities, $arguments);
+    }
+
+    /**
+     * Determine if the entity does not have the given abilities.
+     *
+     * @param  array|string  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function cannot($abilities, $arguments = [])
+    {
+        return $this->cant($abilities, $arguments);
     }
 }

@@ -28,15 +28,18 @@ class RestRoute extends Route
      * Dispatch the route
      *
      * @param \Radiate\Http\Request $request
-     * @return void
+     * @return \Closure
      */
     public function handle(Request $request)
     {
         return function (WP_REST_Request $wpRequest) use ($request) {
-            die($this->runRequestThroughStack(
-                $request->merge($parameters = $wpRequest->get_url_params()),
-                $parameters
-            ));
+            $request->setRouteResolver(function () {
+                return $this;
+            });
+
+            $this->parameters = $wpRequest->get_url_params();
+
+            die($this->runRequestThroughStack($request));
         };
     }
 
@@ -49,5 +52,29 @@ class RestRoute extends Route
     protected function parseUri(string $uri): string
     {
         return preg_replace('@\/\{([\w]+?)(\?)?\}@', '\/?(?P<$1>[\w-]+)$2', $uri);
+    }
+
+    /**
+     * Generate a URL for the route
+     *
+     * @param \Radiate\Routing\UrlGenerator $url
+     * @param array $parameters
+     * @return string
+     */
+    public function generateUrl(UrlGenerator $url, array $parameters = [])
+    {
+        $path = preg_replace_callback('/\{(.*?)\}/', function ($matches) use (&$parameters) {
+            if (isset($parameters[$matches[1]])) {
+                $value = $parameters[$matches[1]];
+
+                unset($parameters[$matches[1]]);
+
+                return $value;
+            }
+
+            return $matches[0];
+        }, $this->uri());
+
+        return $url->rest($this->namespace() . '/' . $path, $parameters);
     }
 }

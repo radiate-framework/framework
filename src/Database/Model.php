@@ -3,11 +3,14 @@
 namespace Radiate\Database;
 
 use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 use Radiate\Database\Concerns\HasAttributes;
 use Radiate\Database\Concerns\HasGlobalScopes;
+use RuntimeException;
 
-class Model implements ArrayAccess, JsonSerializable
+class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
 {
     use HasAttributes;
     use HasGlobalScopes;
@@ -18,6 +21,13 @@ class Model implements ArrayAccess, JsonSerializable
      * @var string
      */
     protected $primaryKey = 'ID';
+
+    /**
+     * The object type
+     *
+     * @var string
+     */
+    protected $objectType = '';
 
     /**
      * The array of booted models.
@@ -39,6 +49,20 @@ class Model implements ArrayAccess, JsonSerializable
      * @var bool
      */
     public $wasRecentlyCreated = false;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var string[]
+     */
+    protected $fillable = [];
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var string[]
+     */
+    protected $guarded = ['*'];
 
     /**
      * Create a new Eloquent model instance.
@@ -100,6 +124,16 @@ class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return $this->getKeyName();
+    }
+
+    /**
      * Get the value of the model's primary key.
      *
      * @return mixed
@@ -107,6 +141,16 @@ class Model implements ArrayAccess, JsonSerializable
     public function getKey()
     {
         return $this->getAttribute($this->getKeyName());
+    }
+
+    /**
+     * Get the model's object type.
+     *
+     * @return string
+     */
+    public function getObjectType()
+    {
+        return $this->objectType;
     }
 
     /**
@@ -191,21 +235,6 @@ class Model implements ArrayAccess, JsonSerializable
     public function newCollection(array $models = [])
     {
         return new Collection($models);
-    }
-
-    /**
-     * Create a new model instance
-     *
-     * @param array $attributes
-     * @return \Radiate\Database\Model
-     */
-    public static function __create(array $attributes)
-    {
-        $model = new static($attributes);
-
-        $model->save();
-
-        return $model;
     }
 
     /**
@@ -301,10 +330,50 @@ class Model implements ArrayAccess, JsonSerializable
     public function fill(array $attributes)
     {
         foreach ($attributes as $key => $value) {
-            $this->setAttribute($key, $value);
+            if ($this->isFillable($key)) {
+                $this->setAttribute($key, $value);
+            } else {
+                throw new RuntimeException(sprintf(
+                    'Add [%s] to fillable property to allow mass assignment on [%s].',
+                    $key,
+                    get_class($this)
+                ));
+            }
         }
 
         return $this;
+    }
+
+    /**
+     * Set the fillable attributes for the model.
+     *
+     * @param  array  $fillable
+     * @return $this
+     */
+    public function fillable(array $fillable)
+    {
+        $this->fillable = $fillable;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the attribute is fillable
+     *
+     * @param string $key
+     * @return boolean
+     */
+    protected function isFillable(string $key)
+    {
+        if (in_array($key, $this->fillable)) {
+            return true;
+        }
+
+        if (in_array($key, $this->guarded) || in_array('*', $this->guarded)) {
+            return false;
+        }
+
+        return empty($this->fillable);
     }
 
     /**
@@ -413,7 +482,7 @@ class Model implements ArrayAccess, JsonSerializable
      * @param  int  $options
      * @return string
      */
-    public function toJson(int $options = 0)
+    public function toJson($options = 0)
     {
         return json_encode($this->jsonSerialize(), $options);
     }
@@ -445,7 +514,7 @@ class Model implements ArrayAccess, JsonSerializable
      * @param  array  $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call(string $method, array $parameters = [])
     {
         return $this->getQueryBuilder()->$method(...$parameters);
     }
@@ -457,7 +526,7 @@ class Model implements ArrayAccess, JsonSerializable
      * @param  array  $parameters
      * @return mixed
      */
-    public static function __callStatic($method, $parameters)
+    public static function __callStatic(string $method, array $parameters = [])
     {
         return (new static)->$method(...$parameters);
     }

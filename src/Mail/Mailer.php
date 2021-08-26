@@ -130,9 +130,9 @@ class Mailer
      * Send the mail
      *
      * @param \Radiate\Mail\Mailable $mailable
-     * @return void
+     * @return bool
      */
-    public function send(Mailable $mailable): void
+    public function send(Mailable $mailable): bool
     {
         $mailable->build();
 
@@ -145,15 +145,13 @@ class Mailer
             $phpMailer->Encoding = 'base64';
         });
 
-        $this->events->listen('wp_loaded', function () use ($mailable) {
-            return wp_mail(
-                $mailable->buildTo(),
-                $mailable->buildSubject(),
-                $mailable->buildHtml(),
-                $mailable->buildHeaders(),
-                $mailable->buildAttachments()
-            );
-        });
+        return wp_mail(
+            $mailable->buildTo(),
+            $mailable->buildSubject(),
+            $mailable->buildHtml(),
+            $mailable->buildHeaders(),
+            $mailable->buildAttachments()
+        );
     }
 
     /**

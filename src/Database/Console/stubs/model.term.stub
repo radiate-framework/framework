@@ -1,0 +1,15 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\Database\Models\Term as Model;
+
+class {{ class }} extends Model
+{
+    /**
+     * The taxonomy
+     *
+     * @var string
+     */
+    protected static $taxonomy = '{{ type }}';
+}

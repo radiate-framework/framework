@@ -54,6 +54,13 @@ class Application extends Container
     protected $routeMiddleware = [];
 
     /**
+     * The registered class aliases
+     *
+     * @var array
+     */
+    protected $registeredClassAliases = [];
+
+    /**
      * Create the applicaiton
      *
      * @param string $basePath
@@ -119,14 +126,32 @@ class Application extends Container
                 \Illuminate\Contracts\Container\Container::class,
                 \Psr\Container\ContainerInterface::class,
             ],
-            'auth' => [\Radiate\Auth\AuthManager::class],
+            'db' => [\Radiate\Database\DatabaseManager::class],
+            'db.connection' => [
+                \Radiate\Database\Connection::class,
+                \wpdb::class,
+            ],
+            'auth' => [
+                \Radiate\Auth\AuthManager::class,
+                Illuminate\Contracts\Auth\Factory::class,
+            ],
+            'cache' => [\Radiate\Cache\Repository::class],
             'config' => [
                 \Radiate\Config\Repository::class,
                 \Illuminate\Config\Repository::class,
                 \Illuminate\Contracts\Config\Repository::class,
             ],
+            'encrypter' => [
+                \Radiate\Encryption\Encrypter::class,
+                \Illuminate\Contracts\Encryption\Encrypter::class,
+                \Illuminate\Contracts\Encryption\StringEncrypter::class,
+            ],
             'events' => [\Radiate\Events\Dispatcher::class],
             'files' => [\Radiate\Filesystem\Filesystem::class],
+            'hash' => [
+                \Radiate\Hashing\Hasher::class,
+                \Illuminate\Contracts\Hashing\Hasher::class,
+            ],
             'mailer' => [\Radiate\Mail\Mailer::class],
             'request' => [\Radiate\Http\Request::class],
             'router' => [\Radiate\Routing\Router::class],
@@ -161,6 +186,24 @@ class Application extends Container
     protected function setFacadeRoot()
     {
         Facade::setFacadeApplication($this);
+    }
+
+    /**
+     * Register the class aliases
+     *
+     * @param array $aliases
+     * @return void
+     */
+    public function aliases(array $aliases = [])
+    {
+        foreach ($aliases as $alias => $class) {
+            if ($this->registeredClassAliases[$alias]) {
+                return;
+            }
+            if (class_alias($class, $alias)) {
+                $this->registeredClassAliases[$alias] = $class;
+            };
+        }
     }
 
     /**

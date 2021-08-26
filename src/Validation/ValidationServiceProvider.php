@@ -41,7 +41,7 @@ class ValidationServiceProvider extends ServiceProvider
      */
     protected function registerRequestValidation()
     {
-        Request::macro('validate', function (array $rules, array $messages = []) {
+        Request::macro('validate', function (array $rules, array $messages = []): array {
             /**
              * @var \Radiate\Http\Request $this
              */

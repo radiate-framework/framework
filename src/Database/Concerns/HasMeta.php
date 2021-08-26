@@ -7,54 +7,23 @@ use Radiate\Database\Models\Meta;
 trait HasMeta
 {
     /**
-     * The cached meta
+     * The model meta object
      *
      * @var \Radiate\Database\Models\Meta
      */
-    protected $cachedMeta;
+    protected $meta;
 
     /**
-     * Get the object meta
+     * Get the meta object
      *
-     * @return \Radiate\Database\Models\Meta|null
+     * @return \Radiate\Database\Models\Meta
      */
-    public function getMetaAttribute()
+    public function meta()
     {
-        if ($this->cachedMeta) {
-            return $this->cachedMeta;
+        if (!$this->meta) {
+            $this->meta = (new Meta($this))->hydrate();
         }
 
-        $meta = get_metadata($this->objectType, $this->getKey());
-
-        if (!$meta) {
-            return;
-        }
-
-        $this->cachedMeta = new Meta($this->unserializeMeta($meta));
-
-        return $this->cachedMeta;
-    }
-
-    /**
-     * Unserialize the object meta
-     *
-     * @param array $meta
-     * @return array
-     */
-    protected function unserializeMeta(array $meta)
-    {
-        $unserialized = [];
-
-        foreach ($meta as $key => $values) {
-            $newValues = [];
-
-            foreach ($values as $value) {
-                $newValues[] = maybe_unserialize($value);
-            }
-
-            $unserialized[$key] = count($newValues) !== 1 ? $newValues : $newValues[0];
-        }
-
-        return $unserialized;
+        return $this->meta;
     }
 }

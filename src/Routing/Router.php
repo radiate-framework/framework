@@ -6,6 +6,7 @@ use Closure;
 use Radiate\Events\Dispatcher;
 use Radiate\Foundation\Application;
 use Radiate\Http\Request;
+use Radiate\Support\Collection;
 
 class Router
 {
@@ -202,6 +203,16 @@ class Router
         }
 
         return $route;
+    }
+
+    /**
+     * Get the registered routes
+     *
+     * @return \Radiate\Support\Collection
+     */
+    public function getRoutes()
+    {
+        return Collection::make($this->routes);
     }
 
     /**

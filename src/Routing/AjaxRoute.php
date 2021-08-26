@@ -26,12 +26,28 @@ class AjaxRoute extends Route
      * Dispatch the route
      *
      * @param \Radiate\Http\Request $request
-     * @return void
+     * @return \Closure
      */
     public function handle(Request $request)
     {
         return function () use ($request) {
+            $request->setRouteResolver(function () {
+                return $this;
+            });
+
             die($this->runRequestThroughStack($request));
         };
+    }
+
+    /**
+     * Generate a URL for the route
+     *
+     * @param \Radiate\Routing\UrlGenerator $url
+     * @param array $parameters
+     * @return string
+     */
+    public function generateUrl(UrlGenerator $url, array $parameters = [])
+    {
+        return $url->ajax($this->uri(), $parameters);
     }
 }

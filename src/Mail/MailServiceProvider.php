@@ -30,7 +30,7 @@ class MailServiceProvider extends ServiceProvider
         ]);
 
         $this->publishes([
-            __DIR__ . '/resources/views' => $this->app->basePath('views/vendor/mail'),
+            __DIR__ . '/resources/views' => $this->app['config']['view.path'] . '/mail',
         ], 'mail');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Radiate\Routing;
 
+use Closure;
 use Radiate\Foundation\Application;
 use Radiate\Http\Request;
 use Radiate\Support\Pipeline;
@@ -38,6 +39,13 @@ abstract class Route
     protected $uri;
 
     /**
+     * The route name
+     *
+     * @var string
+     */
+    protected $name = '';
+
+    /**
      * The route action
      *
      * @var mixed
@@ -50,6 +58,13 @@ abstract class Route
      * @var array
      */
     protected $attributes;
+
+    /**
+     * The route parameters
+     *
+     * @var array
+     */
+    protected $parameters = [];
 
     /**
      * Create the route instance
@@ -82,12 +97,46 @@ abstract class Route
      */
     public function action()
     {
-        if (is_callable($this->action)) {
+        if ($this->action instanceof Closure) {
             return $this->action;
         }
+
+        if (is_array($this->action)) {
+            $class = is_object($a = $this->action[0]) ? $a : new $a;
+
+            return [$class, $this->action[1]];
+        }
+
         if (is_string($this->action) && class_exists($this->action)) {
             return [new $this->action, '__invoke'];
         }
+    }
+
+    /**
+     * Get the action name for the route.
+     *
+     * @return string
+     */
+    public function getActionName()
+    {
+        if ($this->action instanceof Closure) {
+            return 'Closure';
+        }
+        if (is_string($this->action)) {
+            return $this->action;
+        }
+        if (is_object($this->action)) {
+            return get_class($this->action);
+        }
+        if (is_array($this->action)) {
+            $class =  is_string($this->action[0])
+                ? $this->action[0]
+                : get_class($this->action[0]);
+
+            return $class . '@' . $this->action[1];
+        }
+
+        return '';
     }
 
     /**
@@ -130,6 +179,29 @@ abstract class Route
     public function prefix(string $path = '')
     {
         return trim($this->attributes['prefix'] . ($path ? '/' . $path : $path), '/');
+    }
+
+    /**
+     * Set the route name
+     *
+     * @param string $name
+     * @return static
+     */
+    public function name(string $name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get the route name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -183,17 +255,16 @@ abstract class Route
      * Handle the controller action
      *
      * @param \Radiate\Http\Request $request
-     * @param array $parameters
      * @return mixed
      */
-    protected function runRequestThroughStack(Request $request, array $parameters = [])
+    protected function runRequestThroughStack(Request $request)
     {
         try {
-            $response = (new Pipeline())
+            $response = (new Pipeline($this->app))
                 ->send($request)
                 ->through($this->gatherMiddleware())
-                ->then(function ($request) use ($parameters) {
-                    return $this->app->call($this->action(), $parameters);
+                ->then(function () {
+                    return $this->app->call($this->action(), $this->parameters());
                 });
         } catch (Throwable $e) {
             $response = $this->app->renderException($request, $e);
@@ -214,14 +285,50 @@ abstract class Route
         $middleware = [];
 
         foreach ($this->attributes['middleware'] as $alias) {
-            if ($wares = $routeMiddleware[$alias]) {
+            [$name, $parameters] = array_pad(explode(':', $alias, 2), 2, null);
+
+            if ($wares = $routeMiddleware[$name]) {
                 foreach ((array) $wares as $ware) {
-                    $middleware[] = $ware ?? null;
+                    $middleware[] = ($ware . ':' . $parameters) ?? null;
                 }
             }
         };
 
         return array_unique($middleware);
+    }
+
+    /**
+     * Get the route parameters
+     *
+     * @return array
+     */
+    public function parameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * Get a route parameter
+     *
+     * @param string $key
+     * @param mixed|null $default
+     * @return mixed
+     */
+    public function parameter(string $key, $default = null)
+    {
+        return $this->parameters[$key] ?? $default;
+    }
+
+    /**
+     * Set a parameter
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function setParameter(string $key, $value)
+    {
+        $this->parameters[$key] = $value;
     }
 
     /**

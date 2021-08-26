@@ -19,7 +19,9 @@ class FormRequestServiceProvider extends ServiceProvider
         });
 
         $this->app->resolving(FormRequest::class, function ($request, $app) {
-            FormRequest::createFrom($app['request'], $request);
+            $request = FormRequest::createFrom($app['request'], $request);
+
+            $request->setContainer($app);
         });
     }
 }

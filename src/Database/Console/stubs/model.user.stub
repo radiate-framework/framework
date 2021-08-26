@@ -1,0 +1,10 @@
+<?php
+
+namespace {{ namespace }};
+
+use Radiate\Database\Models\User as Model;
+
+class {{ class }} extends Model
+{
+    //
+}
