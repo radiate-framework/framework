@@ -307,6 +307,121 @@ class Request implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Determine if the request is secure
+     *
+     * @return boolean
+     */
+    public function isSecure(): bool
+    {
+        $https = $this->server('HTTPS');
+
+        return $https && strtolower($https) !== 'off';
+    }
+
+    /**
+     * Get the request scheme
+     *
+     * @return string
+     */
+    public function getScheme(): string
+    {
+        return $this->isSecure() ? 'https' : 'http';
+    }
+
+    /**
+     * Get the port
+     *
+     * @return integer
+     */
+    public function getPort(): int
+    {
+        if (!$this->header('host')) {
+            return $this->server('SERVER_PORT');
+        }
+
+        return $this->isSecure() ? 443 : 80;
+    }
+
+    /**
+     * Get the host including port if non-standard
+     *
+     * @return string
+     */
+    public function getHttpHost(): string
+    {
+        $scheme = $this->getScheme();
+        $port = $this->getPort();
+
+        if (($scheme == 'http' && $port == 80) || ($scheme == 'https' && $port == 443)) {
+            return $this->getHost();
+        }
+
+        return $this->getHost() . ':' . $port;
+    }
+
+    /**
+     * Get the host
+     *
+     * @return string
+     */
+    public function getHost(): string
+    {
+        return $this->header('host', $this->server('SERVER_NAME', $this->server('SERVER_ADDR')));
+    }
+
+    /**
+     * Get the scheme and host
+     *
+     * @return string
+     */
+    public function getSchemeAndHttpHost(): string
+    {
+        return $this->getScheme() . '://' . $this->getHttpHost();
+    }
+
+    /**
+     * Get the query string
+     *
+     * @return string
+     */
+    public function getQueryString(): string
+    {
+        return $this->server('QUERY_STRING', '');
+    }
+
+    /**
+     * Get the base path
+     *
+     * @return string
+     */
+    public function getBaseUrl(): string
+    {
+        return strtok($this->server('REQUEST_URI'), '?');
+    }
+
+    /**
+     * Get the URL
+     *
+     * @return string
+     */
+    public function url(): string
+    {
+        return $this->getSchemeAndHttpHost() . $this->getBaseUrl();
+    }
+
+    /**
+     * Get the full URL including query parameters
+     *
+     * @return string
+     */
+    public function fullUrl(): string
+    {
+        $qs = $this->getQueryString();
+
+        return $this->getSchemeAndHttpHost() . $this->getBaseUrl() . ($qs ? '?' . $qs : '');
+    }
+
+    /**
      * Get the bearer token from the request headers.
      *
      * @return string|null
