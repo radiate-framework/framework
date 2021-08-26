@@ -3,7 +3,6 @@
 namespace Radiate\Auth;
 
 use Radiate\Auth\Access\Gate;
-use Radiate\Auth\JWT\Builder;
 use Radiate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -17,10 +16,6 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->app->singleton('auth', function ($app) {
             return new AuthManager($app);
-        });
-
-        $this->app->singleton('jwt', function ($app) {
-            return new Builder($app['encrypter']->getKey());
         });
 
         $this->app->singleton('gate', function ($app) {
