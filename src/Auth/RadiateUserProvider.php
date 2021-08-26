@@ -45,7 +45,7 @@ class RadiateUserProvider implements UserProvider
         $user = wp_authenticate($credentials['email'], $credentials['password']);
 
         if (!is_wp_error($user)) {
-            return $this->newUserInstance($user->to_array());
+            return $this->model->newInstance($user->to_array());
         }
     }
 
