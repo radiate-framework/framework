@@ -47,15 +47,21 @@ class Response implements ArrayAccess
     /**
      * Get the JSON decoded body of the response as an array.
      *
-     * @return array
+     * @param  string|null $key
+     * @param  mixed|null $default
+     * @return array|mixed
      */
-    public function json()
+    public function json(?string $key = null, $default = null)
     {
         if (!$this->decoded) {
             $this->decoded = json_decode($this->body(), true);
         }
+        
+        if (!$key) {
+            return $this->decoded;
+        }
 
-        return $this->decoded;
+        return $this->decoded->$key ?? $default;
     }
 
     /**
@@ -64,7 +70,7 @@ class Response implements ArrayAccess
      * @param  string|null  $key
      * @return \Radiate\Support\Collection
      */
-    public function collect($key = null)
+    public function collect(?string $key = null): Collection
     {
         return Collection::make($this->json($key));
     }
@@ -175,7 +181,7 @@ class Response implements ArrayAccess
      *
      * @return array
      */
-    public function cookies()
+    public function cookies(): array
     {
         return $this->response->get_cookies();
     }
@@ -185,7 +191,7 @@ class Response implements ArrayAccess
      *
      * @return \WP_HTTP_Requests_Response
      */
-    public function toWordPressResponse()
+    public function toWordPressResponse(): WP_HTTP_Requests_Response
     {
         return $this->response;
     }
@@ -197,7 +203,7 @@ class Response implements ArrayAccess
      *
      * @throws \Radiate\Http\Client\RequestException
      */
-    public function throw()
+    public function throw(): static
     {
         if ($this->serverError() || $this->clientError()) {
             throw new RequestException($this);
