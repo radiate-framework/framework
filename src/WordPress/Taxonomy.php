@@ -93,14 +93,34 @@ abstract class Taxonomy
     }
 
     /**
+     * Get the taxonomy singular label
+     *
+     * @return string
+     */
+    public function singular()
+    {
+        return $this->singular;
+    }
+
+    /**
+     * Get the taxonomy plural label
+     *
+     * @return string
+     */
+    public function plural()
+    {
+        return $this->plural;
+    }
+
+    /**
      * Get the taxonomy options
      *
      * @return array
      */
     public function options()
     {
-        $s = $this->singular;
-        $p = $this->plural;
+        $s = $this->singular();
+        $p = $this->plural();
 
         $labels = [
             'name'                       => __($p),
