@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use Radiate\Http\Concerns\InteractsWithInput;
+use Radiate\Support\Str;
 use WP_REST_Request;
 
 class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerializable
@@ -34,13 +35,6 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      * @var \Closure
      */
     protected $userResolver;
-
-    /**
-     * The route resolver
-     *
-     * @var \Closure
-     */
-    protected $routeResolver;
 
     /**
      * Create the request instance
@@ -101,7 +95,6 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
             $request->set_server_params($from->get_server_params());
 
             $request->setUserResolver($from->getUserResolver());
-            $request->setRouteResolver($from->getRouteResolver());
         }
 
         return $request;
@@ -118,7 +111,7 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
         $headers = [];
 
         foreach ($server as $key => $value) {
-            if (str_starts_with($key, 'HTTP_')) {
+            if (Str::startsWith($key, 'HTTP_')) {
                 $headers[substr($key, 5)] = $value;
             } elseif ('REDIRECT_HTTP_AUTHORIZATION' === $key && empty($server['HTTP_AUTHORIZATION'])) {
                 /*
@@ -520,31 +513,6 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
     public function getUserResolver()
     {
         return $this->userResolver ?: function () {
-            //
-        };
-    }
-
-    /**
-     * Set the route resolver
-     *
-     * @param \Closure $resolver
-     * @return self
-     */
-    public function setRouteResolver(Closure $resolver)
-    {
-        $this->routeResolver = $resolver;
-
-        return $this;
-    }
-
-    /**
-     * Get the route resolver
-     *
-     * @return \Closure
-     */
-    public function getRouteResolver()
-    {
-        return $this->routeResolver ?: function () {
             //
         };
     }
