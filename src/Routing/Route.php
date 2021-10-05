@@ -60,13 +60,6 @@ abstract class Route
     protected $attributes;
 
     /**
-     * The route parameters
-     *
-     * @var array
-     */
-    protected $parameters = [];
-
-    /**
      * Create the route instance
      *
      * @param array|string $methods
@@ -295,40 +288,6 @@ abstract class Route
         };
 
         return array_unique($middleware);
-    }
-
-    /**
-     * Get the route parameters
-     *
-     * @return array
-     */
-    public function parameters()
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * Get a route parameter
-     *
-     * @param string $key
-     * @param mixed|null $default
-     * @return mixed
-     */
-    public function parameter(string $key, $default = null)
-    {
-        return $this->parameters[$key] ?? $default;
-    }
-
-    /**
-     * Set a parameter
-     *
-     * @param string $key
-     * @param mixed $value
-     * @return void
-     */
-    public function setParameter(string $key, $value)
-    {
-        $this->parameters[$key] = $value;
     }
 
     /**
