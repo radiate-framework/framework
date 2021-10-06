@@ -7,13 +7,14 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
+use Radiate\Http\Concerns\InteractsWithContentTypes;
 use Radiate\Http\Concerns\InteractsWithInput;
 use Radiate\Support\Str;
 use WP_REST_Request;
 
 class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerializable
 {
-    use InteractsWithInput, Macroable;
+    use InteractsWithContentTypes, InteractsWithInput, Macroable;
 
     /**
      * The cookie attributes
@@ -51,7 +52,7 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
         $this->set_query_params(wp_unslash($query));
         $this->set_body_params(wp_unslash($request));
         $this->set_file_params($files);
-        $this->set_headers($this->getHeaders(wp_unslash($server)));
+        $this->set_headers($this->getHeadersFromServer(wp_unslash($server)));
         $this->set_body(file_get_contents('php://input'));
 
         $this->set_cookie_params($cookies);
@@ -71,11 +72,11 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
     /**
      * Create a new request from this one
      *
-     * @param self $from
-     * @param \WP_REST_Request|null $to
-     * @return \Radiate\Http\Request
+     * @param \Radiate\Http\Request $from
+     * @param \Radiate\Http\Request|null $to
+     * @return static
      */
-    public static function createFrom(WP_REST_Request $from, ?Request $to = null)
+    public static function createFrom(self $from, ?Request $to = null)
     {
         $request = $to ?: new static;
 
@@ -89,16 +90,40 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
         $request->set_default_params($from->get_default_params());
         $request->set_attributes($from->get_attributes());
         $request->set_url_params($from->get_url_params());
-
-        if ($from instanceof Request) {
-            $request->set_cookie_params($from->get_cookie_params());
-            $request->set_server_params($from->get_server_params());
-
-            $request->setUserResolver($from->getUserResolver());
-        }
+        $request->set_cookie_params($from->get_cookie_params());
+        $request->set_server_params($from->get_server_params());
+        $request->setUserResolver($from->getUserResolver());
 
         return $request;
     }
+
+    /**
+     * Create a Radiate request from a WP_REST_Request instance.
+     *
+     * @param  \WP_REST_Request  $request
+     * @return static
+     */
+    public static function createFromBase(WP_REST_Request $request)
+    {
+        $newRequest = new static;
+
+        $newRequest->set_method($request->get_method());
+        $newRequest->set_route($request->get_route());
+        $newRequest->set_query_params($request->get_query_params());
+        $newRequest->set_body_params($request->get_body_params());
+        $newRequest->set_file_params($request->get_file_params());
+        $newRequest->set_headers($request->get_headers());
+        $newRequest->set_body($request->get_body());
+        $newRequest->set_default_params($request->get_default_params());
+        $newRequest->set_attributes($request->get_attributes());
+        $newRequest->set_url_params($request->get_url_params());
+        $newRequest->set_cookie_params($_COOKIE);
+        $newRequest->set_server_params($_SERVER);
+
+        return $newRequest;
+    }
+
+
 
     /**
      * Get the headers from the server global
@@ -106,20 +131,20 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      * @param array $server
      * @return array
      */
-    protected function getHeaders(array $server): array
+    protected function getHeadersFromServer(array $server): array
     {
         $headers = [];
 
         foreach ($server as $key => $value) {
             if (Str::startsWith($key, 'HTTP_')) {
                 $headers[substr($key, 5)] = $value;
-            } elseif ('REDIRECT_HTTP_AUTHORIZATION' === $key && empty($server['HTTP_AUTHORIZATION'])) {
+            } elseif ($key === 'REDIRECT_HTTP_AUTHORIZATION' && empty($server['HTTP_AUTHORIZATION'])) {
                 /*
 				 * In some server configurations, the authorization header is passed in this alternate location.
 				 * Since it would not be passed in in both places we do not check for both headers and resolve.
 				 */
                 $headers['AUTHORIZATION'] = $value;
-            } elseif (in_array($key, ['CONTENT_LENGTH', 'CONTENT_MD5', 'CONTENT_TYPE'])) {
+            } elseif (in_array($key, ['CONTENT_LENGTH', 'CONTENT_MD5', 'CONTENT_TYPE', 'PHP_AUTH_USER', 'PHP_AUTH_PW'])) {
                 $headers[$key] = $value;
             }
         }
@@ -133,7 +158,7 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      * @param array $server
      * @return void
      */
-    public function set_server_params(array $server = [])
+    public function set_server_params(array $server = []): void
     {
         $this->server = $server;
     }
@@ -154,7 +179,7 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      * @param array $cookies
      * @return void
      */
-    public function set_cookie_params(array $cookies = [])
+    public function set_cookie_params(array $cookies = []): void
     {
         $this->cookies = $cookies;
     }
@@ -237,37 +262,7 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      */
     public function ajax()
     {
-        return $this->header('X_REQUESTED_WITH') == 'XMLHttpRequest';
-    }
-
-    /**
-     * Determine if the request can accept a JSON response
-     *
-     * @return bool
-     */
-    public function wantsJson()
-    {
-        return strpos($this->header('ACCEPT', '*/*'), '/json') !== false;
-    }
-
-    /**
-     * Determine if the request is sending JSON.
-     *
-     * @return bool
-     */
-    public function isJson()
-    {
-        return $this->is_json_content_type();
-    }
-
-    /**
-     * Determine if the request expects a JSON response
-     *
-     * @return bool
-     */
-    public function expectsJson()
-    {
-        return $this->ajax() || $this->wantsJson();
+        return $this->header('x-requested-with') == 'XMLHttpRequest';
     }
 
     /**
@@ -291,25 +286,19 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      *
      * @return string
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->get_body();
     }
 
     /**
-     * Get the input source for the request.
+     * Get the client user agent.
      *
-     * @return array
+     * @return string|null
      */
-    protected function getInputSource()
+    public function userAgent(): ?string
     {
-        if ($this->isJson()) {
-            return $this->json();
-        }
-
-        return in_array($this->realMethod(), ['GET', 'HEAD'])
-            ? $this->query
-            : $this->request;
+        return $this->header('user-agent');
     }
 
     /**
@@ -432,9 +421,9 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      *
      * @return string|null
      */
-    public function getUser()
+    public function getUser(): ?string
     {
-        return $this->header('PHP_AUTH_USER');
+        return $this->server('PHP_AUTH_USER');
     }
 
     /**
@@ -442,9 +431,9 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      *
      * @return string|null
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
-        return $this->header('PHP_AUTH_PW');
+        return $this->server('PHP_AUTH_PW');
     }
 
     /**
@@ -466,9 +455,9 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      * @param mixed $value
      * @return void
      */
-    public function add(string $key, $value)
+    public function add(string $key, $value): void
     {
-        $this->set_param($key, $value);
+        $this->params['defaults'][$key] = $value;
     }
 
     /**
@@ -477,7 +466,7 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      * @param string $key
      * @return void
      */
-    public function remove(string $key)
+    public function remove(string $key): void
     {
         unset($this[$key]);
     }
@@ -498,7 +487,7 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      * @param \Closure $resolver
      * @return self
      */
-    public function setUserResolver(Closure $resolver)
+    public function setUserResolver(Closure $resolver): self
     {
         $this->userResolver = $resolver;
 
@@ -510,7 +499,7 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      *
      * @return \Closure
      */
-    public function getUserResolver()
+    public function getUserResolver(): Closure
     {
         return $this->userResolver ?: function () {
             //
@@ -564,7 +553,7 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      * @param string $key
      * @return bool
      */
-    public function __isset(string $key)
+    public function __isset(string $key): bool
     {
         return $this->has($key);
     }
@@ -587,7 +576,7 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      * @param mixed $value
      * @return void
      */
-    public function __set(string $key, $value)
+    public function __set(string $key, $value): void
     {
         $this->add($key, $value);
     }
@@ -598,7 +587,7 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
      * @param string $key
      * @return void
      */
-    public function __unset(string $key)
+    public function __unset(string $key): void
     {
         $this->remove($key);
     }

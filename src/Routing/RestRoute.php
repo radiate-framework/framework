@@ -32,8 +32,8 @@ class RestRoute extends Route
      */
     public function handle(Request $request)
     {
-        return function (WP_REST_Request $wpRequest) use ($request) {
-            $request = Request::createFrom($wpRequest, $request);
+        return function (WP_REST_Request $wpRequest) {
+            $request = Request::createFromBase($wpRequest);
 
             die($this->runRequestThroughStack($request));
         };

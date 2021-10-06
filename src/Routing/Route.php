@@ -256,8 +256,10 @@ abstract class Route
             $response = (new Pipeline($this->app))
                 ->send($request)
                 ->through($this->gatherMiddleware())
-                ->then(function () {
-                    return $this->app->call($this->action(), $this->parameters());
+                ->then(function ($request) {
+                    $this->app->instance('request', $request);
+
+                    return $this->app->call($this->action());
                 });
         } catch (Throwable $e) {
             $response = $this->app->renderException($request, $e);
