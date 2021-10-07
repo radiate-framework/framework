@@ -22,6 +22,21 @@ class Response extends WP_REST_Response implements JsonSerializable
     }
 
     /**
+     * Create a response from a base WP_REST_Response
+     *
+     * @param WP_REST_Response $response
+     * @return static
+     */
+    public static function createFromBase(WP_REST_Response $response)
+    {
+        return new static(
+            $response->get_data(),
+            $response->get_status(),
+            $response->get_headers()
+        );
+    }
+
+    /**
      * Get the status code for the response.
      *
      * @return int

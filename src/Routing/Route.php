@@ -288,6 +288,12 @@ abstract class Route
             return $response;
         }
 
+        if (is_wp_error($response)) {
+            return JsonResponse::createFromBase(
+                rest_convert_error_to_response($response)
+            );
+        }
+
         if (
             $response instanceof Arrayable ||
             $response instanceof Jsonable ||
