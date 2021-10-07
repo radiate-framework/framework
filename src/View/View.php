@@ -3,9 +3,12 @@
 namespace Radiate\View;
 
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Support\Traits\Macroable;
 
 class View implements Renderable
 {
+    use Macroable;
+
     /**
      * The view.
      *
@@ -44,11 +47,16 @@ class View implements Renderable
     /**
      * Get the string contents of the view.
      *
+     * @param callable|null $callback
      * @return string
      */
-    public function render(): string
+    public function render(?callable $callback = null): string
     {
-        return $this->evaluatePath($this->path, $this->data);
+        $contents = $this->evaluatePath($this->path, $this->data);
+
+        $response = isset($callback) ? $callback($this, $contents) : null;
+
+        return $response ?: $contents;
     }
 
     /**
