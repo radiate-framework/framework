@@ -33,7 +33,7 @@ class Finder
      *
      * @var array
      */
-    protected $extensions = ['php', 'html'];
+    protected $extensions = ['php', 'html', 'md'];
 
     /**
      * Create the finder instance
