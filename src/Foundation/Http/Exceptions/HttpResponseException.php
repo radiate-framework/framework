@@ -2,19 +2,35 @@
 
 namespace Radiate\Foundation\Http\Exceptions;
 
+use Radiate\Http\Response;
 use RuntimeException;
 
 class HttpResponseException extends RuntimeException
 {
     /**
-     * Set the status header and return the message.
+     * The response
      *
-     * @return string
+     * @var \Radiate\Http\Response
      */
-    public function getResponse()
-    {
-        status_header($this->getCode(), $message = $this->getMessage());
+    protected $response;
 
-        return $message;
+    /**
+     * Create the exception
+     *
+     * @param \Radiate\Http\Response $response
+     */
+    public function __construct(Response $response)
+    {
+        $this->response = $response;
+    }
+
+    /**
+     * Get the response
+     *
+     * @return \Radiate\Http\Response
+     */
+    public function getResponse(): Response
+    {
+        return $this->response;
     }
 }

@@ -2,11 +2,11 @@
 
 namespace Radiate\Validation;
 
-use Radiate\Foundation\Http\Exceptions\HttpResponseException;
+use Exception;
 use Radiate\Support\Arr;
 use Radiate\Support\Facades\Validator as ValidatorFacade;
 
-class ValidationException extends HttpResponseException
+class ValidationException extends Exception
 {
     /**
      * The validator instance.
@@ -14,13 +14,6 @@ class ValidationException extends HttpResponseException
      * @var \Radiate\Validation\Validator
      */
     public $validator;
-
-    /**
-     * The validation errors.
-     *
-     * @var array
-     */
-    public $errors = [];
 
     /**
      * Create a new exception instance.
@@ -33,19 +26,16 @@ class ValidationException extends HttpResponseException
         parent::__construct('The given data was invalid.', 422);
 
         $this->validator = $validator;
-        $this->errors = $validator->errors();
     }
 
     /**
-     * Set the status header and return the message.
+     * Get the validator errors
      *
-     * @return string
+     * @return array
      */
-    public function getResponse()
+    public function errors(): array
     {
-        status_header($this->getCode(), $this->getMessage());
-
-        return json_encode(['errors' => $this->validator->errors()]);
+        return $this->validator->errors();
     }
 
     /**

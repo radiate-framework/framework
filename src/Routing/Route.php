@@ -2,10 +2,18 @@
 
 namespace Radiate\Routing;
 
+use ArrayObject;
 use Closure;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Renderable;
+use JsonSerializable;
 use Radiate\Foundation\Application;
+use Radiate\Http\JsonResponse;
 use Radiate\Http\Request;
+use Radiate\Http\Response;
 use Radiate\Support\Pipeline;
+use Stringable;
 use Throwable;
 
 abstract class Route
@@ -58,13 +66,6 @@ abstract class Route
      * @var array
      */
     protected $attributes;
-
-    /**
-     * The route parameters
-     *
-     * @var array
-     */
-    protected $parameters = [];
 
     /**
      * Create the route instance
@@ -263,14 +264,54 @@ abstract class Route
             $response = (new Pipeline($this->app))
                 ->send($request)
                 ->through($this->gatherMiddleware())
-                ->then(function () {
-                    return $this->app->call($this->action(), $this->parameters());
+                ->then(function ($request) {
+                    $this->app->instance('request', $request);
+
+                    return $this->app->call($this->action());
                 });
         } catch (Throwable $e) {
             $response = $this->app->renderException($request, $e);
         }
 
         return $response;
+    }
+
+    /**
+     * Static version of prepareResponse.
+     *
+     * @param  mixed  $response
+     * @return \Radiate\Http\Response
+     */
+    public static function toResponse($response): Response
+    {
+        if ($response instanceof Response) {
+            return $response;
+        }
+
+        if (is_wp_error($response)) {
+            return JsonResponse::createFromBase(
+                rest_convert_error_to_response($response)
+            );
+        }
+
+        if (
+            $response instanceof Arrayable ||
+            $response instanceof Jsonable ||
+            $response instanceof ArrayObject ||
+            $response instanceof JsonSerializable ||
+            method_exists($response, 'to_array') ||
+            is_array($response)
+        ) {
+            return new JsonResponse($response);
+        }
+
+        if ($response instanceof Renderable) {
+            $response = $response->render();
+        } elseif ($response instanceof Stringable) {
+            $response = $response->__toString();
+        }
+
+        return new Response($response, 200, ['content-type' => 'text/html']);
     }
 
     /**
@@ -295,40 +336,6 @@ abstract class Route
         };
 
         return array_unique($middleware);
-    }
-
-    /**
-     * Get the route parameters
-     *
-     * @return array
-     */
-    public function parameters()
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * Get a route parameter
-     *
-     * @param string $key
-     * @param mixed|null $default
-     * @return mixed
-     */
-    public function parameter(string $key, $default = null)
-    {
-        return $this->parameters[$key] ?? $default;
-    }
-
-    /**
-     * Set a parameter
-     *
-     * @param string $key
-     * @param mixed $value
-     * @return void
-     */
-    public function setParameter(string $key, $value)
-    {
-        $this->parameters[$key] = $value;
     }
 
     /**

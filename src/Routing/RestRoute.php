@@ -32,14 +32,14 @@ class RestRoute extends Route
      */
     public function handle(Request $request)
     {
-        return function (WP_REST_Request $wpRequest) use ($request) {
-            $request->setRouteResolver(function () {
-                return $this;
-            });
+        return function (WP_REST_Request $wpRequest) {
+            $request = Request::createFromBase($wpRequest);
 
-            $this->parameters = $wpRequest->get_url_params();
+            $response = $this->runRequestThroughStack($request);
 
-            die($this->runRequestThroughStack($request));
+            static::toResponse($response)->send();
+
+            die();
         };
     }
 
