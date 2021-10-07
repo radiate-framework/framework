@@ -2,8 +2,12 @@
 
 namespace Radiate\View;
 
+use Illuminate\Support\Traits\Macroable;
+
 class Factory
 {
+    use Macroable;
+
     /**
      * The file finder
      *

@@ -3,9 +3,12 @@
 namespace Radiate\View;
 
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Support\Traits\Macroable;
 
 class View implements Renderable
 {
+    use Macroable;
+
     /**
      * The view.
      *
