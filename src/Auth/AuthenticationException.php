@@ -16,7 +16,7 @@ class AuthenticationException extends Exception
     /**
      * The path the user should be redirected to.
      *
-     * @var string
+     * @var string|null
      */
     protected $redirectTo;
 
@@ -28,7 +28,7 @@ class AuthenticationException extends Exception
      * @param  string|null  $redirectTo
      * @return void
      */
-    public function __construct($message = 'Unauthenticated.', array $guards = [], $redirectTo = null)
+    public function __construct(string $message = 'Unauthenticated.', array $guards = [], ?string $redirectTo = null)
     {
         parent::__construct($message);
 
@@ -41,7 +41,7 @@ class AuthenticationException extends Exception
      *
      * @return array
      */
-    public function guards()
+    public function guards(): array
     {
         return $this->guards;
     }
@@ -49,9 +49,9 @@ class AuthenticationException extends Exception
     /**
      * Get the path the user should be redirected to.
      *
-     * @return string
+     * @return string|null
      */
-    public function redirectTo()
+    public function redirectTo(): ?string
     {
         return $this->redirectTo;
     }

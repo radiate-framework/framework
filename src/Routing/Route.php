@@ -2,10 +2,18 @@
 
 namespace Radiate\Routing;
 
+use ArrayObject;
 use Closure;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Renderable;
+use JsonSerializable;
 use Radiate\Foundation\Application;
+use Radiate\Http\JsonResponse;
 use Radiate\Http\Request;
+use Radiate\Http\Response;
 use Radiate\Support\Pipeline;
+use Stringable;
 use Throwable;
 
 abstract class Route
@@ -266,6 +274,38 @@ abstract class Route
         }
 
         return $response;
+    }
+
+    /**
+     * Static version of prepareResponse.
+     *
+     * @param  mixed  $response
+     * @return \Radiate\Http\Response
+     */
+    public static function toResponse($response): Response
+    {
+        if ($response instanceof Response) {
+            return $response;
+        }
+
+        if (
+            $response instanceof Arrayable ||
+            $response instanceof Jsonable ||
+            $response instanceof ArrayObject ||
+            $response instanceof JsonSerializable ||
+            method_exists($response, 'to_array') ||
+            is_array($response)
+        ) {
+            return new JsonResponse($response);
+        }
+
+        if ($response instanceof Renderable) {
+            $response = $response->render();
+        } elseif ($response instanceof Stringable) {
+            $response = $response->__toString();
+        }
+
+        return new Response($response, 200, ['content-type' => 'text/html']);
     }
 
     /**

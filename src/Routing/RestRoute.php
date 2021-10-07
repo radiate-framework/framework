@@ -35,7 +35,11 @@ class RestRoute extends Route
         return function (WP_REST_Request $wpRequest) {
             $request = Request::createFromBase($wpRequest);
 
-            die($this->runRequestThroughStack($request));
+            $response = $this->runRequestThroughStack($request);
+
+            static::toResponse($response)->send();
+
+            die();
         };
     }
 
