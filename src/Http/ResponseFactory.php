@@ -2,10 +2,13 @@
 
 namespace Radiate\Http;
 
+use Illuminate\Support\Traits\Macroable;
 use Radiate\View\Factory as ViewFactory;
 
 class ResponseFactory
 {
+    use Macroable;
+
     /**
      * The view factory
      *

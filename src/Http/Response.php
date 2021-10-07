@@ -2,11 +2,14 @@
 
 namespace Radiate\Http;
 
+use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use WP_REST_Response;
 
 class Response extends WP_REST_Response implements JsonSerializable
 {
+    use Macroable;
+
     /**
      * Create the response
      *
