@@ -82,14 +82,22 @@ class Filesystem
      * Get the returned value of a file.
      *
      * @param  string  $path
+     * @param  array  $data
      * @return mixed
      *
      * @throws \Radiate\Filesystem\Exceptions\FileNotFoundException
      */
-    public function getRequire(string $path)
+    public function getRequire(string $path, array $data = [])
     {
         if ($this->isFile($path)) {
-            return require $path;
+            $__path = $path;
+            $__data = $data;
+
+            return (static function () use ($__path, $__data) {
+                extract($__data, EXTR_SKIP);
+
+                return require $__path;
+            })();
         }
 
         throw new FileNotFoundException("File does not exist at path {$path}.");
@@ -98,12 +106,26 @@ class Filesystem
     /**
      * Require the given file once.
      *
-     * @param  string  $file
+     * @param  string  $path
+     * @param  array  $data
      * @return mixed
+     *
+     * @throws \Radiate\Filesystem\Exceptions\FileNotFoundException
      */
-    public function requireOnce(string $file)
+    public function requireOnce(string $path, array $data = [])
     {
-        require_once $file;
+        if ($this->isFile($path)) {
+            $__path = $path;
+            $__data = $data;
+
+            return (static function () use ($__path, $__data) {
+                extract($__data, EXTR_SKIP);
+
+                return require_once $__path;
+            })();
+        }
+
+        throw new FileNotFoundException("File does not exist at path {$path}.");
     }
 
     /**
