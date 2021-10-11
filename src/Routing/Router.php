@@ -150,13 +150,30 @@ class Router
      * @param mixed $action
      * @return \Radiate\Routing\Route
      */
-    public function matches(array $methods, string $uri, $action)
+    public function match(array $methods, string $uri, $action)
     {
         if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
             $methods[] = 'HEAD';
         }
 
         return $this->addRoute(new RestRoute($methods, $uri, $action));
+    }
+
+    /**
+     * Register a new route that returns a view.
+     *
+     * @param  string  $uri
+     * @param  string  $view
+     * @param  array  $data
+     * @param  int  $status
+     * @param  array  $headers
+     * @return \Illuminate\Routing\Route
+     */
+    public function view(string $uri, string $view, array $data = [], int $status = 200, array $headers = [])
+    {
+        return $this->match(['GET', 'HEAD'], $uri, function () use ($view, $data, $status, $headers) {
+            return $this->app[ResponseFactory::class]->view($view, $data, $status, $headers);
+        });
     }
 
     /**
@@ -180,7 +197,7 @@ class Router
                 $this->post('/', [$action, 'store']);
             }
             if (in_array('update', $methods)) {
-                $this->matches(['PUT', 'PATCH'], '{id}', [$action, 'update']);
+                $this->match(['PUT', 'PATCH'], '{id}', [$action, 'update']);
             }
             if (in_array('destroy', $methods)) {
                 $this->delete('{id}', [$action, 'destroy']);
@@ -385,5 +402,20 @@ class Router
     public function listen($events, $callback)
     {
         $this->events->listen($events, $callback);
+    }
+
+    /**
+     * Create a route matching the given methods
+     *
+     * @param array $methods
+     * @param string $uri
+     * @param mixed $action
+     * @return \Radiate\Routing\Route
+     *
+     * @deprecated Use the "match" method instead.
+     */
+    public function matches(array $methods, string $uri, $action)
+    {
+        return $this->match($methods, $uri, $action);
     }
 }
