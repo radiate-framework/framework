@@ -2,12 +2,27 @@
 
 namespace Radiate\View;
 
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Traits\Macroable;
 
-class View implements Renderable
+class View implements Htmlable, Renderable
 {
     use Macroable;
+
+    /**
+     * The factory.
+     *
+     * @var \Radiate\View\Factory
+     */
+    protected $factory;
+
+    /**
+     * The engine.
+     *
+     * @var \Radiate\View\Engine
+     */
+    protected $engine;
 
     /**
      * The view.
@@ -33,12 +48,16 @@ class View implements Renderable
     /**
      * Set the view directory.
      *
+     * @param \Radiate\View\Factory $factory
+     * @param \Radiate\View\Engine $engine
      * @param string $view
      * @param string $path
      * @param array $data
      */
-    public function __construct(string $view, string $path, array $data = [])
+    public function __construct(Factory $factory, Engine $engine, string $view, string $path, array $data = [])
     {
+        $this->factory = $factory;
+        $this->engine = $engine;
         $this->view = $view;
         $this->path = $path;
         $this->data = $data;
@@ -52,7 +71,7 @@ class View implements Renderable
      */
     public function render(?callable $callback = null): string
     {
-        $contents = $this->evaluatePath($this->path, $this->data);
+        $contents = $this->getContents();
 
         $response = isset($callback) ? $callback($this, $contents) : null;
 
@@ -60,18 +79,41 @@ class View implements Renderable
     }
 
     /**
-     * Get the evaluated contents of the view at the given path.
+     * Get the evaluated contents of the view.
      *
-     * @param string $__path
-     * @param array $__data
      * @return string
      */
-    protected function evaluatePath(string $__path, array $__data): string
+    protected function getContents(): string
     {
-        ob_start();
-        extract($__data, EXTR_SKIP);
-        include $__path;
-        return ltrim(ob_get_clean());
+        return $this->engine->get($this->path, $this->gatherData());
+    }
+
+    /**
+     * Get the data bound to the view instance.
+     *
+     * @return array
+     */
+    public function gatherData(): array
+    {
+        $data = array_merge($this->factory->getShared(), $this->data);
+
+        foreach ($data as $key => $value) {
+            if ($value instanceof Renderable) {
+                $data[$key] = $value->render();
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Return the view.
+     *
+     * @return string
+     */
+    public function toHtml(): string
+    {
+        return $this->render();
     }
 
     /**
