@@ -8,9 +8,10 @@ use Radiate\Support\Str;
 use Radiate\Support\Facades\View;
 use ReflectionClass;
 use ReflectionProperty;
+use Stringable;
 use WP_User;
 
-abstract class Mailable implements Renderable
+abstract class Mailable implements Renderable, Stringable
 {
     /**
      * An array of to email addresses

@@ -4,8 +4,9 @@ namespace Radiate\Database;
 
 use JsonSerializable;
 use Radiate\Support\Collection;
+use Stringable;
 
-class Option implements JsonSerializable
+class Option implements JsonSerializable, Stringable
 {
     /**
      * Determine if the option exists

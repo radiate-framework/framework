@@ -5,8 +5,9 @@ namespace Radiate\Support;
 use Closure;
 use Parsedown;
 use Radiate\Support\Pluralizer;
+use Stringable as GlobalStringable;
 
-class Stringable
+class Stringable implements GlobalStringable
 {
     /**
      * The string
@@ -333,7 +334,7 @@ class Stringable
     {
         return !$this->isEmpty();
     }
-    
+
     /**
      * Generate a UUID (version 4).
      *
@@ -341,7 +342,7 @@ class Stringable
      */
     public function uuid(): string
     {
-        return wp_generate_uuid4();   
+        return wp_generate_uuid4();
     }
 
     /**

@@ -5,8 +5,9 @@ namespace Radiate\View;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Traits\Macroable;
+use Stringable;
 
-class View implements Htmlable, Renderable
+class View implements Htmlable, Renderable, Stringable
 {
     use Macroable;
 

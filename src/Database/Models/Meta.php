@@ -11,8 +11,9 @@ use IteratorAggregate;
 use JsonSerializable;
 use Radiate\Database\Concerns\HasAttributes;
 use Radiate\Database\Model;
+use Stringable;
 
-class Meta implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable
+class Meta implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable, Stringable
 {
     use HasAttributes;
 

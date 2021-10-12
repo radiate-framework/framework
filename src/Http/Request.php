@@ -10,9 +10,10 @@ use JsonSerializable;
 use Radiate\Http\Concerns\InteractsWithContentTypes;
 use Radiate\Http\Concerns\InteractsWithInput;
 use Radiate\Support\Str;
+use Stringable;
 use WP_REST_Request;
 
-class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerializable
+class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerializable, Stringable
 {
     use InteractsWithContentTypes, InteractsWithInput, Macroable;
 

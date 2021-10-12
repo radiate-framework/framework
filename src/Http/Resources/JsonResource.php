@@ -7,8 +7,9 @@ use JsonSerializable;
 use Radiate\Http\Request;
 use Radiate\Support\Collection;
 use Radiate\Support\Facades\App;
+use Stringable;
 
-abstract class JsonResource implements ArrayAccess, JsonSerializable
+abstract class JsonResource implements ArrayAccess, JsonSerializable, Stringable
 {
     /**
      * The proxied resource
