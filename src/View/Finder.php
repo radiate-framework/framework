@@ -33,7 +33,7 @@ class Finder
      *
      * @var array
      */
-    protected $extensions = ['php', 'html', 'md'];
+    protected $extensions = ['md.php', 'php', 'md', 'html', 'css'];
 
     /**
      * Create the finder instance
@@ -95,5 +95,30 @@ class Finder
         return array_map(function ($extension) use ($name) {
             return str_replace('.', DIRECTORY_SEPARATOR, $name) . '.' . $extension;
         }, $this->extensions);
+    }
+
+    /**
+     * Get registered extensions.
+     *
+     * @return array
+     */
+    public function getExtensions(): array
+    {
+        return $this->extensions;
+    }
+
+    /**
+     * Register an extension with the finder.
+     *
+     * @param  string  $extension
+     * @return void
+     */
+    public function addExtension(string $extension): void
+    {
+        if (($index = array_search($extension, $this->extensions)) !== false) {
+            unset($this->extensions[$index]);
+        }
+
+        array_unshift($this->extensions, $extension);
     }
 }
