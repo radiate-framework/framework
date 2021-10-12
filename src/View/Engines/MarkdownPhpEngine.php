@@ -5,7 +5,7 @@ namespace Radiate\View\Engines;
 use Radiate\Filesystem\Filesystem;
 use Radiate\Support\Str;
 
-class PhpMarkdownEngine extends PhpEngine
+class MarkdownPhpEngine extends PhpEngine
 {
     /**
      * The filesystem instance.
