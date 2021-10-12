@@ -27,7 +27,7 @@ namespace Radiate\Support;
  * @method static int length(string $string, ?string $encoding = null) Return the length of the given string.
  * @method static \Radiate\Support\Stringable limit(string $string, int $limit = 100, string $end = '...') Limit the number of characters in a string.
  * @method static \Radiate\Support\Stringable lower(string $string) Convert the given string to lower-case.
- * @method static string markdown(string $string) Converts Markdown into HTML.
+ * @method static \Radiate\Support\Markdown markdown(string $string) Converts Markdown into HTML.
  * @method static \Radiate\Support\Stringable|null match(string $string, string $pattern) Get the string matching the given pattern.
  * @method static array matchAll(string $string, string $pattern) Get the string matching the given pattern.
  * @method static \Radiate\Support\Stringable padBoth(string $string, int $length, string $pad = ' ') Pad both sides of a string with another.
