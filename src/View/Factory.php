@@ -89,6 +89,21 @@ class Factory
     }
 
     /**
+     * Get the converted mardown contents for the given view.
+     *
+     * @param  string  $path
+     * @param  array  $data
+     * @param  bool  $compile
+     * @return string
+     */
+    public function markdown(string $view, array $data = [], bool $compile = true): string
+    {
+        return $this->make($view, $data)->render(function (View $view, string $content) use ($compile) {
+            return $compile ? Str::markdown($content) : $compile;
+        });
+    }
+
+    /**
      * Create a new view instance from the given arguments.
      *
      * @param string $view
