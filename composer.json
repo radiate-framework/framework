@@ -23,6 +23,7 @@
     "symfony/finder": "^5.2",
     "illuminate/collections": "^8.28",
     "illuminate/macroable": "^8.28",
-    "dragonmantank/cron-expression": "^3.1"
+    "dragonmantank/cron-expression": "^3.1",
+    "symfony/polyfill-php80": "^1.23"
   }
 }

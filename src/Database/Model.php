@@ -9,8 +9,9 @@ use JsonSerializable;
 use Radiate\Database\Concerns\HasAttributes;
 use Radiate\Database\Concerns\HasGlobalScopes;
 use RuntimeException;
+use Stringable;
 
-class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
+class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, Stringable
 {
     use HasAttributes;
     use HasGlobalScopes;

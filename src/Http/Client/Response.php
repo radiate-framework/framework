@@ -5,9 +5,10 @@ namespace Radiate\Http\Client;
 use ArrayAccess;
 use LogicException;
 use Radiate\Support\Collection;
+use Stringable;
 use WP_HTTP_Requests_Response;
 
-class Response implements ArrayAccess
+class Response implements ArrayAccess, Stringable
 {
     /**
      * The underlying WordPress response.
@@ -56,7 +57,7 @@ class Response implements ArrayAccess
         if (!$this->decoded) {
             $this->decoded = json_decode($this->body(), true);
         }
-        
+
         if (!$key) {
             return $this->decoded;
         }
@@ -203,7 +204,7 @@ class Response implements ArrayAccess
      *
      * @throws \Radiate\Http\Client\RequestException
      */
-    public function throw(): static
+    public function throw()
     {
         if ($this->serverError() || $this->clientError()) {
             throw new RequestException($this);
