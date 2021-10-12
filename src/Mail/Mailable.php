@@ -4,7 +4,6 @@ namespace Radiate\Mail;
 
 use Illuminate\Contracts\Support\Renderable;
 use Radiate\Database\Models\User;
-use Radiate\Support\Str;
 use Radiate\Support\Facades\View;
 use ReflectionClass;
 use ReflectionProperty;
@@ -184,7 +183,7 @@ abstract class Mailable implements Renderable, Stringable
      */
     public function text(string $path, array $data = []): self
     {
-        $this->text = View::make($path, $this->buildViewData($data))->render();
+        $this->text = View::make($path, $this->buildViewData($data));
 
         return $this;
     }
@@ -198,7 +197,7 @@ abstract class Mailable implements Renderable, Stringable
      */
     public function view(string $path, array $data = []): self
     {
-        $this->html = View::make($path, $this->buildViewData($data))->render();
+        $this->html = View::make($path, $this->buildViewData($data));
 
         return $this;
     }
@@ -212,11 +211,11 @@ abstract class Mailable implements Renderable, Stringable
      */
     public function markdown(string $path, array $data = []): self
     {
-        $this->text($path, $data);
+        $markdown = View::markdown($path, $this->buildViewData($data));
 
-        $this->html = View::make('mail.layout', [
-            'markdown' => Str::markdown($this->text),
-        ])->render();
+        $this->text = $markdown->original();
+
+        $this->view('mail.layout', compact('markdown'));
 
         return $this;
     }
