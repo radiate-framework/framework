@@ -203,15 +203,17 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Attempt to authenticate using HTTP Basic Auth.
      *
      * @param  string  $field
-     * @return bool
+     * @return null
+     *
+     * @throws \Radiate\Auth\AuthorizationException
      */
     public function basic(string $field = 'email')
     {
-        if ($this->check()) {
-            return true;
+        if ($this->check() || $this->attemptBasic($this->getRequest(), $field)) {
+            return;
         }
 
-        return $this->attemptBasic($this->getRequest(), $field);
+        $this->failedBasicResponse();
     }
 
     /**
@@ -234,11 +236,17 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Perform a stateless HTTP Basic login attempt.
      *
      * @param  string  $field
-     * @return bool
+     * @return null
+     *
+     * @throws \Radiate\Auth\AuthorizationException
      */
     public function onceBasic($field = 'email')
     {
-        return $this->attemptOnceBasic($this->getRequest(), $field);
+        if ($this->attemptOnceBasic($this->getRequest(), $field)) {
+            return null;
+        }
+
+        return $this->failedBasicResponse();
     }
 
     /**
@@ -277,5 +285,21 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function basicCredentials(Request $request, string $field)
     {
         return [$field => $request->getUser(), 'password' => $request->getPassword()];
+    }
+
+    /**
+     * Get the response for basic authentication.
+     *
+     * @return void
+     *
+     * @throws \Radiate\Auth\AuthorizationException
+     */
+    protected function failedBasicResponse()
+    {
+        throw new AuthorizationException(
+            'Invalid basic credentials.',
+            403,
+            ['www-authenticate' => 'Basic']
+        );
     }
 }
