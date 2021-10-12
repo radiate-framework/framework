@@ -4,9 +4,7 @@ namespace Radiate\View;
 
 use Radiate\Support\ServiceProvider;
 use Radiate\View\Engines\FileEngine;
-use Radiate\View\Engines\MarkdownEngine;
 use Radiate\View\Engines\PhpEngine;
-use Radiate\View\Engines\MarkdownPhpEngine;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -30,7 +28,6 @@ class ViewServiceProvider extends ServiceProvider
 
             $this->registerFileEngine($resolver);
             $this->registerPhpEngine($resolver);
-            $this->registerMarkdownEngine($resolver);
 
             return $resolver;
         });
@@ -59,23 +56,6 @@ class ViewServiceProvider extends ServiceProvider
     {
         $resolver->register('php', function () {
             return new PhpEngine($this->app['files']);
-        });
-    }
-
-    /**
-     * Register the markdown engine
-     *
-     * @param \Radiate\View\EngineResolver $resolver
-     * @return void
-     */
-    protected function registerMarkdownEngine(EngineResolver $resolver): void
-    {
-        $resolver->register('markdown', function () {
-            return new MarkdownEngine($this->app['files']);
-        });
-
-        $resolver->register('markdown-php', function () {
-            return new MarkdownPhpEngine($this->app['files']);
         });
     }
 

@@ -32,9 +32,9 @@ class Factory
      * @var array
      */
     protected $extensions = [
-        'md.php' => 'markdown-php',
+        'md.php' => 'php',
         'php'    => 'php',
-        'md'     => 'markdown',
+        'md'     => 'file',
         'html'   => 'file',
         'css'    => 'file',
     ];
@@ -86,6 +86,21 @@ class Factory
     public function file(string $path, array $data = []): View
     {
         return $this->viewInstance($path, $path, $data);
+    }
+
+    /**
+     * Get the converted mardown contents for the given view.
+     *
+     * @param  string  $path
+     * @param  array  $data
+     * @param  bool  $compile
+     * @return string
+     */
+    public function markdown(string $view, array $data = [], bool $compile = true): string
+    {
+        return $this->make($view, $data)->render(function (View $view, string $content) use ($compile) {
+            return $compile ? Str::markdown($content) : $compile;
+        });
     }
 
     /**
