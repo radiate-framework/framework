@@ -4,8 +4,9 @@ namespace Radiate\Support;
 
 use Closure;
 use Radiate\Support\Pluralizer;
+use Stringable as GlobalStringable;
 
-class Stringable
+class Stringable implements GlobalStringable
 {
     /**
      * The string
