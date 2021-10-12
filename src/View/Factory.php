@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Radiate\Support\Arr;
+use Radiate\Support\Markdown;
 use Radiate\Support\Str;
 
 class Factory
@@ -61,7 +62,7 @@ class Factory
     }
 
     /**
-     * Make a view.
+     * Get the evaluated view contents for the given view.
      *
      * @param string $view
      * @param array $data
@@ -89,18 +90,15 @@ class Factory
     }
 
     /**
-     * Get the converted mardown contents for the given view.
+     * Get the markdown contents for the given view.
      *
      * @param  string  $path
      * @param  array  $data
-     * @param  bool  $compile
-     * @return string
+     * @return \Radiate\Support\Markdown
      */
-    public function markdown(string $view, array $data = [], bool $compile = true): string
+    public function markdown(string $view, array $data = []): Markdown
     {
-        return $this->make($view, $data)->render(function (View $view, string $content) use ($compile) {
-            return $compile ? Str::markdown($content) : $compile;
-        });
+        return Str::markdown($this->make($view, $data));
     }
 
     /**
