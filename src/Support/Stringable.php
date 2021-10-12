@@ -3,7 +3,6 @@
 namespace Radiate\Support;
 
 use Closure;
-use Parsedown;
 use Radiate\Support\Pluralizer;
 use Stringable as GlobalStringable;
 
@@ -197,7 +196,7 @@ class Stringable implements GlobalStringable
     public function contains($needles)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle !== '' && mb_strpos($this->string, $needle) !== false) {
+            if (str_contains($this->string, $needle)) {
                 return true;
             }
         }
@@ -242,7 +241,7 @@ class Stringable implements GlobalStringable
     public function endsWith($needles)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle !== '' && substr($this->string, -strlen($needle)) === (string) $needle) {
+            if (str_ends_with($this->string, $needle)) {
                 return true;
             }
         }
@@ -352,7 +351,7 @@ class Stringable implements GlobalStringable
      */
     public function isUuid(): bool
     {
-        return preg_match('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', $this->string) > 0;
+        return wp_is_uuid($this->string, 4);
     }
 
     /**
@@ -409,11 +408,11 @@ class Stringable implements GlobalStringable
     /**
      * Converts Markdown into HTML.
      *
-     * @return string
+     * @return \Radiate\Support\Markdown
      */
-    public function markdown()
+    public function markdown(): Markdown
     {
-        return (new Parsedown)->text($this->string);
+        return new Markdown($this->string);
     }
 
     /**
@@ -751,7 +750,7 @@ class Stringable implements GlobalStringable
     public function startsWith($needles)
     {
         foreach ((array) $needles as $needle) {
-            if ((string) $needle !== '' && strncmp($this->string, $needle, strlen($needle)) === 0) {
+            if (str_starts_with($this->string, $needle)) {
                 return true;
             }
         }
