@@ -107,6 +107,56 @@ class View implements Htmlable, Renderable
     }
 
     /**
+     * Get the name of the view.
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->view;
+    }
+
+    /**
+     * Get the array of view data.
+     *
+     * @return array
+     */
+    public function data(): array
+    {
+        return $this->data;
+    }
+
+    /**
+     * Get the path to the view file.
+     *
+     * @return string
+     */
+    public function path(): string
+    {
+        return $this->path;
+    }
+
+    /**
+     * Get the view factory instance.
+     *
+     * @return \Radiate\View\Factory
+     */
+    public function factory(): Factory
+    {
+        return $this->factory;
+    }
+
+    /**
+     * Get the view's rendering engine.
+     *
+     * @return \Radiate\View\Engine
+     */
+    public function engine(): Engine
+    {
+        return $this->engine;
+    }
+
+    /**
      * Return the view.
      *
      * @return string
