@@ -73,9 +73,7 @@ class View implements Htmlable, Renderable
     {
         $contents = $this->getContents();
 
-        $response = isset($callback) ? $callback($this, $contents) : null;
-
-        return $response ?: $contents;
+        return !is_null($callback) ? $callback($this, $contents) : $contents;
     }
 
     /**
