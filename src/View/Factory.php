@@ -32,9 +32,9 @@ class Factory
      * @var array
      */
     protected $extensions = [
-        'md.php' => 'markdown-php',
+        'md.php' => 'php',
         'php'    => 'php',
-        'md'     => 'markdown',
+        'md'     => 'file',
         'html'   => 'file',
         'css'    => 'file',
     ];
