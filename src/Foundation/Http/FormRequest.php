@@ -3,7 +3,7 @@
 namespace Radiate\Foundation\Http;
 
 use Illuminate\Contracts\Container\Container;
-use Radiate\Foundation\Http\Exceptions\HttpResponseException;
+use Radiate\Auth\AuthorizationException;
 use Radiate\Http\Request;
 
 class FormRequest extends Request
@@ -14,7 +14,7 @@ class FormRequest extends Request
      * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
-    
+
     /**
      * The valildated attributes.
      *
@@ -34,10 +34,11 @@ class FormRequest extends Request
         }
 
         $this->validatedAttributes = $this->validate(
-            $this->container->call([$this, 'rules']), $this->messages()
+            $this->container->call([$this, 'rules']),
+            $this->messages()
         );
     }
-    
+
     /**
      * Get the validated attributes.
      *
@@ -45,7 +46,7 @@ class FormRequest extends Request
      */
     public function validated()
     {
-        return $this->validatedAttributes;   
+        return $this->validatedAttributes;
     }
 
     /**
@@ -77,11 +78,11 @@ class FormRequest extends Request
      *
      * @return void
      *
-     * @throws \Radiate\Foundation\Http\Exceptions\HttpResponseException
+     * @throws \Radiate\Auth\AuthorizationException
      */
     protected function failedAuthorization()
     {
-        throw new HttpResponseException('Unauthorised.', 401);
+        throw new AuthorizationException();
     }
 
     /**
