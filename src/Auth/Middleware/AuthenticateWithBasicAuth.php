@@ -4,7 +4,6 @@ namespace Radiate\Auth\Middleware;
 
 use Closure;
 use Radiate\Auth\AuthManager;
-use Radiate\Foundation\Http\Exceptions\HttpResponseException;
 use Radiate\Http\Request;
 
 class AuthenticateWithBasicAuth
@@ -34,17 +33,11 @@ class AuthenticateWithBasicAuth
      * @param string|null $guard
      * @param string|null $field
      * @return mixed
-     *
-     * @throws \Radiate\Foundation\Http\Exceptions\HttpResponseException
      */
     public function handle(Request $request, Closure $next, ?string $guard = null, ?string $field = null)
     {
         if ($this->auth->guard($guard)->basic($field ?: 'email')) {
             return $next($request);
         }
-
-        header('WWW_Authenticate: Basic');
-
-        throw new HttpResponseException('Unauthorised.', 401);
     }
 }
