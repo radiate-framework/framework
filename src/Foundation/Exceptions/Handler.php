@@ -5,6 +5,7 @@ namespace Radiate\Foundation\Exceptions;
 use Radiate\Auth\AuthenticationException;
 use Throwable;
 use Radiate\Foundation\Application;
+use Radiate\Foundation\Http\Exceptions\HttpExceptionInterface;
 use Radiate\Foundation\Http\Exceptions\HttpResponseException;
 use Radiate\Http\JsonResponse;
 use Radiate\Http\Request;
@@ -44,9 +45,11 @@ class Handler
             return $e->getResponse();
         }
 
+        $headers = $e instanceof HttpExceptionInterface ? $e->getHeaders() : [];
+
         return $request->expectsJson()
-            ? new JsonResponse(['message' => $e->getMessage()], $e->getCode())
-            : new Response($e->getMessage(), $e->getCode());
+            ? new JsonResponse(['message' => $e->getMessage()], $e->getCode(), $headers)
+            : new Response($e->getMessage(), $e->getCode(), $headers);
     }
 
     /**
