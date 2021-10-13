@@ -13,11 +13,11 @@ class Response extends WP_REST_Response implements JsonSerializable
     /**
      * Create the response
      *
-     * @param string $content
+     * @param string|null $content
      * @param integer $status
      * @param array $headers
      */
-    public function __construct(string $content = '', int $status = 200, array $headers = [])
+    public function __construct(?string $content = '', int $status = 200, array $headers = [])
     {
         $this->header('content-type', 'text/html');
 
