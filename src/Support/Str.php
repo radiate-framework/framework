@@ -22,7 +22,6 @@ namespace Radiate\Support;
  * @method static bool isEmpty(string $string) Determine if the given string is empty.
  * @method static bool isNotEmpty(string $string) Determine if the given string is not empty.
  * @method static bool isUuid(string $string) Determine if a given string is a valid UUID.
- * @method static string uuid() Generate a UUID (version 4).
  * @method static \Radiate\Support\Stringable kebab(string $string) Convert a string to kebab case.
  * @method static int length(string $string, ?string $encoding = null) Return the length of the given string.
  * @method static \Radiate\Support\Stringable limit(string $string, int $limit = 100, string $end = '...') Limit the number of characters in a string.
@@ -37,7 +36,6 @@ namespace Radiate\Support;
  * @method static \Radiate\Support\Stringable plural(string $string, int $count = 2) Get the plural form of an English word.
  * @method static \Radiate\Support\Stringable pluralStudly(string $string, int $count = 2) Pluralize the last word of an English, studly caps case string.
  * @method static \Radiate\Support\Stringable prepend(string $string, string ...$values) Prepend the given values to the string.
- * @method static \Radiate\Support\Stringable random(string $string, int $length = 16) Generate a more truly "random" alpha-numeric string.
  * @method static \Radiate\Support\Stringable replace(string $string, string|string[] $search, string|string[] $replace) Replace the given value in the given string.
  * @method static \Radiate\Support\Stringable replaceArray(string $string, string $search, array $replace) Replace a given value in the string sequentially with an array.
  * @method static \Radiate\Support\Stringable replaceFirst(string $string, string $search, string $replace) Replace the first occurrence of a given value in the string.
@@ -77,6 +75,37 @@ class Str
      */
     public static function of(string $string)
     {
+        return new Stringable($string);
+    }
+
+    /**
+     * Generate a UUID (version 4).
+     *
+     * @return string
+     */
+    public static function uuid(): string
+    {
+        return wp_generate_uuid4();
+    }
+
+    /**
+     * Generate a more truly "random" alpha-numeric string.
+     *
+     * @param  int  $length
+     * @return \Radiate\Support\Stringable
+     */
+    public static function random(int $length = 16)
+    {
+        $string = '';
+
+        while (($len = strlen($string)) < $length) {
+            $size = $length - $len;
+
+            $bytes = random_bytes($size);
+
+            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+        }
+
         return new Stringable($string);
     }
 

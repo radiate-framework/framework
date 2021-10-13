@@ -335,16 +335,6 @@ class Stringable implements GlobalStringable
     }
 
     /**
-     * Generate a UUID (version 4).
-     *
-     * @return string
-     */
-    public function uuid(): string
-    {
-        return wp_generate_uuid4();
-    }
-
-    /**
      * Determine if a given string is a valid UUID.
      *
      * @return bool
@@ -530,27 +520,6 @@ class Stringable implements GlobalStringable
     public function prepend(string ...$values)
     {
         return new static(implode('', $values) . $this->string);
-    }
-
-    /**
-     * Generate a more truly "random" alpha-numeric string.
-     *
-     * @param  int  $length
-     * @return static
-     */
-    public  function random(int $length = 16)
-    {
-        $string = '';
-
-        while (($len = strlen($string)) < $length) {
-            $size = $length - $len;
-
-            $bytes = random_bytes($size);
-
-            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
-        }
-
-        return new static($string);
     }
 
     /**
