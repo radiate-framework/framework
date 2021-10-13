@@ -23,6 +23,6 @@ class ValidateSignature
             return $next($request);
         }
 
-        throw new AuthorizationException('Invalid signature.', 403);
+        throw new AuthorizationException('Invalid signature.');
     }
 }
