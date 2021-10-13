@@ -3,8 +3,8 @@
 namespace Radiate\Auth\Middleware;
 
 use Closure;
+use Radiate\Auth\AuthenticationException;
 use Radiate\Auth\AuthManager;
-use Radiate\Foundation\Http\Exceptions\HttpResponseException;
 use Radiate\Http\Request;
 
 class Authenticate
@@ -34,7 +34,7 @@ class Authenticate
      * @param string|null $guard
      * @return mixed
      *
-     * @throws \Radiate\Foundation\Http\Exceptions\HttpResponseException
+     * @throws \Radiate\Auth\AuthenticationException
      */
     public function handle(Request $request, Closure $next, ?string $guard = null)
     {
@@ -42,6 +42,6 @@ class Authenticate
             return $next($request);
         }
 
-        throw new HttpResponseException('Unauthorised.', 401);
+        throw new AuthenticationException();
     }
 }

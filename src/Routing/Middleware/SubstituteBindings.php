@@ -4,14 +4,13 @@ namespace Radiate\Routing\Middleware;
 
 use Closure;
 use Radiate\Database\Model;
+use Radiate\Database\ModelNotFoundException;
 use Radiate\Foundation\Application;
-use Radiate\Foundation\Http\Exceptions\HttpResponseException;
 use Radiate\Http\Request;
 use Radiate\Routing\Route;
 use ReflectionFunction;
 use ReflectionMethod;
 use ReflectionNamedType;
-use RuntimeException;
 
 class SubstituteBindings
 {
@@ -72,7 +71,7 @@ class SubstituteBindings
      * @param mixed $value
      * @return \Radiate\Database\Model|mixed
      *
-     * @throws \RuntimeException
+     * @throws \Radiate\Database\ModelNotFoundException
      */
     public function resolveBinding(string $model, $value)
     {
@@ -80,7 +79,7 @@ class SubstituteBindings
 
         if ($instance instanceof Model) {
             if (!$return = $instance->where($instance->getRouteKeyName(), $value)->first()) {
-                throw new HttpResponseException("No query results for model [{$model}]", 404);
+                throw new ModelNotFoundException($model);
             }
 
             return $return;
