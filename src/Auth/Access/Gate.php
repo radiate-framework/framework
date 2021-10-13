@@ -346,7 +346,7 @@ class Gate
     public function authorize(string $ability, $arguments = [])
     {
         if (!$this->inspect($ability, Arr::wrap($arguments))) {
-            throw new AuthorizationException('This action is unauthorized.', 403);
+            throw new AuthorizationException();
         }
 
         return $this;
