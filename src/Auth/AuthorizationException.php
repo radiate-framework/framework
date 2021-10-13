@@ -8,6 +8,13 @@ use Radiate\Foundation\Http\Exceptions\HttpExceptionInterface;
 class AuthorizationException extends Exception implements HttpExceptionInterface
 {
     /**
+     * The exception headers
+     *
+     * @var array
+     */
+    protected $headers = [];
+
+    /**
      * Create a new authorization exception.
      *
      * @param  string  $message
