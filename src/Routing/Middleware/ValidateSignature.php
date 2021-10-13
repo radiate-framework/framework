@@ -3,7 +3,7 @@
 namespace Radiate\Routing\Middleware;
 
 use Closure;
-use Radiate\Foundation\Http\Exceptions\HttpResponseException;
+use Radiate\Auth\AuthorizationException;
 use Radiate\Http\Request;
 
 class ValidateSignature
@@ -14,6 +14,8 @@ class ValidateSignature
      * @param \Radiate\Http\Request $request
      * @param \Closure $next
      * @return mixed
+     *
+     * @throws \Radiate\Auth\AuthorizationException
      */
     public function handle(Request $request, Closure $next)
     {
@@ -21,6 +23,6 @@ class ValidateSignature
             return $next($request);
         }
 
-        throw new HttpResponseException('Invalid signature.', 403);
+        throw new AuthorizationException('Invalid signature.', 403);
     }
 }

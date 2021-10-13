@@ -3,10 +3,10 @@
 namespace Radiate\Auth\Access;
 
 use Closure;
+use Radiate\Auth\AuthorizationException;
 use Radiate\Auth\Contracts\Authenticatable;
 use Radiate\Database\Models\User;
 use Radiate\Foundation\Application;
-use Radiate\Foundation\Http\Exceptions\HttpResponseException;
 use Radiate\Support\Arr;
 use Radiate\Support\Collection;
 use Radiate\Support\Str;
@@ -341,12 +341,12 @@ class Gate
      * @param  array|mixed  $arguments
      * @return static
      *
-     * @throws \Radiate\Foundation\Http\Exceptions\HttpResponseException
+     * @throws \Radiate\Auth\AuthorizationException
      */
     public function authorize(string $ability, $arguments = [])
     {
         if (!$this->inspect($ability, Arr::wrap($arguments))) {
-            throw new HttpResponseException('This action is unauthorized.', 403);
+            throw new AuthorizationException('This action is unauthorized.', 403);
         }
 
         return $this;
