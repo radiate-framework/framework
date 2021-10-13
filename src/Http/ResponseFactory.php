@@ -27,7 +27,7 @@ class ResponseFactory
     }
 
     /**
-     * Maske a response
+     * Make a response
      *
      * @param mixed $content
      * @param integer $status
