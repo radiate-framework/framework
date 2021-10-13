@@ -2,11 +2,18 @@
 
 namespace Radiate\Auth;
 
-use Radiate\Foundation\Http\Exceptions\HttpResponseException;
-use Radiate\Http\Response;
+use Exception;
+use Radiate\Foundation\Http\Exceptions\HttpExceptionInterface;
 
-class AuthorizationException extends HttpResponseException
+class AuthorizationException extends Exception implements HttpExceptionInterface
 {
+    /**
+     * The exception headers
+     *
+     * @var array
+     */
+    protected $headers = [];
+
     /**
      * Create a new authorization exception.
      *
@@ -15,6 +22,18 @@ class AuthorizationException extends HttpResponseException
      */
     public function __construct(string $message = 'This action is unauthorized.', int $code = 403, array $headers = [])
     {
-        parent::__construct(new Response($message, $code, $headers));
+        parent::__construct($message, $code);
+
+        $this->headers = $headers;
+    }
+
+    /**
+     * Get the exception headers
+     *
+     * @return array
+     */
+    public function getHeaders(): array
+    {
+        return $this->headers;
     }
 }

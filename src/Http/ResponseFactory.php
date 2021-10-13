@@ -27,7 +27,7 @@ class ResponseFactory
     }
 
     /**
-     * Maske a response
+     * Make a response
      *
      * @param mixed $content
      * @param integer $status
@@ -59,9 +59,9 @@ class ResponseFactory
      * @param mixed $content
      * @param integer $status
      * @param array $headers
-     * @return \Radiate\Http\Response
+     * @return \Radiate\Http\JsonResponse
      */
-    public function json($content = [], int $status = 200, array $headers = [], int $options = 0): Response
+    public function json($content = [], int $status = 200, array $headers = [], int $options = 0): JsonResponse
     {
         return new JsonResponse($content, $status, $headers, $options);
     }
@@ -71,10 +71,10 @@ class ResponseFactory
      *
      * @param string $location
      * @param integer $status
-     * @return \Radiate\Http\Response
+     * @return \Radiate\Http\RedirectResponse
      */
-    public function redirect(string $location, int $status = 302): Response
+    public function redirect(string $location, int $status = 302): RedirectResponse
     {
-        return $this->make('', $status, ['location' => $location]);
+        return new RedirectResponse($location, $status);
     }
 }
