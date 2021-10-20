@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
 use InvalidArgumentException;
 use Radiate\Foundation\Application;
+use Radiate\JWT\Manager;
 
 class AuthManager implements FactoryContract
 {
@@ -124,6 +125,20 @@ class AuthManager implements FactoryContract
         $provider = $this->createUserProvider($config['provider'] ?? null);
 
         return new SessionGuard($provider, $this->app['request']);
+    }
+
+    /**
+     * Create a json web token based authentication guard.
+     *
+     * @param  string  $name
+     * @param  array  $config
+     * @return \Radiate\Auth\JwtGuard
+     */
+    public function createJwtDriver($name, $config)
+    {
+        $provider = $this->createUserProvider($config['provider'] ?? null);
+
+        return new JwtGuard($this->app[Manager::class], $provider, $this->app['request']);
     }
 
     /**
