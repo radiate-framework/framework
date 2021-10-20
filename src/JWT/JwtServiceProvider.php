@@ -1,6 +1,6 @@
 <?php
 
-namespace Radiate\Auth;
+namespace Radiate\JWT;
 
 use Firebase\JWT\JWT;
 use Radiate\JWT\Manager;
