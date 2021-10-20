@@ -127,5 +127,7 @@ class Manager
         if ($token = $this->token($request)) {
             return $this->decode($token);
         }
+
+        return null;
     }
 }
