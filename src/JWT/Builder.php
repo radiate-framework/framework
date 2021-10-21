@@ -86,7 +86,7 @@ class Builder implements Arrayable, Jsonable, JsonSerializable, Stringable
     }
 
     /**
-     * Set the expiry claim
+     * Set the issued at claim
      *
      * @param mixed $expiry
      * @return static
@@ -99,7 +99,7 @@ class Builder implements Arrayable, Jsonable, JsonSerializable, Stringable
     }
 
     /**
-     * Set the expiry claim
+     * Set the not before claim
      *
      * @param mixed $expiry
      * @return static
@@ -112,7 +112,7 @@ class Builder implements Arrayable, Jsonable, JsonSerializable, Stringable
     }
 
     /**
-     * Set the id claim
+     * Set the token id claim
      *
      * @param mixed $id
      * @return static
