@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
+use LogicException;
 use Stringable;
 
 class Payload implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, Stringable
@@ -161,29 +162,6 @@ class Payload implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, Str
     }
 
     /**
-     * Dynamically set a claim
-     *
-     * @param string $claim
-     * @param mixed $value
-     * @return void
-     */
-    public function __set(string $claim, $value)
-    {
-        $this->offsetSet($claim, $value);
-    }
-
-    /**
-     * Dynamically unset a claim
-     *
-     * @param string $claim
-     * @return void
-     */
-    public function __unset(string $claim)
-    {
-        $this->offsetUnset($claim);
-    }
-
-    /**
      * Determine if the offset exists
      *
      * @param string $key
@@ -211,10 +189,12 @@ class Payload implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, Str
      * @param string $key
      * @param string $value
      * @return void
+     *
+     * @throws \LogicException
      */
     public function offsetSet($key, $value)
     {
-        $this->payload[$key] = $value;
+        throw new LogicException('Payload data may not be mutated using array access.');
     }
 
     /**
@@ -222,9 +202,11 @@ class Payload implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, Str
      *
      * @param string $key
      * @return void
+     *
+     * @throws \LogicException
      */
     public function offsetUnset($key)
     {
-        unset($this->payload[$key]);
+        throw new LogicException('Payload data may not be mutated using array access.');
     }
 }
