@@ -140,6 +140,28 @@ class Payload implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, Str
     }
 
     /**
+     * Check a claim exists
+     *
+     * @param string $claim
+     * @return bool
+     */
+    public function has(string $claim)
+    {
+        return $this->offsetExists($claim);
+    }
+
+    /**
+     * Get a claim
+     *
+     * @param string $claim
+     * @return mixed
+     */
+    public function get(string $claim)
+    {
+        return $this->offsetGet($claim);
+    }
+
+    /**
      * Dynamically check a claim exist
      *
      * @param string $claim
