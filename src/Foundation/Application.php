@@ -368,6 +368,10 @@ class Application extends Container
         $this->runRequestThroughStack($request);
 
         $this->bootProviders();
+
+        if ($this->resolved('router')) {
+            $this['router']->dispatch($request);
+        }
     }
 
     /**
