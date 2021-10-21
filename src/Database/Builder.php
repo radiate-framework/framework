@@ -332,6 +332,23 @@ class Builder
     }
 
     /**
+     * Get the first record or throw an exception
+     *
+     * @param string $column
+     * @return \Radiate\Database\Model|mixed
+     *
+     * @throws \Radiate\Database\ModelNotFoundException
+     */
+    public function firstOrFail()
+    {
+        if ($first = $this->first()) {
+            return $first;
+        }
+
+        throw new ModelNotFoundException(get_class($this->model));
+    }
+
+    /**
      * Dynamically handle calls into the query instance.
      *
      * @param string $method
