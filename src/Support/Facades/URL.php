@@ -3,8 +3,8 @@
 namespace Radiate\Support\Facades;
 
 /**
- * @method string static current() Get the current URL without query parameters.
- * @method string static full() Get the current URL including query parameters.
+ * @method static string current() Get the current URL without query parameters.
+ * @method static string full() Get the current URL including query parameters.
  * @method static string previous(string|null $fallback = null) Get the URL for the previous request.
  * @method static string register(string $redirect = '') Return the registration URL
  * @method static string login(string $redirect = '/') Return the login URL
@@ -22,7 +22,7 @@ namespace Radiate\Support\Facades;
  * @method static string formatParameters(array $parameters = []) Return a formatted query string
  * @method static string asset(string $path) Generate the URL to an application asset.
  * @method static bool hasValidSignature(\Radiate\Http\Request $request) Determine if the request URL has a valid signature
- * @method static hasCorrectSignature(\Radiate\Http\Request $request) Determine if the request URL has a correct signature
+ * @method static bool hasCorrectSignature(\Radiate\Http\Request $request) Determine if the request URL has a correct signature
  * @method static bool signatureHasNotExpired(\Radiate\Http\Request $request) Determine if the request URL is expired
  * @method static string signedUrl(string $path, array $parameters = [], int|null $expiration = null) Create a signed URL
  * @method static string temporarySignedUrl(string $path, int $expiration, array $parameters = []) Get a temporary signed URL
