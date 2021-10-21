@@ -31,17 +31,68 @@ class Authenticate
      *
      * @param \Radiate\Http\Request $request
      * @param \Closure $next
-     * @param string|null $guard
+     * @param string[] ...$guards
      * @return mixed
      *
      * @throws \Radiate\Auth\AuthenticationException
      */
-    public function handle(Request $request, Closure $next, ?string $guard = null)
+    public function handle(Request $request, Closure $next, ...$guards)
     {
-        if ($this->auth->guard($guard)->check()) {
-            return $next($request);
+        $this->authenticate($request, $guards);
+
+        return $next($request);
+    }
+
+    /**
+     * Determine if the user is logged in to any of the given guards.
+     *
+     * @param  \Request\Http\Request  $request
+     * @param  array  $guards
+     * @return void
+     *
+     * @throws \Radiate\Auth\AuthenticationException
+     */
+    protected function authenticate(Request $request, array $guards)
+    {
+        if (empty($guards)) {
+            $guards = [null];
         }
 
-        throw new AuthenticationException();
+        foreach ($guards as $guard) {
+            if ($this->auth->guard($guard)->check()) {
+                return $this->auth->shouldUse($guard);
+            }
+        }
+
+        $this->unauthenticated($request, $guards);
+    }
+
+    /**
+     * Handle an unauthenticated user.
+     *
+     * @param  \Request\Http\Request  $request
+     * @param  array  $guards
+     * @return void
+     *
+     * @throws \Radiate\Auth\AuthenticationException
+     */
+    protected function unauthenticated(Request $request, array $guards)
+    {
+        throw new AuthenticationException(
+            'Unauthenticated.',
+            $guards,
+            $this->redirectTo($request)
+        );
+    }
+
+    /**
+     * Get the path the user should be redirected to when they are not authenticated.
+     *
+     * @param  \Radiate\Http\Request  $request
+     * @return string|null
+     */
+    protected function redirectTo(Request $request)
+    {
+        //
     }
 }
