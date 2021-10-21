@@ -24,7 +24,5 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->map();
-
-        $this->app['router']->dispatch($this->app['request']);
     }
 }
