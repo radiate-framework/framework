@@ -38,7 +38,7 @@ class Payload implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, Str
     }
 
     /**
-     * Set the audience claim
+     * Get the audience claim
      *
      * @return mixed|null
      */
@@ -48,7 +48,7 @@ class Payload implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, Str
     }
 
     /**
-     * Set the subject claim
+     * Get the subject claim
      *
      * @return mixed|null
      */
@@ -58,7 +58,7 @@ class Payload implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, Str
     }
 
     /**
-     * Set the expiry claim
+     * Get the expiry claim
      *
      * @return mixed|null
      */
@@ -68,7 +68,7 @@ class Payload implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, Str
     }
 
     /**
-     * Set the expiry claim
+     * Get the issued at claim
      *
      * @return mixed|null
      */
@@ -78,7 +78,7 @@ class Payload implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, Str
     }
 
     /**
-     * Set the expiry claim
+     * Get the not before claim
      *
      * @return mixed|null
      */
@@ -88,7 +88,7 @@ class Payload implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, Str
     }
 
     /**
-     * Set the id claim
+     * Get the token id claim
      *
      * @return mixed|null
      */
