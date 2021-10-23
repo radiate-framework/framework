@@ -323,7 +323,6 @@ class Builder
     /**
      * Get the first record
      *
-     * @param string $column
      * @return \Radiate\Database\Model|mixed
      */
     public function first()
@@ -334,7 +333,6 @@ class Builder
     /**
      * Get the first record or throw an exception
      *
-     * @param string $column
      * @return \Radiate\Database\Model|mixed
      *
      * @throws \Radiate\Database\ModelNotFoundException
@@ -343,6 +341,23 @@ class Builder
     {
         if ($first = $this->first()) {
             return $first;
+        }
+
+        throw new ModelNotFoundException(get_class($this->model));
+    }
+
+    /**
+     * Get the first record or throw an exception
+     *
+     * @param int $id
+     * @return \Radiate\Database\Model|mixed
+     *
+     * @throws \Radiate\Database\ModelNotFoundException
+     */
+    public function findOrFail(int $id)
+    {
+        if ($found = $this->find($id)) {
+            return $found;
         }
 
         throw new ModelNotFoundException(get_class($this->model));
