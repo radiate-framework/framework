@@ -2,10 +2,9 @@
 
 namespace Radiate\Database;
 
-use Radiate\Foundation\Http\Exceptions\HttpResponseException;
-use Radiate\Http\Response;
+use RuntimeException;
 
-class ModelNotFoundException extends HttpResponseException
+class ModelNotFoundException extends RuntimeException
 {
     /**
      * Create a new model not found exception.
@@ -15,8 +14,6 @@ class ModelNotFoundException extends HttpResponseException
      */
     public function __construct(string $model)
     {
-        parent::__construct(
-            new Response("No query results for model [{$model}]", 404)
-        );
+        parent::__construct("No query results for model [{$model}]", 404);
     }
 }
