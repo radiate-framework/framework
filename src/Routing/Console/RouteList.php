@@ -95,7 +95,7 @@ class RouteList extends Command
     {
         return [
             'Method'     => implode('|', $route->methods()),
-            'URI'        => $route->uri(),
+            'URI'        => ltrim($route->namespace() . '/', '/') . $route->uri(),
             'Name'       => $route->getName(),
             'Action'     => $route->getActionName(),
             'Middleware' => implode(', ', $route->middleware()),
