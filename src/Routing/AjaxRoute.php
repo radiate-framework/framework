@@ -31,6 +31,10 @@ class AjaxRoute extends Route
     public function handle(Request $request)
     {
         return function () use ($request) {
+            $request->setRouteResolver(function () {
+                return $this;
+            });
+
             $response = $this->runRequestThroughStack($request);
 
             static::toResponse($response)->send();

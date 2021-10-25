@@ -39,6 +39,13 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
     protected $userResolver;
 
     /**
+     * The route resolver
+     *
+     * @var \Closure
+     */
+    protected $routeResolver;
+
+    /**
      * Create the request instance
      *
      * @param array $query
@@ -94,6 +101,7 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
         $request->set_cookie_params($from->get_cookie_params());
         $request->set_server_params($from->get_server_params());
         $request->setUserResolver($from->getUserResolver());
+        $request->setRouteResolver($from->getRouteResolver());
 
         return $request;
     }
@@ -196,19 +204,46 @@ class Request extends WP_REST_Request implements Arrayable, Jsonable, JsonSerial
     }
 
     /**
-     * Get the request route parameters
+     * Get the request route
      *
-     * @param string|null $key
+     * @param string|null $parameters
      * @param mixed|null $default
-     * @return mixed
+     * @return \Radiate\Routing\Route|mixed
      */
-    public function route(?string $key = null, $default = null)
+    public function route(?string $parameter = null, $default = null)
     {
-        if ($key) {
-            return $this->get_url_params()[$key] ?? $default;
+        $route = call_user_func($this->getRouteResolver());
+
+        if (is_null($route) || is_null($parameter)) {
+            return $route;
         }
 
-        return $this->get_url_params();
+        return $route->parameter($parameter, $default);
+    }
+
+    /**
+     * Set the route resolver
+     *
+     * @param \Closure $resolver
+     * @return self
+     */
+    public function setRouteResolver(Closure $resolver)
+    {
+        $this->routeResolver = $resolver;
+
+        return $this;
+    }
+
+    /**
+     * Get the route resolver
+     *
+     * @return \Closure
+     */
+    public function getRouteResolver()
+    {
+        return $this->routeResolver ?: function () {
+            //
+        };
     }
 
     /**
