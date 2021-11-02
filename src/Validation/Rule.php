@@ -17,6 +17,7 @@ class Rule
     {
         return new IsIn(...$array);
     }
+
     /**
      * Statically call the IsNotIn rule
      *
