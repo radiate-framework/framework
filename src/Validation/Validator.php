@@ -77,6 +77,7 @@ class Validator
         'ipv6'             => Rules\IsIpv6::class,
         'max'              => Rules\IsMax::class,
         'min'              => Rules\IsMin::class,
+        'not_in'           => Rules\IsNotIn::class,
         'numeric'          => Rules\IsNumeric::class,
         'posttype_exists'  => Rules\PostTypeExists::class,
         'regex'            => Rules\MatchesRegex::class,
