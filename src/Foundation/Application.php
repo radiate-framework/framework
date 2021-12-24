@@ -197,7 +197,7 @@ class Application extends Container
     public function aliases(array $aliases = [])
     {
         foreach ($aliases as $alias => $class) {
-            if ($this->registeredClassAliases[$alias]) {
+            if (isset($this->registeredClassAliases[$alias])) {
                 return;
             }
             if (class_alias($class, $alias)) {
