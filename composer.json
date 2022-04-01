@@ -5,7 +5,8 @@
   "authors": [
     {
       "name": "Ben Rutland",
-      "email": "info@benrutlandweb.co.uk"
+      "email": "info@benrutlandweb.co.uk",
+      "homepage": "https://radiate-framework.github.io/"
     }
   ],
   "minimum-stability": "dev",
