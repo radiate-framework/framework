@@ -65,6 +65,8 @@ class JsonResponse extends Response
             $content = $data->jsonSerialize();
         } elseif ($data instanceof Arrayable) {
             $content = $data->toArray();
+        } elseif (is_array($data)) {
+            $content = $data;
         } elseif (method_exists($data, 'to_array')) {
             $content = $data->to_array();
         } else {
