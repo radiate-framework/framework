@@ -7,12 +7,14 @@ use Radiate\Support\Str;
 use Radiate\View\Compilers\Concerns\CompilesComments;
 use Radiate\View\Compilers\Concerns\CompilesEchos;
 use Radiate\View\Compilers\Concerns\CompilesIncludes;
+use Radiate\View\Compilers\Concerns\CompilesLayout;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
     use CompilesComments;
     use CompilesEchos;
     use CompilesIncludes;
+    use CompilesLayout;
 
 
     protected array $compilers = [
@@ -52,7 +54,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $value = $this->addFooters($value);
         }
 
-        return $value;
+        return  $value;
     }
 
     protected function compileStatements($value)

@@ -8,10 +8,12 @@ use InvalidArgumentException;
 use Radiate\Support\Arr;
 use Radiate\Support\Markdown;
 use Radiate\Support\Str;
+use Radiate\View\Concerns\ManagesLayouts;
 
 class Factory
 {
     use Macroable;
+    use ManagesLayouts;
 
     /**
      * The engine resolver
