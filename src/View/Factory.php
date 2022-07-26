@@ -33,11 +33,10 @@ class Factory
      * @var array
      */
     protected $extensions = [
-        'md.php' => 'php',
-        'php'    => 'php',
-        'md'     => 'file',
-        'html'   => 'file',
-        'css'    => 'file',
+        'blade.php' => 'blade',
+        'php'       => 'php',
+        'html'      => 'file',
+        'css'       => 'file',
     ];
 
     /**
@@ -66,15 +65,16 @@ class Factory
      *
      * @param string $view
      * @param array $data
+     * @param array $mergeData
      * @return \Radiate\View\View
      */
-    public function make(string $view, array $data = []): View
+    public function make(string $view, array $data = [], array $mergeData = []): View
     {
         $path = $this->finder->find(
             $view = $this->normalizeName($view)
         );
 
-        return $this->viewInstance($view, $path, $data);
+        return $this->viewInstance($view, $path, $data, $mergeData);
     }
 
     /**
@@ -82,11 +82,12 @@ class Factory
      *
      * @param  string  $path
      * @param  array  $data
+     * @param array $mergeData
      * @return \Radiate\View\View
      */
-    public function file(string $path, array $data = []): View
+    public function file(string $path, array $data = [], array $mergeData = []): View
     {
-        return $this->viewInstance($path, $path, $data);
+        return $this->viewInstance($path, $path, $data, $mergeData);
     }
 
     /**
@@ -96,9 +97,9 @@ class Factory
      * @param  array  $data
      * @return \Radiate\Support\Markdown
      */
-    public function markdown(string $view, array $data = []): Markdown
+    public function markdown(string $view, array $data = [], array $mergeData = []): Markdown
     {
-        return Str::markdown($this->make($view, $data));
+        return Str::markdown($this->make($view, $data,  $mergeData));
     }
 
     /**
@@ -107,10 +108,13 @@ class Factory
      * @param string $view
      * @param string $path
      * @param array $data
+     * @param array $mergeData
      * @return \Radiate\View\View
      */
-    protected function viewInstance(string $view, string $path, array $data = []): View
+    protected function viewInstance(string $view, string $path, array $data = [], array $mergeData = []): View
     {
+        $data = array_merge($mergeData, $data);
+
         return new View($this, $this->getEngineFromPath($path), $view, $path, $data);
     }
 

@@ -3,6 +3,8 @@
 namespace Radiate\View;
 
 use Radiate\Support\ServiceProvider;
+use Radiate\View\Compliers\BladeCompiler;
+use Radiate\View\Engines\CompilerEngine;
 use Radiate\View\Engines\FileEngine;
 use Radiate\View\Engines\PhpEngine;
 
@@ -23,11 +25,16 @@ class ViewServiceProvider extends ServiceProvider
             return new Finder($app['files'], $app['config']['view.path']);
         });
 
+        $this->app->singleton('blade.compiler', function ($app) {
+            return new BladeCompiler($app['files'], $app['config']['view']['compiled']);
+        });
+
         $this->app->singleton('view.engine.resolver', function () {
             $resolver = new EngineResolver();
 
             $this->registerFileEngine($resolver);
             $this->registerPhpEngine($resolver);
+            $this->registerBladeEngine($resolver);
 
             return $resolver;
         });
@@ -56,6 +63,19 @@ class ViewServiceProvider extends ServiceProvider
     {
         $resolver->register('php', function () {
             return new PhpEngine($this->app['files']);
+        });
+    }
+
+    /**
+     * Register the blade engine
+     *
+     * @param \Radiate\View\EngineResolver $resolver
+     * @return void
+     */
+    protected function registerBladeEngine(EngineResolver $resolver): void
+    {
+        $resolver->register('php', function () {
+            return new CompilerEngine($this->app['blade.compiler'], $this->app['files']);
         });
     }
 
