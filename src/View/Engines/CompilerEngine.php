@@ -3,20 +3,21 @@
 namespace Radiate\View\Engines;
 
 use Radiate\Filesystem\Filesystem;
-use Radiate\View\Compliers\CompilerInterface;
+use Radiate\View\Compilers\CompilerInterface;
 
 class CompilerEngine extends PhpEngine
 {
     /**
      * The Blade compiler instance.
      *
-     * @var \Radiate\View\Compliers\CompilerInterface
+     * @var \Radiate\View\Compilers\CompilerInterface
      */
     protected $compiler;
 
     /**
      * Create a new file engine instance.
      *
+     * @param  \Radiate\View\Compilers\CompilerInterface  $compiler
      * @param  \Radiate\Filesystem\Filesystem  $files
      * @return void
      */

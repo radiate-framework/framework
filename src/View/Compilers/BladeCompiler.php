@@ -1,6 +1,6 @@
 <?php
 
-namespace Radiate\View\Compliers;
+namespace Radiate\View\Compilers;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {

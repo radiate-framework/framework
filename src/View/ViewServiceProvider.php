@@ -3,7 +3,7 @@
 namespace Radiate\View;
 
 use Radiate\Support\ServiceProvider;
-use Radiate\View\Compliers\BladeCompiler;
+use Radiate\View\Compilers\BladeCompiler;
 use Radiate\View\Engines\CompilerEngine;
 use Radiate\View\Engines\FileEngine;
 use Radiate\View\Engines\PhpEngine;
@@ -74,7 +74,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     protected function registerBladeEngine(EngineResolver $resolver): void
     {
-        $resolver->register('php', function () {
+        $resolver->register('blade', function () {
             return new CompilerEngine($this->app['blade.compiler'], $this->app['files']);
         });
     }

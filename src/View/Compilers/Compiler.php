@@ -1,6 +1,6 @@
 <?php
 
-namespace Radiate\View\Compliers;
+namespace Radiate\View\Compilers;
 
 use InvalidArgumentException;
 use Radiate\Filesystem\Filesystem;
